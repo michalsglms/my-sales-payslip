@@ -355,9 +355,9 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                 <div className="p-3 bg-muted/50 rounded-lg">
                   <p className="text-xs text-muted-foreground mb-1">ימי עבודה</p>
                   <p className="text-xl font-bold">{calculations.monthly.workdays}</p>
-                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                    <span>עברו {calculations.monthly.workdaysPassed}</span>
-                    <span>נותרו {calculations.monthly.workdaysRemaining}</span>
+                  <div className="mt-1 text-xs text-muted-foreground text-right space-y-0.5">
+                    <div>עברו {calculations.monthly.workdaysPassed}</div>
+                    <div>נותרו {calculations.monthly.workdaysRemaining}</div>
                   </div>
                 </div>
                 <div className="p-3 bg-green-500/10 rounded-lg">
@@ -461,9 +461,9 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                 <div className="p-3 bg-muted/50 rounded-lg">
                   <p className="text-xs text-muted-foreground mb-1">ימי עבודה</p>
                   <p className="text-xl font-bold">{calculations.quarterly.workdays}</p>
-                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                    <span>עברו {calculations.quarterly.workdaysPassed}</span>
-                    <span>נותרו {calculations.quarterly.workdaysRemaining}</span>
+                  <div className="mt-1 text-xs text-muted-foreground text-right space-y-0.5">
+                    <div>עברו {calculations.quarterly.workdaysPassed}</div>
+                    <div>נותרו {calculations.quarterly.workdaysRemaining}</div>
                   </div>
                 </div>
                 <div className="p-3 bg-green-500/10 rounded-lg">
