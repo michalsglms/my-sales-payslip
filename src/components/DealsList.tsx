@@ -23,7 +23,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Pencil, Trash2, ArrowUpDown } from "lucide-react";
+import { Pencil, Trash2, ArrowUpDown, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import EditDealDialog from "./EditDealDialog";
@@ -51,6 +51,7 @@ const DealsList = ({ deals, onDealsChange }: DealsListProps) => {
   const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
   const [deletingDealId, setDeletingDealId] = useState<string | null>(null);
   const [sortByName, setSortByName] = useState(false);
+  const [sortByDate, setSortByDate] = useState(false);
   const { toast } = useToast();
   const handleDelete = async (dealId: string) => {
     try {
@@ -106,13 +107,24 @@ const DealsList = ({ deals, onDealsChange }: DealsListProps) => {
   };
 
   const sortedDeals = useMemo(() => {
-    if (!sortByName) return deals;
-    return [...deals].sort((a, b) => {
-      const nameA = (a.client_name || "").toLowerCase();
-      const nameB = (b.client_name || "").toLowerCase();
-      return nameA.localeCompare(nameB, 'he');
-    });
-  }, [deals, sortByName]);
+    let result = [...deals];
+    
+    if (sortByName) {
+      result.sort((a, b) => {
+        const nameA = (a.client_name || "").toLowerCase();
+        const nameB = (b.client_name || "").toLowerCase();
+        return nameA.localeCompare(nameB, 'he');
+      });
+    }
+    
+    if (sortByDate) {
+      result.sort((a, b) => {
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      });
+    }
+    
+    return result;
+  }, [deals, sortByName, sortByDate]);
 
   const eqDeals = sortedDeals.filter(d => d.client_type === "EQ");
   const cfdDeals = sortedDeals.filter(d => d.client_type === "CFD");
@@ -228,14 +240,24 @@ const DealsList = ({ deals, onDealsChange }: DealsListProps) => {
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>עסקאות אחרונות</CardTitle>
-          <Button
-            variant={sortByName ? "default" : "outline"}
-            size="sm"
-            onClick={() => setSortByName(!sortByName)}
-          >
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-            מיון לפי שם
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant={sortByDate ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSortByDate(!sortByDate)}
+            >
+              <Calendar className="ml-2 h-4 w-4" />
+              מיון לפי תאריך
+            </Button>
+            <Button
+              variant={sortByName ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSortByName(!sortByName)}
+            >
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+              מיון לפי שם
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent dir="rtl">
