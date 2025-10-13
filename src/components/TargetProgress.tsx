@@ -508,7 +508,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
     if (crossedMonthly && !hasPlayedMonthlyConfetti) {
       setHasPlayedMonthlyConfetti(true);
       
-      // Check if both targets are reached
+      // Check if CFD target is also reached (regardless of when it was reached)
       if (mpCFD >= 100) {
         setCongratsMessage("כל הכבוד! הגעת לכל היעדים החודשיים שלך! 🎉🏆");
         setCongratsSubMessage("אתה יכול ללכת לים! 🌊☀️");
@@ -526,7 +526,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
     if (crossedMonthlyCFD && !hasPlayedMonthlyConfettiCFD) {
       setHasPlayedMonthlyConfettiCFD(true);
       
-      // Check if both targets are reached
+      // Check if general target is also reached (regardless of when it was reached)
       if (mp >= 100) {
         setCongratsMessage("כל הכבוד! הגעת לכל היעדים החודשיים שלך! 🎉🏆");
         setCongratsSubMessage("אתה יכול ללכת לים! 🌊☀️");
@@ -544,7 +544,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
     if (crossedQuarterly && !hasPlayedQuarterlyConfetti) {
       setHasPlayedQuarterlyConfetti(true);
       
-      // Check if both targets are reached
+      // Check if CFD target is also reached (regardless of when it was reached)
       if (qpCFD >= 100) {
         setCongratsMessage("כל הכבוד! הגעת לכל היעדים הרבעוניים שלך! 🎊🏆");
         setCongratsSubMessage("אתה יכול ללכת לים! 🌊☀️");
@@ -562,7 +562,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
     if (crossedQuarterlyCFD && !hasPlayedQuarterlyConfettiCFD) {
       setHasPlayedQuarterlyConfettiCFD(true);
       
-      // Check if both targets are reached
+      // Check if general target is also reached (regardless of when it was reached)
       if (qp >= 100) {
         setCongratsMessage("כל הכבוד! הגעת לכל היעדים הרבעוניים שלך! 🎊🏆");
         setCongratsSubMessage("אתה יכול ללכת לים! 🌊☀️");
