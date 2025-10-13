@@ -581,19 +581,21 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
               )}
             </TableRow>
           ))}
-          <TableRow className="bg-muted/50 font-bold">
-            <TableCell className="text-right">סה"כ</TableCell>
+          <TableRow className="bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 font-bold border-t-2 border-primary/30">
+            <TableCell className="text-right text-lg font-bold">סה"כ</TableCell>
             <TableCell className="text-right"></TableCell>
             <TableCell className="text-right"></TableCell>
             <TableCell className="text-right">
-              <Badge variant="outline">{dealsArray.length}</Badge>
+              <Badge variant="outline" className="text-base font-bold px-3 py-1 bg-primary/10 border-primary/30">
+                {dealsArray.length}
+              </Badge>
             </TableCell>
             <TableCell className="text-right"></TableCell>
             <TableCell className="text-right"></TableCell>
-            <TableCell className="text-right font-bold">
+            <TableCell className="text-right text-lg font-bold">
               ${totals.totalDeposit.toLocaleString()}
             </TableCell>
-            <TableCell className="text-right font-bold text-primary">
+            <TableCell className="text-right text-lg font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
               ₪{totals.totalBonus.toLocaleString()}
             </TableCell>
             <TableCell className="text-right"></TableCell>
@@ -652,10 +654,10 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
           </p>
         ) : (
           <Tabs defaultValue="all" dir="rtl">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="all">כללי</TabsTrigger>
-              <TabsTrigger value="eq">EQ</TabsTrigger>
-              <TabsTrigger value="cfd">CFD</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsTrigger value="all">כללי 📊</TabsTrigger>
+              <TabsTrigger value="eq">EQ 📈</TabsTrigger>
+              <TabsTrigger value="cfd">CFD 💹</TabsTrigger>
             </TabsList>
             <TabsContent value="all" className="mt-4">
               {renderTable(sortedDeals, allTotals)}
