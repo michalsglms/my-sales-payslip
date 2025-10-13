@@ -15,12 +15,22 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
   const [isImporting, setIsImporting] = useState(false);
 
   const getTrafficSourceCode = (label: string): "AFF" | "RFF" | "PPC" | "ORG" => {
+    // הקוד כבר מגיע באנגלית מהאקסל (ORG, AFF, RFF, PPC)
+    const upperLabel = label.trim().toUpperCase();
+    
+    // אם זה כבר אחד מהקודים התקינים, החזר אותו
+    if (upperLabel === "ORG" || upperLabel === "AFF" || upperLabel === "RFF" || upperLabel === "PPC") {
+      return upperLabel as "AFF" | "RFF" | "PPC" | "ORG";
+    }
+    
+    // אם זה טקסט בעברית, המר לקוד
     const mapping: Record<string, "AFF" | "RFF" | "PPC" | "ORG"> = {
       "הפניה": "RFF",
       "פרסום ממומן": "PPC",
       "אורגני": "ORG",
       "שיווק שותפים": "AFF",
     };
+    
     return mapping[label] || "RFF";
   };
 
