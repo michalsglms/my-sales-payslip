@@ -717,7 +717,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
               </div>
 
               <div className="border-t pt-4">
-                <h4 className="text-sm font-semibold mb-3">תחזית לסוף התקופה (קצב: {calculations.monthly.dailyRate.toFixed(1)}/יום)</h4>
+                <h4 className="text-sm font-semibold mb-3">תחזית לסוף החודש (קצב: {calculations.monthly.dailyRate.toFixed(1)}/יום)</h4>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-3 bg-muted/50 rounded-lg">
                     <p className="text-xs text-muted-foreground mb-1">יעד כללי צפוי</p>
@@ -831,7 +831,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
               </div>
 
               <div className="border-t pt-4">
-                <h4 className="text-sm font-semibold mb-3">תחזית לסוף התקופה (קצב: {calculations.quarterly.dailyRate.toFixed(1)}/יום)</h4>
+                <h4 className="text-sm font-semibold mb-3">תחזית לסוף הרבעון (קצב: {calculations.quarterly.dailyRate.toFixed(1)}/יום)</h4>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-3 bg-muted/50 rounded-lg">
                     <p className="text-xs text-muted-foreground mb-1">יעד כללי צפוי</p>
