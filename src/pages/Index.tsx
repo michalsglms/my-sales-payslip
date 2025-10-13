@@ -139,6 +139,7 @@ const Index = () => {
           deals={deals}
           monthlyTargets={monthlyTargets}
           quarterlyTargets={quarterlyTargets}
+          onTargetUpdated={fetchTargets}
         />
 
         <SalaryCalculator

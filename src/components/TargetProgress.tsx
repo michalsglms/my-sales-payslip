@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import EditTargetDialog from "@/components/EditTargetDialog";
 
 interface Deal {
   id: string;
@@ -30,9 +31,10 @@ interface TargetProgressProps {
   deals: Deal[];
   monthlyTargets: MonthlyTarget[];
   quarterlyTargets: QuarterlyTarget[];
+  onTargetUpdated: () => void;
 }
 
-const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets }: TargetProgressProps) => {
+const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdated }: TargetProgressProps) => {
   const calculations = useMemo(() => {
     const now = new Date();
     const currentMonth = now.getMonth() + 1;
@@ -157,7 +159,19 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets }: TargetProgr
     <div className="grid gap-4 md:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle>יעד חודשי</CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle>יעד חודשי</CardTitle>
+            {calculations.monthly.target && (
+              <EditTargetDialog
+                targetId={calculations.monthly.target.id}
+                targetType="monthly"
+                currentGeneralTarget={calculations.monthly.target.general_target_amount}
+                currentCfdTarget={calculations.monthly.target.cfd_target_amount}
+                period="חודשי"
+                onTargetUpdated={onTargetUpdated}
+              />
+            )}
+          </div>
         </CardHeader>
         <CardContent className="space-y-4" dir="rtl">
           {calculations.monthly.target ? (
@@ -213,7 +227,19 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets }: TargetProgr
 
       <Card>
         <CardHeader>
-          <CardTitle>יעד רבעוני</CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle>יעד רבעוני</CardTitle>
+            {calculations.quarterly.target && (
+              <EditTargetDialog
+                targetId={calculations.quarterly.target.id}
+                targetType="quarterly"
+                currentGeneralTarget={calculations.quarterly.target.general_target_amount}
+                currentCfdTarget={calculations.quarterly.target.cfd_target_amount}
+                period="רבעוני"
+                onTargetUpdated={onTargetUpdated}
+              />
+            )}
+          </div>
         </CardHeader>
         <CardContent className="space-y-4" dir="rtl">
           {calculations.quarterly.target ? (
