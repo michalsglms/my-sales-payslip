@@ -749,7 +749,12 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
               <div className="h-10 w-10 rounded-full bg-blue-500/10 flex items-center justify-center">
                 <Calendar className="h-5 w-5 text-blue-600" />
               </div>
-              <CardTitle className="text-lg">יעד רבעוני - רבעון {selectedQuarterNum}/{selectedQuarterYearNum}</CardTitle>
+              <div>
+                <CardTitle className="text-lg">יעד רבעוני</CardTitle>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  רבעון {selectedQuarterNum}/{selectedQuarterYearNum}
+                </p>
+              </div>
             </div>
             {calculations.quarterly.target && (
               <EditTargetDialog
