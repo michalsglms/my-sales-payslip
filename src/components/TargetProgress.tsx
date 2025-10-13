@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -53,6 +53,8 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
   const [targetFormOpen, setTargetFormOpen] = useState(false);
   const [hasPlayedMonthlyConfetti, setHasPlayedMonthlyConfetti] = useState(false);
   const [hasPlayedQuarterlyConfetti, setHasPlayedQuarterlyConfetti] = useState(false);
+  const prevMonthlyPct = useRef(0);
+  const prevQuarterlyPct = useRef(0);
   const now = new Date();
   const currentMonth = now.getMonth() + 1;
   const currentYear = now.getFullYear();
@@ -323,96 +325,79 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
     };
   }, [deals, monthlyTargets, quarterlyTargets, selectedYear, selectedMonth, selectedQuarterYearNum, selectedQuarterNum, currentYear, currentMonth, currentQuarter]);
 
-  // Play confetti and sound when target is reached
+  // Reset confetti flags when changing period selection
+  useEffect(() => {
+    setHasPlayedMonthlyConfetti(false);
+    setHasPlayedQuarterlyConfetti(false);
+    prevMonthlyPct.current = 0;
+    prevQuarterlyPct.current = 0;
+  }, [selectedMonth, selectedYear]);
+
+  // Play confetti and sound when target is reached (on crossing 100%)
   useEffect(() => {
     const playApplause = () => {
-      // Create a simple celebratory sound using Web Audio API
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      
-      // Create oscillator for celebratory sound
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = 523.25; // C5 note
-      oscillator.type = 'sine';
-      
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.5);
-      
-      // Add a second note for harmony
-      setTimeout(() => {
-        const osc2 = audioContext.createOscillator();
-        const gain2 = audioContext.createGain();
-        
-        osc2.connect(gain2);
-        gain2.connect(audioContext.destination);
-        
-        osc2.frequency.value = 659.25; // E5 note
-        osc2.type = 'sine';
-        
-        gain2.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-        
-        osc2.start(audioContext.currentTime);
-        osc2.stop(audioContext.currentTime + 0.5);
-      }, 200);
+      try {
+        const AudioCtx = (window as any).AudioContext || (window as any).webkitAudioContext;
+        const audioContext = new AudioCtx();
+        const osc1 = audioContext.createOscillator();
+        const gain1 = audioContext.createGain();
+        osc1.connect(gain1); gain1.connect(audioContext.destination);
+        osc1.type = 'triangle'; osc1.frequency.value = 523.25; // C5
+        gain1.gain.setValueAtTime(0.001, audioContext.currentTime);
+        gain1.gain.exponentialRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
+        gain1.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.35);
+        osc1.start(); osc1.stop(audioContext.currentTime + 0.35);
+        setTimeout(() => {
+          const osc2 = audioContext.createOscillator();
+          const gain2 = audioContext.createGain();
+          osc2.connect(gain2); gain2.connect(audioContext.destination);
+          osc2.type = 'triangle'; osc2.frequency.value = 659.25; // E5
+          gain2.gain.setValueAtTime(0.001, audioContext.currentTime);
+          gain2.gain.exponentialRampToValueAtTime(0.25, audioContext.currentTime + 0.01);
+          gain2.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.35);
+          osc2.start(); osc2.stop(audioContext.currentTime + 0.35);
+        }, 120);
+      } catch (e) {
+        console.log('Audio API not available', e);
+      }
     };
 
     const fireConfetti = () => {
-      const duration = 3000;
+      const duration = 2500;
       const animationEnd = Date.now() + duration;
-      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
-      function randomInRange(min: number, max: number) {
-        return Math.random() * (max - min) + min;
-      }
-
-      const interval: any = setInterval(function() {
+      const defaults = { startVelocity: 35, spread: 360, ticks: 60, zIndex: 2000 } as any;
+      const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+      const interval: any = setInterval(() => {
         const timeLeft = animationEnd - Date.now();
-
-        if (timeLeft <= 0) {
-          return clearInterval(interval);
-        }
-
+        if (timeLeft <= 0) return clearInterval(interval);
         const particleCount = 50 * (timeLeft / duration);
-        confetti({
-          ...defaults,
-          particleCount,
-          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
-        });
-        confetti({
-          ...defaults,
-          particleCount,
-          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
-        });
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: 0.2 } });
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: 0.2 } });
       }, 250);
     };
 
-    // Check monthly target
-    if (calculations.monthly.target && 
-        calculations.monthly.totalPercentage >= 100 && 
-        !hasPlayedMonthlyConfetti &&
-        calculations.monthly.isCurrentPeriod) {
+    const mp = calculations.monthly.totalPercentage;
+    const qp = calculations.quarterly.totalPercentage;
+
+    const crossedMonthly = mp >= 100 && prevMonthlyPct.current < 100 && !!calculations.monthly.target;
+    const crossedQuarterly = qp >= 100 && prevQuarterlyPct.current < 100 && !!calculations.quarterly.target;
+
+    console.log('Confetti check', { mp, qp, crossedMonthly, crossedQuarterly });
+
+    if (crossedMonthly && !hasPlayedMonthlyConfetti) {
       setHasPlayedMonthlyConfetti(true);
       fireConfetti();
       playApplause();
     }
 
-    // Check quarterly target
-    if (calculations.quarterly.target && 
-        calculations.quarterly.totalPercentage >= 100 && 
-        !hasPlayedQuarterlyConfetti &&
-        calculations.quarterly.isCurrentPeriod) {
+    if (crossedQuarterly && !hasPlayedQuarterlyConfetti) {
       setHasPlayedQuarterlyConfetti(true);
       fireConfetti();
       playApplause();
     }
+
+    prevMonthlyPct.current = mp;
+    prevQuarterlyPct.current = qp;
   }, [calculations, hasPlayedMonthlyConfetti, hasPlayedQuarterlyConfetti]);
 
   return (
