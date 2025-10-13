@@ -253,11 +253,11 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-accent/5" dir="rtl">
-      <header className="border-b bg-card/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+    <div className="min-h-screen bg-background" dir="rtl">
+      <header className="border-b bg-card backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-5 flex items-center justify-between">
           <div className="animate-fade-in">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold text-foreground">
               מערכת ניהול שכר
             </h1>
             <p className="text-sm text-muted-foreground mt-1">שלום, {profile.full_name} 👋</p>
@@ -265,7 +265,6 @@ const Index = () => {
           <Button 
             variant="outline" 
             onClick={signOut}
-            className="hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-all duration-300 hover:scale-105"
           >
             <LogOut className="ml-2 h-4 w-4" />
             התנתק
@@ -276,15 +275,14 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8 space-y-6">
         <div className="flex justify-between items-center animate-fade-in-up">
           <Select value={selectedMonthYear} onValueChange={setSelectedMonthYear}>
-            <SelectTrigger className="w-[200px] bg-card/80 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-all duration-300 shadow-sm hover:shadow-md">
+            <SelectTrigger className="w-[200px]">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-card/95 backdrop-blur-md z-50 border-primary/20">
+            <SelectContent className="z-50">
               {availableMonths.map((month) => (
                 <SelectItem 
                   key={month.value} 
                   value={month.value}
-                  className="hover:bg-primary/10 transition-colors"
                 >
                   {month.label}
                 </SelectItem>
