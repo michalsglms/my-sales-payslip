@@ -9,6 +9,7 @@ import DealForm from "@/components/DealForm";
 import DealsList from "@/components/DealsList";
 import TargetForm from "@/components/TargetForm";
 import TargetProgress from "@/components/TargetProgress";
+import ExportToExcel from "@/components/ExportToExcel";
 import { LogOut } from "lucide-react";
 
 const Index = () => {
@@ -128,6 +129,7 @@ const Index = () => {
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">חודש נוכחי</h2>
           <div className="flex gap-2">
+            <ExportToExcel deals={deals} userName={profile.full_name} />
             <TargetForm userId={user.id} onTargetAdded={fetchTargets} />
             <DealForm userId={user.id} onDealAdded={fetchDeals} />
           </div>
