@@ -215,6 +215,30 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
       }
     }
 
+    // Calculate projected monthly bonus (based on projected percentages)
+    let monthlyProjectedBonus = 0;
+    if (monthlyTarget && isCurrentMonth && monthWorkdaysPassed > 0) {
+      // General target bonus
+      if (monthlyProjectedPercentage >= 100) {
+        monthlyProjectedBonus += 2000;
+      } else if (monthlyProjectedPercentage >= 90) {
+        monthlyProjectedBonus += 1000;
+      }
+
+      // CFD specific bonus
+      if (monthlyProjectedCFDPercentage >= 100) {
+        monthlyProjectedBonus += 1000;
+      } else if (monthlyProjectedCFDPercentage >= 90) {
+        monthlyProjectedBonus += 500;
+      }
+
+      // 70% bonus (valid until 30.9.25)
+      const validUntil = new Date(2025, 8, 30); // September 30, 2025
+      if (now <= validUntil && monthlyProjectedPercentage >= 70) {
+        monthlyProjectedBonus += 2000;
+      }
+    }
+
     // Calculate quarterly bonuses (starts from July 2025)
     let quarterlyBonus = 0;
     const quarterlyStartDate = new Date(2025, 6, 1); // July 1, 2025
@@ -234,6 +258,24 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
       }
     }
 
+    // Calculate projected quarterly bonus (based on projected percentages)
+    let quarterlyProjectedBonus = 0;
+    if (quarterlyTarget && now >= quarterlyStartDate && isCurrentQuarter && quarterWorkdaysPassed > 0) {
+      // General target bonus
+      if (quarterlyProjectedPercentage >= 100) {
+        quarterlyProjectedBonus += 6000;
+      } else if (quarterlyProjectedPercentage >= 90) {
+        quarterlyProjectedBonus += 3000;
+      }
+
+      // CFD specific bonus
+      if (quarterlyProjectedCFDPercentage >= 100) {
+        quarterlyProjectedBonus += 3000;
+      } else if (quarterlyProjectedCFDPercentage >= 90) {
+        quarterlyProjectedBonus += 1500;
+      }
+    }
+
     return {
       monthly: {
         target: monthlyTarget,
@@ -242,6 +284,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
         totalPercentage: Math.min(monthlyPercentage, 100),
         cfdPercentage: Math.min(monthlyCFDPercentage, 100),
         bonus: monthlyBonus,
+        projectedBonus: monthlyProjectedBonus,
         workdays: monthlyTarget?.workdays_in_period || selectedMonthWorkdays,
         workdaysPassed: monthWorkdaysPassed,
         workdaysRemaining: monthWorkdaysRemaining,
@@ -259,6 +302,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
         totalPercentage: Math.min(quarterlyPercentage, 100),
         cfdPercentage: Math.min(quarterlyCFDPercentage, 100),
         bonus: quarterlyBonus,
+        projectedBonus: quarterlyProjectedBonus,
         workdays: quarterlyTarget?.workdays_in_period || selectedQuarterWorkdays,
         workdaysPassed: quarterWorkdaysPassed,
         workdaysRemaining: quarterWorkdaysRemaining,
@@ -362,13 +406,21 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                 </div>
               </div>
 
-              <div className="border-t pt-4">
+              <div className="border-t pt-4 space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="font-medium">מענק חודשי פוטנציאלי</span>
                   <span className="text-2xl font-bold text-primary">
                     ₪{calculations.monthly.bonus.toLocaleString()}
                   </span>
                 </div>
+                {calculations.monthly.isCurrentPeriod && calculations.monthly.projectedBonus > 0 && (
+                  <div className="flex justify-between items-center p-3 bg-primary/5 rounded-lg border border-primary/20">
+                    <span className="text-sm font-medium">מענק צפוי לפי הקצב הנוכחי</span>
+                    <span className="text-xl font-bold text-primary">
+                      ₪{calculations.monthly.projectedBonus.toLocaleString()}
+                    </span>
+                  </div>
+                )}
               </div>
             </>
           ) : (
@@ -469,13 +521,21 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                 </div>
               </div>
 
-              <div className="border-t pt-4">
+              <div className="border-t pt-4 space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="font-medium">מענק רבעוני פוטנציאלי</span>
                   <span className="text-2xl font-bold text-primary">
                     ₪{calculations.quarterly.bonus.toLocaleString()}
                   </span>
                 </div>
+                {calculations.quarterly.isCurrentPeriod && calculations.quarterly.projectedBonus > 0 && (
+                  <div className="flex justify-between items-center p-3 bg-primary/5 rounded-lg border border-primary/20">
+                    <span className="text-sm font-medium">מענק צפוי לפי הקצב הנוכחי</span>
+                    <span className="text-xl font-bold text-primary">
+                      ₪{calculations.quarterly.projectedBonus.toLocaleString()}
+                    </span>
+                  </div>
+                )}
               </div>
             </>
           ) : (
