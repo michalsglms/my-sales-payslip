@@ -135,6 +135,103 @@ const Index = () => {
     }
   };
 
+  // Calculate bonuses for the selected month
+  const { monthlyBonus, quarterlyBonus } = useMemo(() => {
+    const selectedQuarter = Math.ceil(selectedMonth / 3);
+    
+    // Get selected month's target
+    const monthlyTarget = monthlyTargets.find(
+      (t) => t.month === selectedMonth && t.year === selectedYear
+    );
+
+    // Get selected quarter's target
+    const quarterlyTarget = quarterlyTargets.find(
+      (t) => t.quarter === selectedQuarter && t.year === selectedYear
+    );
+
+    // Count deals for selected month
+    const monthlyDeals = deals.filter((deal: any) => deal.is_new_client);
+    const monthlyTotalCount = monthlyDeals.length;
+    const monthlyCFDCount = monthlyDeals.filter((d: any) => d.client_type === "CFD").length;
+
+    // Count deals for selected quarter
+    const quarterlyDeals = deals.filter((deal: any) => {
+      const dealDate = new Date(deal.created_at);
+      const dealMonth = dealDate.getMonth() + 1;
+      const quarterDealStartMonth = (selectedQuarter - 1) * 3 + 1;
+      return (
+        dealMonth >= quarterDealStartMonth &&
+        dealMonth < quarterDealStartMonth + 3 &&
+        dealDate.getFullYear() === selectedYear &&
+        deal.is_new_client
+      );
+    });
+
+    const quarterlyTotalCount = quarterlyDeals.length;
+    const quarterlyCFDCount = quarterlyDeals.filter((d: any) => d.client_type === "CFD").length;
+
+    // Calculate percentages
+    const monthlyPercentage = monthlyTarget
+      ? (monthlyTotalCount / monthlyTarget.general_target_amount) * 100
+      : 0;
+    const monthlyCFDPercentage = monthlyTarget
+      ? (monthlyCFDCount / monthlyTarget.cfd_target_amount) * 100
+      : 0;
+
+    const quarterlyPercentage = quarterlyTarget
+      ? (quarterlyTotalCount / quarterlyTarget.general_target_amount) * 100
+      : 0;
+    const quarterlyCFDPercentage = quarterlyTarget
+      ? (quarterlyCFDCount / quarterlyTarget.cfd_target_amount) * 100
+      : 0;
+
+    // Calculate monthly bonuses
+    let calculatedMonthlyBonus = 0;
+    if (monthlyTarget) {
+      if (monthlyPercentage >= 100) {
+        calculatedMonthlyBonus += 2000;
+      } else if (monthlyPercentage >= 90) {
+        calculatedMonthlyBonus += 1000;
+      }
+
+      if (monthlyCFDPercentage >= 100) {
+        calculatedMonthlyBonus += 1000;
+      } else if (monthlyCFDPercentage >= 90) {
+        calculatedMonthlyBonus += 500;
+      }
+
+      // 70% bonus (valid until 30.9.25)
+      const now = new Date();
+      const validUntil = new Date(2025, 8, 30);
+      if (now <= validUntil && monthlyPercentage >= 70) {
+        calculatedMonthlyBonus += 2000;
+      }
+    }
+
+    // Calculate quarterly bonuses (starts from July 2025)
+    let calculatedQuarterlyBonus = 0;
+    const now = new Date();
+    const quarterlyStartDate = new Date(2025, 6, 1);
+    if (quarterlyTarget && now >= quarterlyStartDate) {
+      if (quarterlyPercentage >= 100) {
+        calculatedQuarterlyBonus += 6000;
+      } else if (quarterlyPercentage >= 90) {
+        calculatedQuarterlyBonus += 3000;
+      }
+
+      if (quarterlyCFDPercentage >= 100) {
+        calculatedQuarterlyBonus += 3000;
+      } else if (quarterlyCFDPercentage >= 90) {
+        calculatedQuarterlyBonus += 1500;
+      }
+    }
+
+    return {
+      monthlyBonus: calculatedMonthlyBonus,
+      quarterlyBonus: calculatedQuarterlyBonus,
+    };
+  }, [deals, monthlyTargets, quarterlyTargets, selectedYear, selectedMonth]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -205,6 +302,8 @@ const Index = () => {
         <SalaryCalculator
           baseSalary={parseFloat(profile.base_salary)}
           deals={deals}
+          monthlyBonus={monthlyBonus}
+          quarterlyBonus={quarterlyBonus}
         />
 
         {dealsLoading ? (

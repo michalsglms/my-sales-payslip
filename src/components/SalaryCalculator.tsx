@@ -13,9 +13,11 @@ interface Deal {
 interface SalaryCalculatorProps {
   baseSalary: number;
   deals: Deal[];
+  monthlyBonus?: number;
+  quarterlyBonus?: number;
 }
 
-const SalaryCalculator = ({ baseSalary, deals }: SalaryCalculatorProps) => {
+const SalaryCalculator = ({ baseSalary, deals, monthlyBonus = 0, quarterlyBonus = 0 }: SalaryCalculatorProps) => {
   const calculations = useMemo(() => {
     let eqBonus = 0;
     let cfdBonus = 0;
@@ -57,17 +59,21 @@ const SalaryCalculator = ({ baseSalary, deals }: SalaryCalculatorProps) => {
     });
 
     const totalBonus = eqBonus + cfdBonus;
-    const totalSalary = baseSalary + totalBonus;
+    const targetBonuses = monthlyBonus + quarterlyBonus;
+    const totalSalary = baseSalary + totalBonus + targetBonuses;
 
     return {
       baseSalary,
       eqBonus,
       cfdBonus,
       totalBonus,
+      monthlyBonus,
+      quarterlyBonus,
+      targetBonuses,
       totalSalary,
       newClientsCount: deals.filter(d => d.is_new_client).length,
     };
-  }, [baseSalary, deals]);
+  }, [baseSalary, deals, monthlyBonus, quarterlyBonus]);
 
   return (
     <Card>
@@ -96,6 +102,19 @@ const SalaryCalculator = ({ baseSalary, deals }: SalaryCalculatorProps) => {
             <span className="font-medium">₪{calculations.cfdBonus.toLocaleString()}</span>
           </div>
         </div>
+
+        {calculations.targetBonuses > 0 && (
+          <div className="border-t pt-4 space-y-2">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">בונוס יעדים חודשי</span>
+              <span className="font-medium">₪{calculations.monthlyBonus.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">בונוס יעדים רבעוני</span>
+              <span className="font-medium">₪{calculations.quarterlyBonus.toLocaleString()}</span>
+            </div>
+          </div>
+        )}
 
         <div className="border-t pt-4">
           <div className="flex justify-between items-center">
