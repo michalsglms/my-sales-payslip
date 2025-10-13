@@ -23,7 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Settings } from "lucide-react";
+import { Pencil } from "lucide-react";
 
 const baseSalarySchema = z.object({
   base_salary: z.string().min(1, "יש להזין שכר בסיס"),
@@ -78,9 +78,8 @@ const EditBaseSalary = ({ userId, currentBaseSalary, onSalaryUpdated }: EditBase
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
-          <Settings className="ml-2 h-4 w-4" />
-          הגדרת בסיס
+        <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Pencil className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md" dir="rtl">
