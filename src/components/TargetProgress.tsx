@@ -343,15 +343,15 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
         const AudioCtx = (window as any).AudioContext || (window as any).webkitAudioContext;
         const audioContext = new AudioCtx();
         
-        // Series of celebratory sounds - fanfare style
-        const notes = [
-          { freq: 523.25, time: 0, duration: 0.15 },    // C5
-          { freq: 659.25, time: 0.15, duration: 0.15 }, // E5
-          { freq: 783.99, time: 0.3, duration: 0.2 },   // G5
-          { freq: 1046.5, time: 0.5, duration: 0.3 },   // C6 - finale!
+        // Trumpet fanfare
+        const fanfareNotes = [
+          { freq: 523.25, time: 0, duration: 0.2 },     // C5
+          { freq: 659.25, time: 0.2, duration: 0.2 },   // E5
+          { freq: 783.99, time: 0.4, duration: 0.25 },  // G5
+          { freq: 1046.5, time: 0.65, duration: 0.4 },  // C6
         ];
 
-        notes.forEach(note => {
+        fanfareNotes.forEach(note => {
           setTimeout(() => {
             const osc = audioContext.createOscillator();
             const gain = audioContext.createGain();
@@ -360,32 +360,77 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
             osc.type = 'triangle';
             osc.frequency.value = note.freq;
             gain.gain.setValueAtTime(0.001, audioContext.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.4, audioContext.currentTime + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.5, audioContext.currentTime + 0.02);
             gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + note.duration);
             osc.start();
             osc.stop(audioContext.currentTime + note.duration);
           }, note.time * 1000);
         });
 
-        // Add white noise burst for applause effect
-        [0.1, 0.3, 0.5, 0.7].forEach(time => {
+        // Massive crowd applause and cheering - much longer and louder
+        const createApplauseNoise = (startTime: number, duration: number, volume: number) => {
           setTimeout(() => {
-            const bufferSize = audioContext.sampleRate * 0.2;
-            const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-              data[i] = Math.random() * 2 - 1;
+            const bufferSize = audioContext.sampleRate * duration;
+            const buffer = audioContext.createBuffer(2, bufferSize, audioContext.sampleRate);
+            
+            // Create stereo applause with more variation
+            for (let channel = 0; channel < 2; channel++) {
+              const data = buffer.getChannelData(channel);
+              for (let i = 0; i < bufferSize; i++) {
+                // Mix of different noise patterns for realistic applause
+                const white = Math.random() * 2 - 1;
+                const brown = (i > 0 ? data[i-1] * 0.9 : 0) + white * 0.1;
+                data[i] = brown * (0.7 + Math.random() * 0.3); // Add variation
+              }
             }
+            
             const noise = audioContext.createBufferSource();
             const noiseGain = audioContext.createGain();
+            const filter = audioContext.createBiquadFilter();
+            
             noise.buffer = buffer;
-            noise.connect(noiseGain);
+            noise.connect(filter);
+            filter.connect(noiseGain);
             noiseGain.connect(audioContext.destination);
-            noiseGain.gain.setValueAtTime(0.15, audioContext.currentTime);
-            noiseGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
+            
+            // Band-pass filter for more realistic crowd sound
+            filter.type = 'bandpass';
+            filter.frequency.value = 1000;
+            filter.Q.value = 1.5;
+            
+            // Envelope for natural applause sound
+            noiseGain.gain.setValueAtTime(0.001, audioContext.currentTime);
+            noiseGain.gain.exponentialRampToValueAtTime(volume, audioContext.currentTime + 0.1);
+            noiseGain.gain.setValueAtTime(volume, audioContext.currentTime + duration * 0.7);
+            noiseGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + duration);
+            
             noise.start();
+          }, startTime * 1000);
+        };
+
+        // Create multiple overlapping applause layers for thickness
+        createApplauseNoise(0, 3.5, 0.3);      // Main applause
+        createApplauseNoise(0.1, 3.4, 0.25);   // Layer 2
+        createApplauseNoise(0.2, 3.3, 0.2);    // Layer 3
+        createApplauseNoise(0.3, 3.2, 0.15);   // Layer 4
+        
+        // Add cheering bursts
+        [0.5, 1.2, 2.0, 2.8].forEach(time => {
+          setTimeout(() => {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            osc.type = 'sawtooth';
+            osc.frequency.value = 200 + Math.random() * 300;
+            gain.gain.setValueAtTime(0.001, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.15, audioContext.currentTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioContext.currentTime + 0.3);
           }, time * 1000);
         });
+        
       } catch (e) {
         console.log('Audio API not available', e);
       }
@@ -470,17 +515,35 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
   return (
     <>
       <Dialog open={congratsDialogOpen} onOpenChange={setCongratsDialogOpen}>
-        <DialogContent className="sm:max-w-md text-center" dir="rtl">
-          <DialogHeader>
-            <DialogTitle className="text-3xl font-bold text-primary mb-4">
-              {congratsMessage}
-            </DialogTitle>
-            <DialogDescription className="text-xl">
+        <DialogContent className="sm:max-w-lg text-center border-2 border-primary/20 bg-gradient-to-br from-background via-primary/5 to-background shadow-2xl" dir="rtl">
+          <DialogHeader className="space-y-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 blur-xl animate-pulse" />
+              <DialogTitle className="relative text-4xl font-extrabold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent leading-relaxed py-2">
+                {congratsMessage}
+              </DialogTitle>
+            </div>
+            <DialogDescription className="text-2xl font-semibold text-foreground/90">
               עבודה מצוינת! המשך כך! 💪✨
             </DialogDescription>
           </DialogHeader>
-          <div className="text-6xl my-6 animate-bounce">
-            🏆
+          
+          <div className="flex justify-center items-center gap-4 my-8">
+            <div className="text-7xl animate-bounce" style={{ animationDuration: '0.6s' }}>
+              🏆
+            </div>
+            <div className="text-6xl animate-bounce" style={{ animationDuration: '0.8s', animationDelay: '0.1s' }}>
+              🎉
+            </div>
+            <div className="text-7xl animate-bounce" style={{ animationDuration: '0.7s', animationDelay: '0.2s' }}>
+              🎊
+            </div>
+          </div>
+          
+          <div className="mt-4 p-4 rounded-lg bg-primary/10 border border-primary/20">
+            <p className="text-lg font-medium text-primary">
+              אתה מדהים! 🌟
+            </p>
           </div>
         </DialogContent>
       </Dialog>
