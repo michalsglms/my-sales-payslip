@@ -253,11 +253,11 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-accent/5" dir="rtl">
       <header className="border-b bg-card/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <div className="container mx-auto px-4 py-5 flex items-center justify-between">
           <div className="animate-fade-in">
-            <h1 className="text-3xl font-bold text-foreground">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
               מערכת ניהול שכר
             </h1>
             <p className="text-sm text-muted-foreground mt-1">שלום, {profile.full_name} 👋</p>

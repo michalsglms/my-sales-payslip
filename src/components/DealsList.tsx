@@ -581,21 +581,21 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
               )}
             </TableRow>
           ))}
-          <TableRow className="bg-muted/30 font-bold border-t-2 border-primary/30">
+          <TableRow className="bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 font-bold border-t-2 border-primary/30">
             <TableCell className="text-right text-lg font-bold">סה"כ</TableCell>
             <TableCell className="text-right"></TableCell>
             <TableCell className="text-right"></TableCell>
             <TableCell className="text-right">
-              <Badge variant="outline" className="text-base font-bold px-3 py-1 bg-primary/10 border-primary">
+              <Badge variant="outline" className="text-base font-bold px-3 py-1 bg-primary/10 border-primary/30">
                 {dealsArray.length}
               </Badge>
             </TableCell>
             <TableCell className="text-right"></TableCell>
             <TableCell className="text-right"></TableCell>
-            <TableCell className="text-right text-lg font-bold text-foreground">
+            <TableCell className="text-right text-lg font-bold">
               ${totals.totalDeposit.toLocaleString()}
             </TableCell>
-            <TableCell className="text-right text-lg font-bold text-primary">
+            <TableCell className="text-right text-lg font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
               ₪{totals.totalBonus.toLocaleString()}
             </TableCell>
             <TableCell className="text-right"></TableCell>
@@ -608,10 +608,10 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
 
   return (
     <>
-      <Card className="overflow-hidden border-border shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up">
-      <CardHeader className="bg-muted/30 border-b border-border">
+      <Card className="overflow-hidden border-secondary/20 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up bg-gradient-to-br from-card via-card to-secondary/5">
+      <CardHeader className="bg-gradient-to-r from-secondary/10 via-accent/10 to-primary/10 border-b border-secondary/20">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-2xl font-bold text-foreground">
+          <CardTitle className="text-2xl bg-gradient-to-r from-secondary via-accent to-primary bg-clip-text text-transparent">
             לקוחות חדשים 📊
           </CardTitle>
           <div className="flex gap-2">

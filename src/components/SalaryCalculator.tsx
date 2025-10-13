@@ -89,10 +89,10 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
   }, [baseSalary, deals, monthlyGeneralBonus, monthlyCfdBonus, quarterlyGeneralBonus, quarterlyCfdBonus]);
 
   return (
-    <Card className="overflow-hidden border-border shadow-lg hover:shadow-xl transition-all duration-300 animate-scale-in">
-      <CardHeader className="bg-muted/30 border-b border-border">
+    <Card className="overflow-hidden border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 animate-scale-in bg-gradient-to-br from-card via-card to-primary/5">
+      <CardHeader className="bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 border-b border-primary/20">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-2xl font-bold text-foreground">
+          <CardTitle className="text-2xl bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
             חישוב השכר 💰
           </CardTitle>
           <EditBaseSalary 
@@ -104,30 +104,30 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
       </CardHeader>
       <CardContent className="space-y-4 pt-6" dir="rtl">
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1 p-4 rounded-lg bg-muted/30 border border-border hover:shadow-md transition-all duration-300">
+          <div className="space-y-1 p-4 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 hover:shadow-md transition-all duration-300">
             <p className="text-sm text-muted-foreground font-medium">שכר בסיס</p>
-            <p className="text-3xl font-bold text-foreground">
+            <p className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               ₪{calculations.baseSalary.toLocaleString()}
             </p>
           </div>
-          <div className="space-y-1 p-4 rounded-lg bg-muted/30 border border-border hover:shadow-md transition-all duration-300">
+          <div className="space-y-1 p-4 rounded-lg bg-gradient-to-br from-secondary/10 to-accent/5 border border-secondary/20 hover:shadow-md transition-all duration-300">
             <p className="text-sm text-muted-foreground font-medium">לקוחות חדשים</p>
-            <p className="text-3xl font-bold text-foreground">
+            <p className="text-3xl font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">
               {calculations.newClientsCount}
             </p>
           </div>
         </div>
 
-        <div className="border-t border-border pt-4 space-y-3">
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/30 transition-all duration-300">
+        <div className="border-t border-primary/10 pt-4 space-y-3">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-primary/5 to-transparent hover:from-primary/10 transition-all duration-300">
             <span className="text-muted-foreground font-medium">סך הכל בונוס EQ</span>
             <span className="w-16 text-center font-bold text-primary">{calculations.eqCount}</span>
-            <span className="font-bold text-lg text-foreground">₪{calculations.eqBonus.toLocaleString()}</span>
+            <span className="font-bold text-lg text-primary">₪{calculations.eqBonus.toLocaleString()}</span>
           </div>
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/20 hover:bg-muted/30 transition-all duration-300">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-secondary/5 to-transparent hover:from-secondary/10 transition-all duration-300">
             <span className="text-muted-foreground font-medium">סך הכל בונוס CFD</span>
-            <span className="w-16 text-center font-bold text-primary">{calculations.cfdCount}</span>
-            <span className="font-bold text-lg text-foreground">₪{calculations.cfdBonus.toLocaleString()}</span>
+            <span className="w-16 text-center font-bold text-secondary">{calculations.cfdCount}</span>
+            <span className="font-bold text-lg text-secondary">₪{calculations.cfdBonus.toLocaleString()}</span>
           </div>
         </div>
 
@@ -152,12 +152,12 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
           </div>
         )}
 
-        <div className="border-t-2 border-border pt-6 mt-6">
-          <div className="flex justify-between items-center p-6 rounded-xl bg-primary/5 border-2 border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 animate-bounce-in">
-            <span className="text-xl font-bold text-foreground">
+        <div className="border-t-2 border-primary/20 pt-6 mt-6">
+          <div className="flex justify-between items-center p-6 rounded-xl bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 shadow-lg hover:shadow-xl transition-all duration-300 animate-bounce-in">
+            <span className="text-xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
               סה"כ שכר צפוי 💎
             </span>
-            <span className="text-4xl font-black text-primary">
+            <span className="text-4xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
               ₪{calculations.totalSalary.toLocaleString()}
             </span>
           </div>
