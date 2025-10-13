@@ -34,6 +34,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
 
 const dealSchema = z.object({
+  client_name: z.string().min(1, "יש להזין שם לקוח"),
+  client_phone: z.string().min(1, "יש להזין טלפון לקוח"),
   client_type: z.enum(["EQ", "CFD"], { required_error: "יש לבחור סוג לקוח" }),
   traffic_source: z.enum(["AFF", "RFF", "PPC", "ORG"], { required_error: "יש לבחור מקור הגעה" }),
   initial_deposit: z.string().min(1, "יש להזין סכום הפקדה"),
@@ -60,6 +62,8 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
     try {
       const { error } = await supabase.from("deals").insert({
         sales_rep_id: userId,
+        client_name: data.client_name,
+        client_phone: data.client_phone,
         client_type: data.client_type,
         traffic_source: data.traffic_source,
         initial_deposit: parseFloat(data.initial_deposit),
@@ -102,6 +106,34 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="client_name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>שם הלקוח</FormLabel>
+                  <FormControl>
+                    <Input placeholder="הזן שם לקוח" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="client_phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>טלפון הלקוח</FormLabel>
+                  <FormControl>
+                    <Input type="tel" placeholder="הזן מספר טלפון" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="client_type"
