@@ -253,14 +253,20 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30" dir="rtl">
-      <header className="border-b bg-background">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">מערכת ניהול שכר</h1>
-            <p className="text-sm text-muted-foreground">שלום, {profile.full_name}</p>
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-accent/5" dir="rtl">
+      <header className="border-b bg-card/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <div className="container mx-auto px-4 py-5 flex items-center justify-between">
+          <div className="animate-fade-in">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+              מערכת ניהול שכר
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">שלום, {profile.full_name} 👋</p>
           </div>
-          <Button variant="outline" onClick={signOut}>
+          <Button 
+            variant="outline" 
+            onClick={signOut}
+            className="hover:bg-destructive hover:text-destructive-foreground hover:border-destructive transition-all duration-300 hover:scale-105"
+          >
             <LogOut className="ml-2 h-4 w-4" />
             התנתק
           </Button>
@@ -268,14 +274,18 @@ const Index = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center animate-fade-in-up">
           <Select value={selectedMonthYear} onValueChange={setSelectedMonthYear}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[200px] bg-card/80 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-all duration-300 shadow-sm hover:shadow-md">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-background z-50">
+            <SelectContent className="bg-card/95 backdrop-blur-md z-50 border-primary/20">
               {availableMonths.map((month) => (
-                <SelectItem key={month.value} value={month.value}>
+                <SelectItem 
+                  key={month.value} 
+                  value={month.value}
+                  className="hover:bg-primary/10 transition-colors"
+                >
                   {month.label}
                 </SelectItem>
               ))}

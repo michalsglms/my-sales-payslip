@@ -89,10 +89,12 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
   }, [baseSalary, deals, monthlyGeneralBonus, monthlyCfdBonus, quarterlyGeneralBonus, quarterlyCfdBonus]);
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="overflow-hidden border-primary/20 shadow-lg hover:shadow-xl transition-all duration-300 animate-scale-in bg-gradient-to-br from-card via-card to-primary/5">
+      <CardHeader className="bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 border-b border-primary/20">
         <div className="flex justify-between items-center">
-          <CardTitle>חישוב השכר</CardTitle>
+          <CardTitle className="text-2xl bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+            חישוב השכר 💰
+          </CardTitle>
           <EditBaseSalary 
             userId={userId} 
             currentBaseSalary={baseSalary} 
@@ -100,56 +102,62 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
           />
         </div>
       </CardHeader>
-      <CardContent className="space-y-4" dir="rtl">
+      <CardContent className="space-y-4 pt-6" dir="rtl">
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">שכר בסיס</p>
-            <p className="text-2xl font-bold">₪{calculations.baseSalary.toLocaleString()}</p>
+          <div className="space-y-1 p-4 rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 hover:shadow-md transition-all duration-300">
+            <p className="text-sm text-muted-foreground font-medium">שכר בסיס</p>
+            <p className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              ₪{calculations.baseSalary.toLocaleString()}
+            </p>
           </div>
-          <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">לקוחות חדשים</p>
-            <p className="text-2xl font-bold">{calculations.newClientsCount}</p>
+          <div className="space-y-1 p-4 rounded-lg bg-gradient-to-br from-secondary/10 to-accent/5 border border-secondary/20 hover:shadow-md transition-all duration-300">
+            <p className="text-sm text-muted-foreground font-medium">לקוחות חדשים</p>
+            <p className="text-3xl font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">
+              {calculations.newClientsCount}
+            </p>
           </div>
         </div>
 
-        <div className="border-t pt-4 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">סך הכל בונוס EQ</span>
-            <span className="w-16 text-center font-medium">{calculations.eqCount}</span>
-            <span className="font-medium">₪{calculations.eqBonus.toLocaleString()}</span>
+        <div className="border-t border-primary/10 pt-4 space-y-3">
+          <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-primary/5 to-transparent hover:from-primary/10 transition-all duration-300">
+            <span className="text-muted-foreground font-medium">סך הכל בונוס EQ</span>
+            <span className="w-16 text-center font-bold text-primary">{calculations.eqCount}</span>
+            <span className="font-bold text-lg text-primary">₪{calculations.eqBonus.toLocaleString()}</span>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">סך הכל בונוס CFD</span>
-            <span className="w-16 text-center font-medium">{calculations.cfdCount}</span>
-            <span className="font-medium">₪{calculations.cfdBonus.toLocaleString()}</span>
+          <div className="flex items-center justify-between p-3 rounded-lg bg-gradient-to-r from-secondary/5 to-transparent hover:from-secondary/10 transition-all duration-300">
+            <span className="text-muted-foreground font-medium">סך הכל בונוס CFD</span>
+            <span className="w-16 text-center font-bold text-secondary">{calculations.cfdCount}</span>
+            <span className="font-bold text-lg text-secondary">₪{calculations.cfdBonus.toLocaleString()}</span>
           </div>
         </div>
 
         {calculations.targetBonuses > 0 && (
-          <div className="border-t pt-4 space-y-2">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">מענק הגעה ליעד חודשי טוטאל</span>
-              <span className="font-medium">₪{calculations.monthlyGeneralBonus.toLocaleString()}</span>
+          <div className="border-t border-accent/10 pt-4 space-y-3">
+            <div className="flex justify-between p-3 rounded-lg bg-gradient-to-r from-accent/5 to-transparent hover:from-accent/10 transition-all duration-300">
+              <span className="text-muted-foreground font-medium">מענק הגעה ליעד חודשי טוטאל</span>
+              <span className="font-bold text-lg text-accent">₪{calculations.monthlyGeneralBonus.toLocaleString()}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">מענק הגעה ליעד חודשי CFD</span>
-              <span className="font-medium">₪{calculations.monthlyCfdBonus.toLocaleString()}</span>
+            <div className="flex justify-between p-3 rounded-lg bg-gradient-to-r from-accent/5 to-transparent hover:from-accent/10 transition-all duration-300">
+              <span className="text-muted-foreground font-medium">מענק הגעה ליעד חודשי CFD</span>
+              <span className="font-bold text-lg text-accent">₪{calculations.monthlyCfdBonus.toLocaleString()}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">מענק הגעה ליעד רבעוני טוטאל</span>
-              <span className="font-medium">₪{calculations.quarterlyGeneralBonus.toLocaleString()}</span>
+            <div className="flex justify-between p-3 rounded-lg bg-gradient-to-r from-primary/5 to-transparent hover:from-primary/10 transition-all duration-300">
+              <span className="text-muted-foreground font-medium">מענק הגעה ליעד רבעוני טוטאל</span>
+              <span className="font-bold text-lg text-primary">₪{calculations.quarterlyGeneralBonus.toLocaleString()}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">מענק הגעה ליעד רבעוני CFD</span>
-              <span className="font-medium">₪{calculations.quarterlyCfdBonus.toLocaleString()}</span>
+            <div className="flex justify-between p-3 rounded-lg bg-gradient-to-r from-primary/5 to-transparent hover:from-primary/10 transition-all duration-300">
+              <span className="text-muted-foreground font-medium">מענק הגעה ליעד רבעוני CFD</span>
+              <span className="font-bold text-lg text-primary">₪{calculations.quarterlyCfdBonus.toLocaleString()}</span>
             </div>
           </div>
         )}
 
-        <div className="border-t pt-4">
-          <div className="flex justify-between items-center">
-            <span className="text-lg font-semibold">סה"כ שכר צפוי</span>
-            <span className="text-3xl font-bold text-primary">
+        <div className="border-t-2 border-primary/20 pt-6 mt-6">
+          <div className="flex justify-between items-center p-6 rounded-xl bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 shadow-lg hover:shadow-xl transition-all duration-300 animate-bounce-in">
+            <span className="text-xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+              סה"כ שכר צפוי 💎
+            </span>
+            <span className="text-4xl font-black bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
               ₪{calculations.totalSalary.toLocaleString()}
             </span>
           </div>

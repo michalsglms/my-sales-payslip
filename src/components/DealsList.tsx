@@ -604,16 +604,19 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
 
   return (
     <>
-      <Card>
-      <CardHeader>
+      <Card className="overflow-hidden border-secondary/20 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up bg-gradient-to-br from-card via-card to-secondary/5">
+      <CardHeader className="bg-gradient-to-r from-secondary/10 via-accent/10 to-primary/10 border-b border-secondary/20">
         <div className="flex justify-between items-center">
-          <CardTitle>לקוחות חדשים</CardTitle>
+          <CardTitle className="text-2xl bg-gradient-to-r from-secondary via-accent to-primary bg-clip-text text-transparent">
+            לקוחות חדשים 📊
+          </CardTitle>
           <div className="flex gap-2">
             {!isAddingDeal && (
               <Button
                 variant="default"
                 size="sm"
                 onClick={() => setIsAddingDeal(true)}
+                className="shadow-md hover:shadow-lg"
               >
                 <Plus className="ml-2 h-4 w-4" />
                 הוסף לקוח חדש
@@ -623,6 +626,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
               variant={sortByDate ? "default" : "outline"}
               size="sm"
               onClick={() => setSortByDate(!sortByDate)}
+              className="shadow-sm hover:shadow-md"
             >
               <Calendar className="ml-2 h-4 w-4" />
               מיון לפי תאריך
@@ -631,6 +635,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
               variant={sortByName ? "default" : "outline"}
               size="sm"
               onClick={() => setSortByName(!sortByName)}
+              className="shadow-sm hover:shadow-md"
             >
               <ArrowUpDown className="ml-2 h-4 w-4" />
               מיון לפי שם
