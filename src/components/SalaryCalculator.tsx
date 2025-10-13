@@ -36,8 +36,8 @@ const SalaryCalculator = ({ baseSalary, deals }: SalaryCalculatorProps) => {
         }
       }
 
-      // Deposit bonus for EQ clients with $10,000+
-      if (deal.client_type === "EQ" && deal.initial_deposit >= 10000 && deal.completed_within_4_days) {
+      // Additional 500 ILS bonus ONLY for EQ clients with $10,000+ (not CFD)
+      if (deal.client_type === "EQ" && deal.initial_deposit >= 10000) {
         depositBonus += 500;
       }
     });
@@ -78,7 +78,7 @@ const SalaryCalculator = ({ baseSalary, deals }: SalaryCalculatorProps) => {
             <span className="font-medium">₪{calculations.trafficSourceBonus.toLocaleString()}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">תוספת הפקדה $10K+</span>
+            <span className="text-muted-foreground">תוספת EQ על $10K+</span>
             <span className="font-medium">₪{calculations.depositBonus.toLocaleString()}</span>
           </div>
         </div>
