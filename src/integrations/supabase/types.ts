@@ -16,7 +16,6 @@ export type Database = {
     Tables: {
       deals: {
         Row: {
-          campaign: string | null
           client_link: string | null
           client_name: string | null
           client_phone: string | null
@@ -31,7 +30,6 @@ export type Database = {
           traffic_source: string
         }
         Insert: {
-          campaign?: string | null
           client_link?: string | null
           client_name?: string | null
           client_phone?: string | null
@@ -46,7 +44,6 @@ export type Database = {
           traffic_source: string
         }
         Update: {
-          campaign?: string | null
           client_link?: string | null
           client_name?: string | null
           client_phone?: string | null
