@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -51,6 +52,8 @@ interface TargetProgressProps {
 
 const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdated, selectedYear, selectedMonth, userId }: TargetProgressProps) => {
   const [targetFormOpen, setTargetFormOpen] = useState(false);
+  const [congratsDialogOpen, setCongratsDialogOpen] = useState(false);
+  const [congratsMessage, setCongratsMessage] = useState("");
   const [hasPlayedMonthlyConfetti, setHasPlayedMonthlyConfetti] = useState(false);
   const [hasPlayedQuarterlyConfetti, setHasPlayedQuarterlyConfetti] = useState(false);
   const prevMonthlyPct = useRef(0);
@@ -446,12 +449,16 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
 
     if (crossedMonthly && !hasPlayedMonthlyConfetti) {
       setHasPlayedMonthlyConfetti(true);
+      setCongratsMessage("כל הכבוד! הגעת ליעד החודשי שלך! 🎉");
+      setCongratsDialogOpen(true);
       fireConfetti();
       playApplause();
     }
 
     if (crossedQuarterly && !hasPlayedQuarterlyConfetti) {
       setHasPlayedQuarterlyConfetti(true);
+      setCongratsMessage("כל הכבוד! הגעת ליעד הרבעוני שלך! 🎊");
+      setCongratsDialogOpen(true);
       fireConfetti();
       playApplause();
     }
@@ -462,6 +469,22 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
 
   return (
     <>
+      <Dialog open={congratsDialogOpen} onOpenChange={setCongratsDialogOpen}>
+        <DialogContent className="sm:max-w-md text-center" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="text-3xl font-bold text-primary mb-4">
+              {congratsMessage}
+            </DialogTitle>
+            <DialogDescription className="text-xl">
+              עבודה מצוינת! המשך כך! 💪✨
+            </DialogDescription>
+          </DialogHeader>
+          <div className="text-6xl my-6 animate-bounce">
+            🏆
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <div className="grid gap-4 md:grid-cols-2">
         <Card 
           className={!calculations.monthly.target ? "cursor-pointer hover:bg-muted/50 transition-colors border-2 border-dashed" : ""}
