@@ -507,14 +507,15 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
 
     if (crossedMonthly && !hasPlayedMonthlyConfetti) {
       setHasPlayedMonthlyConfetti(true);
-      setCongratsMessage("כל הכבוד! הגעת ליעד הכללי החודשי שלך! 🎉");
       
-      // Check if CFD target not yet reached
-      if (calculations.monthly.target && mpCFD < 100) {
-        const remaining = calculations.monthly.target.cfd_target_amount - calculations.monthly.cfdCount;
-        setCongratsSubMessage(`נשאר לך עוד ${remaining} לקוחות CFD כדי להגיע ליעד CFD החודשי! 💪`);
+      // Check if both targets are reached
+      if (mpCFD >= 100) {
+        setCongratsMessage("כל הכבוד! הגעת לכל היעדים החודשיים שלך! 🎉🏆");
+        setCongratsSubMessage("אתה יכול ללכת לים! 🌊☀️");
       } else {
-        setCongratsSubMessage("");
+        setCongratsMessage("כל הכבוד! הגעת ליעד הכללי החודשי שלך! 🎉");
+        const remaining = calculations.monthly.target!.cfd_target_amount - calculations.monthly.cfdCount;
+        setCongratsSubMessage(`נשאר לך עוד ${remaining} לקוחות CFD כדי להגיע ליעד CFD החודשי! 💪`);
       }
       
       setCongratsDialogOpen(true);
@@ -524,14 +525,15 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
 
     if (crossedMonthlyCFD && !hasPlayedMonthlyConfettiCFD) {
       setHasPlayedMonthlyConfettiCFD(true);
-      setCongratsMessage("כל הכבוד! הגעת ליעד CFD החודשי שלך! 🎉");
       
-      // Check if general target not yet reached
-      if (calculations.monthly.target && mp < 100) {
-        const remaining = calculations.monthly.target.general_target_amount - calculations.monthly.totalCount;
-        setCongratsSubMessage(`נשאר לך עוד ${remaining} לקוחות כדי להגיע ליעד הכללי החודשי! 💪`);
+      // Check if both targets are reached
+      if (mp >= 100) {
+        setCongratsMessage("כל הכבוד! הגעת לכל היעדים החודשיים שלך! 🎉🏆");
+        setCongratsSubMessage("אתה יכול ללכת לים! 🌊☀️");
       } else {
-        setCongratsSubMessage("");
+        setCongratsMessage("כל הכבוד! הגעת ליעד CFD החודשי שלך! 🎉");
+        const remaining = calculations.monthly.target!.general_target_amount - calculations.monthly.totalCount;
+        setCongratsSubMessage(`נשאר לך עוד ${remaining} לקוחות כדי להגיע ליעד הכללי החודשי! 💪`);
       }
       
       setCongratsDialogOpen(true);
@@ -541,14 +543,15 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
 
     if (crossedQuarterly && !hasPlayedQuarterlyConfetti) {
       setHasPlayedQuarterlyConfetti(true);
-      setCongratsMessage("כל הכבוד! הגעת ליעד הכללי הרבעוני שלך! 🎊");
       
-      // Check if CFD target not yet reached
-      if (calculations.quarterly.target && qpCFD < 100) {
-        const remaining = calculations.quarterly.target.cfd_target_amount - calculations.quarterly.cfdCount;
-        setCongratsSubMessage(`נשאר לך עוד ${remaining} לקוחות CFD כדי להגיע ליעד CFD הרבעוני! 💪`);
+      // Check if both targets are reached
+      if (qpCFD >= 100) {
+        setCongratsMessage("כל הכבוד! הגעת לכל היעדים הרבעוניים שלך! 🎊🏆");
+        setCongratsSubMessage("אתה יכול ללכת לים! 🌊☀️");
       } else {
-        setCongratsSubMessage("");
+        setCongratsMessage("כל הכבוד! הגעת ליעד הכללי הרבעוני שלך! 🎊");
+        const remaining = calculations.quarterly.target!.cfd_target_amount - calculations.quarterly.cfdCount;
+        setCongratsSubMessage(`נשאר לך עוד ${remaining} לקוחות CFD כדי להגיע ליעד CFD הרבעוני! 💪`);
       }
       
       setCongratsDialogOpen(true);
@@ -558,14 +561,15 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
 
     if (crossedQuarterlyCFD && !hasPlayedQuarterlyConfettiCFD) {
       setHasPlayedQuarterlyConfettiCFD(true);
-      setCongratsMessage("כל הכבוד! הגעת ליעד CFD הרבעוני שלך! 🎊");
       
-      // Check if general target not yet reached
-      if (calculations.quarterly.target && qp < 100) {
-        const remaining = calculations.quarterly.target.general_target_amount - calculations.quarterly.totalCount;
-        setCongratsSubMessage(`נשאר לך עוד ${remaining} לקוחות כדי להגיע ליעד הכללי הרבעוני! 💪`);
+      // Check if both targets are reached
+      if (qp >= 100) {
+        setCongratsMessage("כל הכבוד! הגעת לכל היעדים הרבעוניים שלך! 🎊🏆");
+        setCongratsSubMessage("אתה יכול ללכת לים! 🌊☀️");
       } else {
-        setCongratsSubMessage("");
+        setCongratsMessage("כל הכבוד! הגעת ליעד CFD הרבעוני שלך! 🎊");
+        const remaining = calculations.quarterly.target!.general_target_amount - calculations.quarterly.totalCount;
+        setCongratsSubMessage(`נשאר לך עוד ${remaining} לקוחות כדי להגיע ליעד הכללי הרבעוני! 💪`);
       }
       
       setCongratsDialogOpen(true);
