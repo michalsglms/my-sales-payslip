@@ -14,14 +14,16 @@ interface MonthlyTarget {
   id: string;
   month: number;
   year: number;
-  target_amount: number;
+  general_target_amount: number;
+  cfd_target_amount: number;
 }
 
 interface QuarterlyTarget {
   id: string;
   quarter: number;
   year: number;
-  target_amount: number;
+  general_target_amount: number;
+  cfd_target_amount: number;
 }
 
 interface TargetProgressProps {
@@ -73,19 +75,19 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets }: TargetProgr
     const monthlyTotalCount = monthlyDeals.length;
     const monthlyCFDCount = monthlyDeals.filter((d) => d.client_type === "CFD").length;
     const monthlyPercentage = monthlyTarget
-      ? (monthlyTotalCount / monthlyTarget.target_amount) * 100
+      ? (monthlyTotalCount / monthlyTarget.general_target_amount) * 100
       : 0;
     const monthlyCFDPercentage = monthlyTarget
-      ? (monthlyCFDCount / monthlyTarget.target_amount) * 100
+      ? (monthlyCFDCount / monthlyTarget.cfd_target_amount) * 100
       : 0;
 
     const quarterlyTotalCount = quarterlyDeals.length;
     const quarterlyCFDCount = quarterlyDeals.filter((d) => d.client_type === "CFD").length;
     const quarterlyPercentage = quarterlyTarget
-      ? (quarterlyTotalCount / quarterlyTarget.target_amount) * 100
+      ? (quarterlyTotalCount / quarterlyTarget.general_target_amount) * 100
       : 0;
     const quarterlyCFDPercentage = quarterlyTarget
-      ? (quarterlyCFDCount / quarterlyTarget.target_amount) * 100
+      ? (quarterlyCFDCount / quarterlyTarget.cfd_target_amount) * 100
       : 0;
 
     // Calculate monthly bonuses
@@ -164,7 +166,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets }: TargetProgr
                 <div className="flex justify-between text-sm">
                   <span>יעד כללי (EQ + CFD)</span>
                   <span className="font-medium">
-                    {calculations.monthly.totalCount} / {calculations.monthly.target.target_amount}
+                    {calculations.monthly.totalCount} / {calculations.monthly.target.general_target_amount}
                   </span>
                 </div>
                 <Progress value={calculations.monthly.totalPercentage} />
@@ -180,7 +182,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets }: TargetProgr
                 <div className="flex justify-between text-sm">
                   <span>יעד CFD</span>
                   <span className="font-medium">
-                    {calculations.monthly.cfdCount} / {calculations.monthly.target.target_amount}
+                    {calculations.monthly.cfdCount} / {calculations.monthly.target.cfd_target_amount}
                   </span>
                 </div>
                 <Progress value={calculations.monthly.cfdPercentage} />
@@ -221,7 +223,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets }: TargetProgr
                   <span>יעד כללי (EQ + CFD)</span>
                   <span className="font-medium">
                     {calculations.quarterly.totalCount} /{" "}
-                    {calculations.quarterly.target.target_amount}
+                    {calculations.quarterly.target.general_target_amount}
                   </span>
                 </div>
                 <Progress value={calculations.quarterly.totalPercentage} />
@@ -238,7 +240,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets }: TargetProgr
                   <span>יעד CFD</span>
                   <span className="font-medium">
                     {calculations.quarterly.cfdCount} /{" "}
-                    {calculations.quarterly.target.target_amount}
+                    {calculations.quarterly.target.cfd_target_amount}
                   </span>
                 </div>
                 <Progress value={calculations.quarterly.cfdPercentage} />

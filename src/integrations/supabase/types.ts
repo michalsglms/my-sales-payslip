@@ -63,27 +63,30 @@ export type Database = {
       }
       monthly_targets: {
         Row: {
+          cfd_target_amount: number | null
           created_at: string
+          general_target_amount: number
           id: string
           month: number
           sales_rep_id: string
-          target_amount: number
           year: number
         }
         Insert: {
+          cfd_target_amount?: number | null
           created_at?: string
+          general_target_amount: number
           id?: string
           month: number
           sales_rep_id: string
-          target_amount: number
           year: number
         }
         Update: {
+          cfd_target_amount?: number | null
           created_at?: string
+          general_target_amount?: number
           id?: string
           month?: number
           sales_rep_id?: string
-          target_amount?: number
           year?: number
         }
         Relationships: [
@@ -122,27 +125,30 @@ export type Database = {
       }
       quarterly_targets: {
         Row: {
+          cfd_target_amount: number | null
           created_at: string
+          general_target_amount: number
           id: string
           quarter: number
           sales_rep_id: string
-          target_amount: number
           year: number
         }
         Insert: {
+          cfd_target_amount?: number | null
           created_at?: string
+          general_target_amount: number
           id?: string
           quarter: number
           sales_rep_id: string
-          target_amount: number
           year: number
         }
         Update: {
+          cfd_target_amount?: number | null
           created_at?: string
+          general_target_amount?: number
           id?: string
           quarter?: number
           sales_rep_id?: string
-          target_amount?: number
           year?: number
         }
         Relationships: [

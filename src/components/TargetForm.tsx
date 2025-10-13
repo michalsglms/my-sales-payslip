@@ -29,13 +29,15 @@ import { Target } from "lucide-react";
 const monthlyTargetSchema = z.object({
   month: z.string().min(1, "יש לבחור חודש"),
   year: z.string().min(1, "יש לבחור שנה"),
-  target_amount: z.string().min(1, "יש להזין יעד"),
+  general_target_amount: z.string().min(1, "יש להזין יעד כללי"),
+  cfd_target_amount: z.string().min(1, "יש להזין יעד CFD"),
 });
 
 const quarterlyTargetSchema = z.object({
   quarter: z.string().min(1, "יש לבחור רבעון"),
   year: z.string().min(1, "יש לבחור שנה"),
-  target_amount: z.string().min(1, "יש להזין יעד"),
+  general_target_amount: z.string().min(1, "יש להזין יעד כללי"),
+  cfd_target_amount: z.string().min(1, "יש להזין יעד CFD"),
 });
 
 type MonthlyTargetValues = z.infer<typeof monthlyTargetSchema>;
@@ -64,7 +66,8 @@ const TargetForm = ({ userId, onTargetAdded }: TargetFormProps) => {
         sales_rep_id: userId,
         month: parseInt(data.month),
         year: parseInt(data.year),
-        target_amount: parseFloat(data.target_amount),
+        general_target_amount: parseFloat(data.general_target_amount),
+        cfd_target_amount: parseFloat(data.cfd_target_amount),
       });
 
       if (error) throw error;
@@ -92,7 +95,8 @@ const TargetForm = ({ userId, onTargetAdded }: TargetFormProps) => {
         sales_rep_id: userId,
         quarter: parseInt(data.quarter),
         year: parseInt(data.year),
-        target_amount: parseFloat(data.target_amount),
+        general_target_amount: parseFloat(data.general_target_amount),
+        cfd_target_amount: parseFloat(data.cfd_target_amount),
       });
 
       if (error) throw error;
@@ -165,14 +169,28 @@ const TargetForm = ({ userId, onTargetAdded }: TargetFormProps) => {
                 </div>
                 <FormField
                   control={monthlyForm.control}
-                  name="target_amount"
+                  name="general_target_amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>יעד כמותי (מספר לקוחות)</FormLabel>
+                      <FormLabel>יעד כללי כמותי (מספר לקוחות EQ+CFD)</FormLabel>
                       <FormControl>
                         <Input type="number" placeholder="10" {...field} />
                       </FormControl>
-                      <FormDescription>מספר הלקוחות החדשים ליעד</FormDescription>
+                      <FormDescription>מספר סך כל הלקוחות החדשים ליעד</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={monthlyForm.control}
+                  name="cfd_target_amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>יעד CFD כמותי (מספר לקוחות CFD בלבד)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="5" {...field} />
+                      </FormControl>
+                      <FormDescription>מספר לקוחות CFD בלבד ליעד</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -216,14 +234,28 @@ const TargetForm = ({ userId, onTargetAdded }: TargetFormProps) => {
                 </div>
                 <FormField
                   control={quarterlyForm.control}
-                  name="target_amount"
+                  name="general_target_amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>יעד כמותי (מספר לקוחות)</FormLabel>
+                      <FormLabel>יעד כללי כמותי (מספר לקוחות EQ+CFD)</FormLabel>
                       <FormControl>
                         <Input type="number" placeholder="30" {...field} />
                       </FormControl>
-                      <FormDescription>מספר הלקוחות החדשים ליעד</FormDescription>
+                      <FormDescription>מספר סך כל הלקוחות החדשים ליעד</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={quarterlyForm.control}
+                  name="cfd_target_amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>יעד CFD כמותי (מספר לקוחות CFD בלבד)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="15" {...field} />
+                      </FormControl>
+                      <FormDescription>מספר לקוחות CFD בלבד ליעד</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
