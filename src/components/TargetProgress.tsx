@@ -510,7 +510,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
       
       // Check if CFD target is also reached (regardless of when it was reached)
       if (mpCFD >= 100) {
-        setCongratsMessage("כל הכבוד! הגעת לכל היעדים החודשיים שלך! 🎉🏆");
+        setCongratsMessage("כל הכבוד! הגעת לכל היעדים החודש! 🎉🏆");
         setCongratsSubMessage("אתה יכול ללכת לים! 🌊☀️");
       } else {
         setCongratsMessage("כל הכבוד! הגעת ליעד הכללי החודשי שלך! 🎉");
@@ -528,7 +528,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
       
       // Check if general target is also reached (regardless of when it was reached)
       if (mp >= 100) {
-        setCongratsMessage("כל הכבוד! הגעת לכל היעדים החודשיים שלך! 🎉🏆");
+        setCongratsMessage("כל הכבוד! הגעת לכל היעדים החודש! 🎉🏆");
         setCongratsSubMessage("אתה יכול ללכת לים! 🌊☀️");
       } else {
         setCongratsMessage("כל הכבוד! הגעת ליעד CFD החודשי שלך! 🎉");
@@ -546,7 +546,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
       
       // Check if CFD target is also reached (regardless of when it was reached)
       if (qpCFD >= 100) {
-        setCongratsMessage("כל הכבוד! הגעת לכל היעדים הרבעוניים שלך! 🎊🏆");
+        setCongratsMessage("כל הכבוד! הגעת לכל היעדים ברבעון! 🎊🏆");
         setCongratsSubMessage("אתה יכול ללכת לים! 🌊☀️");
       } else {
         setCongratsMessage("כל הכבוד! הגעת ליעד הכללי הרבעוני שלך! 🎊");
@@ -564,7 +564,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
       
       // Check if general target is also reached (regardless of when it was reached)
       if (qp >= 100) {
-        setCongratsMessage("כל הכבוד! הגעת לכל היעדים הרבעוניים שלך! 🎊🏆");
+        setCongratsMessage("כל הכבוד! הגעת לכל היעדים ברבעון! 🎊🏆");
         setCongratsSubMessage("אתה יכול ללכת לים! 🌊☀️");
       } else {
         setCongratsMessage("כל הכבוד! הגעת ליעד CFD הרבעוני שלך! 🎊");
