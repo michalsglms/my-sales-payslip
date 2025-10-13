@@ -55,9 +55,13 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
   const [congratsDialogOpen, setCongratsDialogOpen] = useState(false);
   const [congratsMessage, setCongratsMessage] = useState("");
   const [hasPlayedMonthlyConfetti, setHasPlayedMonthlyConfetti] = useState(false);
+  const [hasPlayedMonthlyConfettiCFD, setHasPlayedMonthlyConfettiCFD] = useState(false);
   const [hasPlayedQuarterlyConfetti, setHasPlayedQuarterlyConfetti] = useState(false);
+  const [hasPlayedQuarterlyConfettiCFD, setHasPlayedQuarterlyConfettiCFD] = useState(false);
   const prevMonthlyPct = useRef(0);
+  const prevMonthlyPctCFD = useRef(0);
   const prevQuarterlyPct = useRef(0);
+  const prevQuarterlyPctCFD = useRef(0);
   const now = new Date();
   const currentMonth = now.getMonth() + 1;
   const currentYear = now.getFullYear();
@@ -331,9 +335,13 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
   // Reset confetti flags when changing period selection
   useEffect(() => {
     setHasPlayedMonthlyConfetti(false);
+    setHasPlayedMonthlyConfettiCFD(false);
     setHasPlayedQuarterlyConfetti(false);
+    setHasPlayedQuarterlyConfettiCFD(false);
     prevMonthlyPct.current = 0;
+    prevMonthlyPctCFD.current = 0;
     prevQuarterlyPct.current = 0;
+    prevQuarterlyPctCFD.current = 0;
   }, [selectedMonth, selectedYear]);
 
   // Play confetti and sound when target is reached (on crossing 100%)
@@ -485,16 +493,28 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
     };
 
     const mp = calculations.monthly.totalPercentage;
+    const mpCFD = calculations.monthly.cfdPercentage;
     const qp = calculations.quarterly.totalPercentage;
+    const qpCFD = calculations.quarterly.cfdPercentage;
 
     const crossedMonthly = mp >= 100 && prevMonthlyPct.current < 100 && !!calculations.monthly.target;
+    const crossedMonthlyCFD = mpCFD >= 100 && prevMonthlyPctCFD.current < 100 && !!calculations.monthly.target;
     const crossedQuarterly = qp >= 100 && prevQuarterlyPct.current < 100 && !!calculations.quarterly.target;
+    const crossedQuarterlyCFD = qpCFD >= 100 && prevQuarterlyPctCFD.current < 100 && !!calculations.quarterly.target;
 
-    console.log('Confetti check', { mp, qp, crossedMonthly, crossedQuarterly });
+    console.log('Confetti check', { mp, mpCFD, qp, qpCFD, crossedMonthly, crossedMonthlyCFD, crossedQuarterly, crossedQuarterlyCFD });
 
     if (crossedMonthly && !hasPlayedMonthlyConfetti) {
       setHasPlayedMonthlyConfetti(true);
-      setCongratsMessage("כל הכבוד! הגעת ליעד החודשי שלך! 🎉");
+      setCongratsMessage("כל הכבוד! הגעת ליעד הכללי החודשי שלך! 🎉");
+      setCongratsDialogOpen(true);
+      fireConfetti();
+      playApplause();
+    }
+
+    if (crossedMonthlyCFD && !hasPlayedMonthlyConfettiCFD) {
+      setHasPlayedMonthlyConfettiCFD(true);
+      setCongratsMessage("כל הכבוד! הגעת ליעד CFD החודשי שלך! 🎉");
       setCongratsDialogOpen(true);
       fireConfetti();
       playApplause();
@@ -502,15 +522,25 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
 
     if (crossedQuarterly && !hasPlayedQuarterlyConfetti) {
       setHasPlayedQuarterlyConfetti(true);
-      setCongratsMessage("כל הכבוד! הגעת ליעד הרבעוני שלך! 🎊");
+      setCongratsMessage("כל הכבוד! הגעת ליעד הכללי הרבעוני שלך! 🎊");
+      setCongratsDialogOpen(true);
+      fireConfetti();
+      playApplause();
+    }
+
+    if (crossedQuarterlyCFD && !hasPlayedQuarterlyConfettiCFD) {
+      setHasPlayedQuarterlyConfettiCFD(true);
+      setCongratsMessage("כל הכבוד! הגעת ליעד CFD הרבעוני שלך! 🎊");
       setCongratsDialogOpen(true);
       fireConfetti();
       playApplause();
     }
 
     prevMonthlyPct.current = mp;
+    prevMonthlyPctCFD.current = mpCFD;
     prevQuarterlyPct.current = qp;
-  }, [calculations, hasPlayedMonthlyConfetti, hasPlayedQuarterlyConfetti]);
+    prevQuarterlyPctCFD.current = qpCFD;
+  }, [calculations, hasPlayedMonthlyConfetti, hasPlayedMonthlyConfettiCFD, hasPlayedQuarterlyConfetti, hasPlayedQuarterlyConfettiCFD]);
 
   return (
     <>
