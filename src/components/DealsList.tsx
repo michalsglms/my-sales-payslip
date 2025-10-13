@@ -123,7 +123,9 @@ const DealsList = ({ deals }: DealsListProps) => {
           ))}
           <TableRow className="bg-muted/50 font-bold">
             <TableCell className="text-right">סה"כ</TableCell>
-            <TableCell className="text-center">{dealsArray.length} עסקאות</TableCell>
+            <TableCell>
+              <Badge variant="outline">{dealsArray.length}</Badge>
+            </TableCell>
             <TableCell></TableCell>
             <TableCell className="font-bold">
               ${totals.totalDeposit.toLocaleString()}
