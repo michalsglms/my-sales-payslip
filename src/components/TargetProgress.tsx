@@ -339,41 +339,101 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
       try {
         const AudioCtx = (window as any).AudioContext || (window as any).webkitAudioContext;
         const audioContext = new AudioCtx();
-        const osc1 = audioContext.createOscillator();
-        const gain1 = audioContext.createGain();
-        osc1.connect(gain1); gain1.connect(audioContext.destination);
-        osc1.type = 'triangle'; osc1.frequency.value = 523.25; // C5
-        gain1.gain.setValueAtTime(0.001, audioContext.currentTime);
-        gain1.gain.exponentialRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
-        gain1.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.35);
-        osc1.start(); osc1.stop(audioContext.currentTime + 0.35);
-        setTimeout(() => {
-          const osc2 = audioContext.createOscillator();
-          const gain2 = audioContext.createGain();
-          osc2.connect(gain2); gain2.connect(audioContext.destination);
-          osc2.type = 'triangle'; osc2.frequency.value = 659.25; // E5
-          gain2.gain.setValueAtTime(0.001, audioContext.currentTime);
-          gain2.gain.exponentialRampToValueAtTime(0.25, audioContext.currentTime + 0.01);
-          gain2.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.35);
-          osc2.start(); osc2.stop(audioContext.currentTime + 0.35);
-        }, 120);
+        
+        // Series of celebratory sounds - fanfare style
+        const notes = [
+          { freq: 523.25, time: 0, duration: 0.15 },    // C5
+          { freq: 659.25, time: 0.15, duration: 0.15 }, // E5
+          { freq: 783.99, time: 0.3, duration: 0.2 },   // G5
+          { freq: 1046.5, time: 0.5, duration: 0.3 },   // C6 - finale!
+        ];
+
+        notes.forEach(note => {
+          setTimeout(() => {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            osc.type = 'triangle';
+            osc.frequency.value = note.freq;
+            gain.gain.setValueAtTime(0.001, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.4, audioContext.currentTime + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + note.duration);
+            osc.start();
+            osc.stop(audioContext.currentTime + note.duration);
+          }, note.time * 1000);
+        });
+
+        // Add white noise burst for applause effect
+        [0.1, 0.3, 0.5, 0.7].forEach(time => {
+          setTimeout(() => {
+            const bufferSize = audioContext.sampleRate * 0.2;
+            const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+              data[i] = Math.random() * 2 - 1;
+            }
+            const noise = audioContext.createBufferSource();
+            const noiseGain = audioContext.createGain();
+            noise.buffer = buffer;
+            noise.connect(noiseGain);
+            noiseGain.connect(audioContext.destination);
+            noiseGain.gain.setValueAtTime(0.15, audioContext.currentTime);
+            noiseGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
+            noise.start();
+          }, time * 1000);
+        });
       } catch (e) {
         console.log('Audio API not available', e);
       }
     };
 
     const fireConfetti = () => {
-      const duration = 2500;
+      const duration = 5000; // 5 seconds!
       const animationEnd = Date.now() + duration;
-      const defaults = { startVelocity: 35, spread: 360, ticks: 60, zIndex: 2000 } as any;
+      const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#ff1493'];
+      
+      const defaults = { 
+        startVelocity: 45, 
+        spread: 360, 
+        ticks: 80, 
+        zIndex: 2000,
+        colors: colors
+      } as any;
+      
       const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+      
       const interval: any = setInterval(() => {
         const timeLeft = animationEnd - Date.now();
         if (timeLeft <= 0) return clearInterval(interval);
-        const particleCount = 50 * (timeLeft / duration);
-        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: 0.2 } });
-        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: 0.2 } });
-      }, 250);
+        
+        const particleCount = 100 * (timeLeft / duration); // Way more particles!
+        
+        // Multiple confetti bursts from different positions
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.2), y: 0.1 } });
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.4, 0.6), y: 0.1 } });
+        confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.8, 0.9), y: 0.1 } });
+        
+        // Occasional big bursts
+        if (Math.random() > 0.7) {
+          confetti({
+            ...defaults,
+            particleCount: 150,
+            origin: { x: 0.5, y: 0.3 },
+            spread: 180,
+            startVelocity: 60
+          });
+        }
+      }, 150);
+      
+      // Initial massive burst
+      confetti({
+        particleCount: 200,
+        spread: 360,
+        origin: { x: 0.5, y: 0.5 },
+        colors: colors,
+        zIndex: 2000
+      });
     };
 
     const mp = calculations.monthly.totalPercentage;
