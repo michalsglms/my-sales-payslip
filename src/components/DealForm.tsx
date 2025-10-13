@@ -40,6 +40,7 @@ const dealSchema = z.object({
   initial_deposit: z.string().min(1, "יש להזין סכום הפקדה"),
   is_new_client: z.boolean().default(true),
   completed_within_4_days: z.boolean().default(false),
+  client_link: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -71,6 +72,7 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
         initial_deposit: parseFloat(data.initial_deposit),
         is_new_client: data.is_new_client,
         completed_within_4_days: data.completed_within_4_days,
+        client_link: data.client_link,
         notes: data.notes,
       });
 
@@ -197,6 +199,21 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
                     <FormLabel>הושלם תוך 4 ימים</FormLabel>
                     <FormDescription>האם ההפקדה הושלמה תוך 4 ימים?</FormDescription>
                   </div>
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="client_link"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>קישור ללקוח</FormLabel>
+                  <FormControl>
+                    <Input type="url" placeholder="https://..." {...field} />
+                  </FormControl>
+                  <FormDescription>קישור לפרופיל הלקוח במערכת</FormDescription>
+                  <FormMessage />
                 </FormItem>
               )}
             />

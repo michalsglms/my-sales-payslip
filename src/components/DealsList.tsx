@@ -19,6 +19,7 @@ interface Deal {
   is_new_client: boolean;
   completed_within_4_days: boolean;
   created_at: string;
+  client_link?: string;
   notes?: string;
 }
 
@@ -56,6 +57,7 @@ const DealsList = ({ deals }: DealsListProps) => {
                   <TableHead className="text-right">סוג לקוח</TableHead>
                   <TableHead className="text-right">מקור הגעה</TableHead>
                   <TableHead className="text-right">הפקדה ($)</TableHead>
+                  <TableHead className="text-right">קישור</TableHead>
                   <TableHead className="text-right">סטטוס</TableHead>
                 </TableRow>
               </TableHeader>
@@ -73,6 +75,20 @@ const DealsList = ({ deals }: DealsListProps) => {
                     <TableCell>{getTrafficSourceLabel(deal.traffic_source)}</TableCell>
                     <TableCell className="font-medium">
                       ${deal.initial_deposit.toLocaleString()}
+                    </TableCell>
+                    <TableCell>
+                      {deal.client_link ? (
+                        <a 
+                          href={deal.client_link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          פתח
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">

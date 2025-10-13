@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       deals: {
         Row: {
+          client_link: string | null
           client_type: string
           completed_within_4_days: boolean
           created_at: string
@@ -27,6 +28,7 @@ export type Database = {
           traffic_source: string
         }
         Insert: {
+          client_link?: string | null
           client_type: string
           completed_within_4_days?: boolean
           created_at?: string
@@ -38,6 +40,7 @@ export type Database = {
           traffic_source: string
         }
         Update: {
+          client_link?: string | null
           client_type?: string
           completed_within_4_days?: boolean
           created_at?: string
