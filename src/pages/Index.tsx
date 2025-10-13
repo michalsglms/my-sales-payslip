@@ -1,9 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import SalaryCalculator from "@/components/SalaryCalculator";
 import DealForm from "@/components/DealForm";
 import DealsList from "@/components/DealsList";
@@ -22,6 +29,35 @@ const Index = () => {
   const [monthlyTargets, setMonthlyTargets] = useState<any[]>([]);
   const [quarterlyTargets, setQuarterlyTargets] = useState<any[]>([]);
 
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1;
+  const currentYear = currentDate.getFullYear();
+  
+  // State for selected month/year
+  const [selectedMonthYear, setSelectedMonthYear] = useState(`${currentYear}-${currentMonth}`);
+  const [selectedYear, selectedMonth] = selectedMonthYear.split('-').map(Number);
+
+  // Generate list of available months (last 12 months)
+  const availableMonths = useMemo(() => {
+    const months = [];
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(currentYear, currentMonth - 1 - i, 1);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const monthNames = [
+        'ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני',
+        'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'
+      ];
+      months.push({
+        value: `${year}-${month}`,
+        label: `${monthNames[month - 1]} ${year}`,
+        year,
+        month,
+      });
+    }
+    return months;
+  }, [currentYear, currentMonth]);
+
   useEffect(() => {
     if (!loading && !user) {
       navigate("/auth");
@@ -34,7 +70,7 @@ const Index = () => {
       fetchDeals();
       fetchTargets();
     }
-  }, [user]);
+  }, [user, selectedYear, selectedMonth]);
 
   const fetchProfile = async () => {
     if (!user) return;
@@ -54,15 +90,15 @@ const Index = () => {
     if (!user) return;
 
     setDealsLoading(true);
-    const currentMonth = new Date().getMonth() + 1;
-    const currentYear = new Date().getFullYear();
-    const startOfMonth = new Date(currentYear, currentMonth - 1, 1).toISOString();
+    const startOfMonth = new Date(selectedYear, selectedMonth - 1, 1).toISOString();
+    const endOfMonth = new Date(selectedYear, selectedMonth, 0, 23, 59, 59).toISOString();
 
     const { data, error } = await supabase
       .from("deals")
       .select("*")
       .eq("sales_rep_id", user.id)
       .gte("created_at", startOfMonth)
+      .lte("created_at", endOfMonth)
       .order("created_at", { ascending: false });
 
     if (data) {
@@ -128,16 +164,23 @@ const Index = () => {
 
       <main className="container mx-auto px-4 py-8 space-y-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">
-            {(() => {
-              const monthNames = [
-                'ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני',
-                'יולי', 'אוגוסט', 'סתמבר', 'אוקטובר', 'נובמבר', 'דצמבר'
-              ];
-              const currentDate = new Date();
-              return `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-            })()}
-          </h2>
+          <div className="flex items-center gap-4">
+            <h2 className="text-xl font-semibold">
+              {availableMonths.find(m => m.value === selectedMonthYear)?.label || 'חודש נוכחי'}
+            </h2>
+            <Select value={selectedMonthYear} onValueChange={setSelectedMonthYear}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-background z-50">
+                {availableMonths.map((month) => (
+                  <SelectItem key={month.value} value={month.value}>
+                    {month.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="flex gap-2">
             <EditBaseSalary 
               userId={user.id} 
@@ -155,6 +198,8 @@ const Index = () => {
           monthlyTargets={monthlyTargets}
           quarterlyTargets={quarterlyTargets}
           onTargetUpdated={fetchTargets}
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
         />
 
         <SalaryCalculator

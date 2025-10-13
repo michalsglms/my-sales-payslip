@@ -41,34 +41,19 @@ interface TargetProgressProps {
   monthlyTargets: MonthlyTarget[];
   quarterlyTargets: QuarterlyTarget[];
   onTargetUpdated: () => void;
+  selectedYear: number;
+  selectedMonth: number;
 }
 
-const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdated }: TargetProgressProps) => {
+const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdated, selectedYear, selectedMonth }: TargetProgressProps) => {
   const now = new Date();
   const currentMonth = now.getMonth() + 1;
   const currentYear = now.getFullYear();
   const currentQuarter = Math.ceil(currentMonth / 3);
 
-  // State for selected periods
-  const [selectedMonthYear, setSelectedMonthYear] = useState(`${currentYear}-${currentMonth}`);
-  const [selectedQuarterYear, setSelectedQuarterYear] = useState(`${currentYear}-${currentQuarter}`);
-
-  // Generate list of available months (last 12 months)
-  const availableMonths = useMemo(() => {
-    const months = [];
-    for (let i = 0; i < 12; i++) {
-      const date = new Date(currentYear, currentMonth - 1 - i, 1);
-      const year = date.getFullYear();
-      const month = date.getMonth() + 1;
-      months.push({
-        value: `${year}-${month}`,
-        label: `${month}/${year}`,
-        year,
-        month,
-      });
-    }
-    return months;
-  }, [currentYear, currentMonth]);
+  // State for selected quarter
+  const selectedQuarter = Math.ceil(selectedMonth / 3);
+  const [selectedQuarterYear, setSelectedQuarterYear] = useState(`${selectedYear}-${selectedQuarter}`);
 
   // Generate list of available quarters (last 8 quarters)
   const availableQuarters = useMemo(() => {
@@ -87,7 +72,6 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
     return quarters;
   }, [currentYear, currentQuarter]);
 
-  const [selectedYear, selectedMonthNum] = selectedMonthYear.split('-').map(Number);
   const [selectedQuarterYearNum, selectedQuarterNum] = selectedQuarterYear.split('-').map(Number);
 
   // Calculate workdays in a period (excluding Friday and Saturday)
@@ -108,12 +92,12 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
   };
 
   const calculations = useMemo(() => {
-    const isCurrentMonth = selectedYear === currentYear && selectedMonthNum === currentMonth;
+    const isCurrentMonth = selectedYear === currentYear && selectedMonth === currentMonth;
     const isCurrentQuarter = selectedQuarterYearNum === currentYear && selectedQuarterNum === currentQuarter;
 
     // Calculate selected month workdays
-    const monthStart = new Date(selectedYear, selectedMonthNum - 1, 1);
-    const monthEnd = new Date(selectedYear, selectedMonthNum, 0);
+    const monthStart = new Date(selectedYear, selectedMonth - 1, 1);
+    const monthEnd = new Date(selectedYear, selectedMonth, 0);
     const selectedMonthWorkdays = calculateWorkdays(monthStart, monthEnd);
     
     // Calculate workdays passed so far (only for current month)
@@ -133,7 +117,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
 
     // Get selected month's target
     const monthlyTarget = monthlyTargets.find(
-      (t) => t.month === selectedMonthNum && t.year === selectedYear
+      (t) => t.month === selectedMonth && t.year === selectedYear
     );
 
     // Get selected quarter's target
@@ -141,15 +125,8 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
       (t) => t.quarter === selectedQuarterNum && t.year === selectedQuarterYearNum
     );
 
-    // Count deals for selected month
-    const monthlyDeals = deals.filter((deal) => {
-      const dealDate = new Date(deal.created_at);
-      return (
-        dealDate.getMonth() + 1 === selectedMonthNum &&
-        dealDate.getFullYear() === selectedYear &&
-        deal.is_new_client
-      );
-    });
+    // Count deals for selected month (deals are already filtered by parent)
+    const monthlyDeals = deals.filter((deal) => deal.is_new_client);
 
     // Count deals for selected quarter
     const quarterlyDeals = deals.filter((deal) => {
@@ -293,39 +270,25 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
         isCurrentPeriod: isCurrentQuarter,
       },
     };
-  }, [deals, monthlyTargets, quarterlyTargets, selectedYear, selectedMonthNum, selectedQuarterYearNum, selectedQuarterNum, currentYear, currentMonth, currentQuarter]);
+  }, [deals, monthlyTargets, quarterlyTargets, selectedYear, selectedMonth, selectedQuarterYearNum, selectedQuarterNum, currentYear, currentMonth, currentQuarter]);
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center gap-2">
+          <div className="flex justify-between items-center">
             <CardTitle>יעד חודשי</CardTitle>
-            <div className="flex items-center gap-2">
-              <Select value={selectedMonthYear} onValueChange={setSelectedMonthYear}>
-                <SelectTrigger className="w-[130px] h-9">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-background z-50">
-                  {availableMonths.map((month) => (
-                    <SelectItem key={month.value} value={month.value}>
-                      {month.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {calculations.monthly.target && (
-                <EditTargetDialog
-                  targetId={calculations.monthly.target.id}
-                  targetType="monthly"
-                  currentGeneralTarget={calculations.monthly.target.general_target_amount}
-                  currentCfdTarget={calculations.monthly.target.cfd_target_amount}
-                  currentWorkdays={calculations.monthly.target.workdays_in_period}
-                  period="חודשי"
-                  onTargetUpdated={onTargetUpdated}
-                />
-              )}
-            </div>
+            {calculations.monthly.target && (
+              <EditTargetDialog
+                targetId={calculations.monthly.target.id}
+                targetType="monthly"
+                currentGeneralTarget={calculations.monthly.target.general_target_amount}
+                currentCfdTarget={calculations.monthly.target.cfd_target_amount}
+                currentWorkdays={calculations.monthly.target.workdays_in_period}
+                period="חודשי"
+                onTargetUpdated={onTargetUpdated}
+              />
+            )}
           </div>
         </CardHeader>
         <CardContent className="space-y-4" dir="rtl">
