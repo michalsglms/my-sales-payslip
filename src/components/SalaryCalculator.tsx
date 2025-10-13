@@ -89,12 +89,10 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
   }, [baseSalary, deals, monthlyGeneralBonus, monthlyCfdBonus, quarterlyGeneralBonus, quarterlyCfdBonus]);
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="border-b">
+    <Card>
+      <CardHeader>
         <div className="flex justify-between items-center">
-          <CardTitle className="text-2xl text-foreground">
-            חישוב השכר 💰
-          </CardTitle>
+          <CardTitle>חישוב השכר</CardTitle>
           <EditBaseSalary 
             userId={userId} 
             currentBaseSalary={baseSalary} 
@@ -102,62 +100,56 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
           />
         </div>
       </CardHeader>
-      <CardContent className="space-y-4 pt-6" dir="rtl">
+      <CardContent className="space-y-4" dir="rtl">
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1 p-4 rounded-lg bg-muted/50 border">
-            <p className="text-sm text-muted-foreground font-medium">שכר בסיס</p>
-            <p className="text-3xl font-bold text-foreground">
-              ₪{calculations.baseSalary.toLocaleString()}
-            </p>
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground">שכר בסיס</p>
+            <p className="text-2xl font-bold">₪{calculations.baseSalary.toLocaleString()}</p>
           </div>
-          <div className="space-y-1 p-4 rounded-lg bg-muted/50 border">
-            <p className="text-sm text-muted-foreground font-medium">לקוחות חדשים</p>
-            <p className="text-3xl font-bold text-foreground">
-              {calculations.newClientsCount}
-            </p>
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground">לקוחות חדשים</p>
+            <p className="text-2xl font-bold">{calculations.newClientsCount}</p>
           </div>
         </div>
 
-        <div className="border-t pt-4 space-y-3">
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-            <span className="text-muted-foreground font-medium">סך הכל בונוס EQ</span>
-            <span className="w-16 text-center font-bold text-foreground">{calculations.eqCount}</span>
-            <span className="font-bold text-lg text-foreground">₪{calculations.eqBonus.toLocaleString()}</span>
+        <div className="border-t pt-4 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">סך הכל בונוס EQ</span>
+            <span className="w-16 text-center font-medium">{calculations.eqCount}</span>
+            <span className="font-medium">₪{calculations.eqBonus.toLocaleString()}</span>
           </div>
-          <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-            <span className="text-muted-foreground font-medium">סך הכל בונוס CFD</span>
-            <span className="w-16 text-center font-bold text-foreground">{calculations.cfdCount}</span>
-            <span className="font-bold text-lg text-foreground">₪{calculations.cfdBonus.toLocaleString()}</span>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">סך הכל בונוס CFD</span>
+            <span className="w-16 text-center font-medium">{calculations.cfdCount}</span>
+            <span className="font-medium">₪{calculations.cfdBonus.toLocaleString()}</span>
           </div>
         </div>
 
         {calculations.targetBonuses > 0 && (
-          <div className="border-t pt-4 space-y-3">
-            <div className="flex justify-between p-3 rounded-lg bg-muted/30">
-              <span className="text-muted-foreground font-medium">מענק הגעה ליעד חודשי טוטאל</span>
-              <span className="font-bold text-lg text-foreground">₪{calculations.monthlyGeneralBonus.toLocaleString()}</span>
+          <div className="border-t pt-4 space-y-2">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">מענק הגעה ליעד חודשי טוטאל</span>
+              <span className="font-medium">₪{calculations.monthlyGeneralBonus.toLocaleString()}</span>
             </div>
-            <div className="flex justify-between p-3 rounded-lg bg-muted/30">
-              <span className="text-muted-foreground font-medium">מענק הגעה ליעד חודשי CFD</span>
-              <span className="font-bold text-lg text-foreground">₪{calculations.monthlyCfdBonus.toLocaleString()}</span>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">מענק הגעה ליעד חודשי CFD</span>
+              <span className="font-medium">₪{calculations.monthlyCfdBonus.toLocaleString()}</span>
             </div>
-            <div className="flex justify-between p-3 rounded-lg bg-muted/30">
-              <span className="text-muted-foreground font-medium">מענק הגעה ליעד רבעוני טוטאל</span>
-              <span className="font-bold text-lg text-foreground">₪{calculations.quarterlyGeneralBonus.toLocaleString()}</span>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">מענק הגעה ליעד רבעוני טוטאל</span>
+              <span className="font-medium">₪{calculations.quarterlyGeneralBonus.toLocaleString()}</span>
             </div>
-            <div className="flex justify-between p-3 rounded-lg bg-muted/30">
-              <span className="text-muted-foreground font-medium">מענק הגעה ליעד רבעוני CFD</span>
-              <span className="font-bold text-lg text-foreground">₪{calculations.quarterlyCfdBonus.toLocaleString()}</span>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">מענק הגעה ליעד רבעוני CFD</span>
+              <span className="font-medium">₪{calculations.quarterlyCfdBonus.toLocaleString()}</span>
             </div>
           </div>
         )}
 
-        <div className="border-t-2 pt-6 mt-6">
-          <div className="flex justify-between items-center p-6 rounded-lg bg-muted/50 border-2">
-            <span className="text-xl font-bold text-foreground">
-              סה"כ שכר צפוי 💎
-            </span>
-            <span className="text-4xl font-black text-foreground">
+        <div className="border-t pt-4">
+          <div className="flex justify-between items-center">
+            <span className="text-lg font-semibold">סה"כ שכר צפוי</span>
+            <span className="text-3xl font-bold text-primary">
               ₪{calculations.totalSalary.toLocaleString()}
             </span>
           </div>

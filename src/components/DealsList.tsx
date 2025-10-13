@@ -581,25 +581,21 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
               )}
             </TableRow>
           ))}
-          <TableRow className="bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 font-bold border-t-2 border-primary/30">
-            <TableCell className="text-right text-lg font-bold">סה"כ</TableCell>
-            <TableCell className="text-right"></TableCell>
-            <TableCell className="text-right"></TableCell>
-            <TableCell className="text-right">
-              <Badge variant="outline" className="text-base font-bold px-3 py-1 bg-primary/10 border-primary/30">
-                {dealsArray.length}
-              </Badge>
+          <TableRow className="bg-muted/50 font-bold">
+            <TableCell className="text-right">סה"כ</TableCell>
+            <TableCell></TableCell>
+            <TableCell></TableCell>
+            <TableCell>
+              <Badge variant="outline">{dealsArray.length}</Badge>
             </TableCell>
-            <TableCell className="text-right"></TableCell>
-            <TableCell className="text-right"></TableCell>
-            <TableCell className="text-right text-lg font-bold">
+            <TableCell></TableCell>
+            <TableCell className="font-bold">
               ${totals.totalDeposit.toLocaleString()}
             </TableCell>
-            <TableCell className="text-right text-lg font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+            <TableCell className="font-bold text-primary">
               ₪{totals.totalBonus.toLocaleString()}
             </TableCell>
-            <TableCell className="text-right"></TableCell>
-            <TableCell className="text-right"></TableCell>
+            <TableCell></TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -608,19 +604,16 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
 
   return (
     <>
-      <Card className="overflow-hidden border-secondary/20 shadow-lg hover:shadow-xl transition-all duration-300 animate-fade-in-up bg-gradient-to-br from-card via-card to-secondary/5">
-      <CardHeader className="bg-gradient-to-r from-secondary/10 via-accent/10 to-primary/10 border-b border-secondary/20">
+      <Card>
+      <CardHeader>
         <div className="flex justify-between items-center">
-          <CardTitle className="text-2xl bg-gradient-to-r from-secondary via-accent to-primary bg-clip-text text-transparent">
-            לקוחות חדשים 📊
-          </CardTitle>
+          <CardTitle>לקוחות חדשים</CardTitle>
           <div className="flex gap-2">
             {!isAddingDeal && (
               <Button
                 variant="default"
                 size="sm"
                 onClick={() => setIsAddingDeal(true)}
-                className="shadow-md hover:shadow-lg"
               >
                 <Plus className="ml-2 h-4 w-4" />
                 הוסף לקוח חדש
@@ -630,7 +623,6 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
               variant={sortByDate ? "default" : "outline"}
               size="sm"
               onClick={() => setSortByDate(!sortByDate)}
-              className="shadow-sm hover:shadow-md"
             >
               <Calendar className="ml-2 h-4 w-4" />
               מיון לפי תאריך
@@ -639,7 +631,6 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
               variant={sortByName ? "default" : "outline"}
               size="sm"
               onClick={() => setSortByName(!sortByName)}
-              className="shadow-sm hover:shadow-md"
             >
               <ArrowUpDown className="ml-2 h-4 w-4" />
               מיון לפי שם
@@ -654,10 +645,10 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
           </p>
         ) : (
           <Tabs defaultValue="all" dir="rtl">
-            <TabsList className="grid w-full grid-cols-3 mb-6">
-              <TabsTrigger value="all">כללי 📊</TabsTrigger>
-              <TabsTrigger value="eq">EQ 📈</TabsTrigger>
-              <TabsTrigger value="cfd">CFD 💹</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="all">כללי</TabsTrigger>
+              <TabsTrigger value="eq">EQ</TabsTrigger>
+              <TabsTrigger value="cfd">CFD</TabsTrigger>
             </TabsList>
             <TabsContent value="all" className="mt-4">
               {renderTable(sortedDeals, allTotals)}
