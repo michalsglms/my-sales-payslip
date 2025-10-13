@@ -54,6 +54,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
   const [targetFormOpen, setTargetFormOpen] = useState(false);
   const [congratsDialogOpen, setCongratsDialogOpen] = useState(false);
   const [congratsMessage, setCongratsMessage] = useState("");
+  const [congratsSubMessage, setCongratsSubMessage] = useState("");
   const [hasPlayedMonthlyConfetti, setHasPlayedMonthlyConfetti] = useState(false);
   const [hasPlayedMonthlyConfettiCFD, setHasPlayedMonthlyConfettiCFD] = useState(false);
   const [hasPlayedQuarterlyConfetti, setHasPlayedQuarterlyConfetti] = useState(false);
@@ -507,6 +508,15 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
     if (crossedMonthly && !hasPlayedMonthlyConfetti) {
       setHasPlayedMonthlyConfetti(true);
       setCongratsMessage("כל הכבוד! הגעת ליעד הכללי החודשי שלך! 🎉");
+      
+      // Check if CFD target not yet reached
+      if (calculations.monthly.target && mpCFD < 100) {
+        const remaining = calculations.monthly.target.cfd_target_amount - calculations.monthly.cfdCount;
+        setCongratsSubMessage(`נשאר לך עוד ${remaining} לקוחות CFD כדי להגיע ליעד CFD החודשי! 💪`);
+      } else {
+        setCongratsSubMessage("");
+      }
+      
       setCongratsDialogOpen(true);
       fireConfetti();
       playApplause();
@@ -515,6 +525,15 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
     if (crossedMonthlyCFD && !hasPlayedMonthlyConfettiCFD) {
       setHasPlayedMonthlyConfettiCFD(true);
       setCongratsMessage("כל הכבוד! הגעת ליעד CFD החודשי שלך! 🎉");
+      
+      // Check if general target not yet reached
+      if (calculations.monthly.target && mp < 100) {
+        const remaining = calculations.monthly.target.general_target_amount - calculations.monthly.totalCount;
+        setCongratsSubMessage(`נשאר לך עוד ${remaining} לקוחות כדי להגיע ליעד הכללי החודשי! 💪`);
+      } else {
+        setCongratsSubMessage("");
+      }
+      
       setCongratsDialogOpen(true);
       fireConfetti();
       playApplause();
@@ -523,6 +542,15 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
     if (crossedQuarterly && !hasPlayedQuarterlyConfetti) {
       setHasPlayedQuarterlyConfetti(true);
       setCongratsMessage("כל הכבוד! הגעת ליעד הכללי הרבעוני שלך! 🎊");
+      
+      // Check if CFD target not yet reached
+      if (calculations.quarterly.target && qpCFD < 100) {
+        const remaining = calculations.quarterly.target.cfd_target_amount - calculations.quarterly.cfdCount;
+        setCongratsSubMessage(`נשאר לך עוד ${remaining} לקוחות CFD כדי להגיע ליעד CFD הרבעוני! 💪`);
+      } else {
+        setCongratsSubMessage("");
+      }
+      
       setCongratsDialogOpen(true);
       fireConfetti();
       playApplause();
@@ -531,6 +559,15 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
     if (crossedQuarterlyCFD && !hasPlayedQuarterlyConfettiCFD) {
       setHasPlayedQuarterlyConfettiCFD(true);
       setCongratsMessage("כל הכבוד! הגעת ליעד CFD הרבעוני שלך! 🎊");
+      
+      // Check if general target not yet reached
+      if (calculations.quarterly.target && qp < 100) {
+        const remaining = calculations.quarterly.target.general_target_amount - calculations.quarterly.totalCount;
+        setCongratsSubMessage(`נשאר לך עוד ${remaining} לקוחות כדי להגיע ליעד הכללי הרבעוני! 💪`);
+      } else {
+        setCongratsSubMessage("");
+      }
+      
       setCongratsDialogOpen(true);
       fireConfetti();
       playApplause();
@@ -556,6 +593,13 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
             <DialogDescription className="text-2xl font-semibold text-foreground/90">
               עבודה מצוינת! המשך כך! 💪✨
             </DialogDescription>
+            {congratsSubMessage && (
+              <div className="mt-4 p-4 rounded-lg bg-muted/50 border border-primary/30">
+                <p className="text-lg font-medium text-primary">
+                  {congratsSubMessage}
+                </p>
+              </div>
+            )}
           </DialogHeader>
           
           <div className="flex justify-center items-center gap-4 my-8">
