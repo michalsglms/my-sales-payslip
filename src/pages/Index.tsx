@@ -10,6 +10,7 @@ import DealsList from "@/components/DealsList";
 import TargetForm from "@/components/TargetForm";
 import TargetProgress from "@/components/TargetProgress";
 import ExportToExcel from "@/components/ExportToExcel";
+import EditBaseSalary from "@/components/EditBaseSalary";
 import { LogOut } from "lucide-react";
 
 const Index = () => {
@@ -114,9 +115,16 @@ const Index = () => {
     <div className="min-h-screen bg-muted/30" dir="rtl">
       <header className="border-b bg-background">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">מערכת ניהול שכר</h1>
-            <p className="text-sm text-muted-foreground">שלום, {profile.full_name}</p>
+          <div className="flex items-center gap-4">
+            <div>
+              <h1 className="text-2xl font-bold">מערכת ניהול שכר</h1>
+              <p className="text-sm text-muted-foreground">שלום, {profile.full_name}</p>
+            </div>
+            <EditBaseSalary 
+              userId={user.id} 
+              currentBaseSalary={parseFloat(profile.base_salary)}
+              onSalaryUpdated={fetchProfile}
+            />
           </div>
           <Button variant="outline" onClick={signOut}>
             <LogOut className="ml-2 h-4 w-4" />
