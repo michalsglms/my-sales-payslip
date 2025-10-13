@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Deal {
   id: string;
@@ -60,6 +61,81 @@ const DealsList = ({ deals }: DealsListProps) => {
     return bonus;
   };
 
+  const eqDeals = deals.filter(d => d.client_type === "EQ");
+  const cfdDeals = deals.filter(d => d.client_type === "CFD");
+
+  const calculateTotals = (dealsArray: Deal[]) => {
+    const totalDeposit = dealsArray.reduce((sum, deal) => sum + deal.initial_deposit, 0);
+    const totalBonus = dealsArray.reduce((sum, deal) => sum + calculateBonus(deal), 0);
+    return { totalDeposit, totalBonus };
+  };
+
+  const allTotals = calculateTotals(deals);
+  const eqTotals = calculateTotals(eqDeals);
+  const cfdTotals = calculateTotals(cfdDeals);
+
+  const renderTable = (dealsArray: Deal[], totals: { totalDeposit: number; totalBonus: number }) => (
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="text-right">תאריך</TableHead>
+            <TableHead className="text-right">סוג לקוח</TableHead>
+            <TableHead className="text-right">מקור הגעה</TableHead>
+            <TableHead className="text-right">הפקדה ($)</TableHead>
+            <TableHead className="text-right">בונוס (₪)</TableHead>
+            <TableHead className="text-right">קישור</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {dealsArray.map((deal) => (
+            <TableRow key={deal.id}>
+              <TableCell>
+                {format(new Date(deal.created_at), "dd/MM/yyyy HH:mm", { locale: he })}
+              </TableCell>
+              <TableCell>
+                <Badge variant={deal.client_type === "EQ" ? "default" : "secondary"}>
+                  {deal.client_type}
+                </Badge>
+              </TableCell>
+              <TableCell>{getTrafficSourceLabel(deal.traffic_source)}</TableCell>
+              <TableCell className="font-medium">
+                ${deal.initial_deposit.toLocaleString()}
+              </TableCell>
+              <TableCell className="font-bold text-primary">
+                ₪{calculateBonus(deal).toLocaleString()}
+              </TableCell>
+              <TableCell>
+                {deal.client_link ? (
+                  <a 
+                    href={deal.client_link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                  >
+                    פתח
+                  </a>
+                ) : (
+                  <span className="text-muted-foreground">-</span>
+                )}
+              </TableCell>
+            </TableRow>
+          ))}
+          <TableRow className="bg-muted/50 font-bold">
+            <TableCell colSpan={3} className="text-right">סה"כ</TableCell>
+            <TableCell className="font-bold">
+              ${totals.totalDeposit.toLocaleString()}
+            </TableCell>
+            <TableCell className="font-bold text-primary">
+              ₪{totals.totalBonus.toLocaleString()}
+            </TableCell>
+            <TableCell></TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </div>
+  );
+
   return (
     <Card>
       <CardHeader>
@@ -71,55 +147,34 @@ const DealsList = ({ deals }: DealsListProps) => {
             אין עסקאות להצגה. הוסף עסקה ראשונה!
           </p>
         ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-right">תאריך</TableHead>
-                  <TableHead className="text-right">סוג לקוח</TableHead>
-                  <TableHead className="text-right">מקור הגעה</TableHead>
-                  <TableHead className="text-right">הפקדה ($)</TableHead>
-                  <TableHead className="text-right">בונוס (₪)</TableHead>
-                  <TableHead className="text-right">קישור</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {deals.map((deal) => (
-                  <TableRow key={deal.id}>
-                    <TableCell>
-                      {format(new Date(deal.created_at), "dd/MM/yyyy HH:mm", { locale: he })}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={deal.client_type === "EQ" ? "default" : "secondary"}>
-                        {deal.client_type}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{getTrafficSourceLabel(deal.traffic_source)}</TableCell>
-                    <TableCell className="font-medium">
-                      ${deal.initial_deposit.toLocaleString()}
-                    </TableCell>
-                    <TableCell className="font-bold text-primary">
-                      ₪{calculateBonus(deal).toLocaleString()}
-                    </TableCell>
-                    <TableCell>
-                      {deal.client_link ? (
-                        <a 
-                          href={deal.client_link} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-primary hover:underline"
-                        >
-                          פתח
-                        </a>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <Tabs defaultValue="all" dir="rtl">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="all">כללי ({deals.length})</TabsTrigger>
+              <TabsTrigger value="eq">EQ ({eqDeals.length})</TabsTrigger>
+              <TabsTrigger value="cfd">CFD ({cfdDeals.length})</TabsTrigger>
+            </TabsList>
+            <TabsContent value="all" className="mt-4">
+              {renderTable(deals, allTotals)}
+            </TabsContent>
+            <TabsContent value="eq" className="mt-4">
+              {eqDeals.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">
+                  אין עסקאות EQ להצגה
+                </p>
+              ) : (
+                renderTable(eqDeals, eqTotals)
+              )}
+            </TabsContent>
+            <TabsContent value="cfd" className="mt-4">
+              {cfdDeals.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">
+                  אין עסקאות CFD להצגה
+                </p>
+              ) : (
+                renderTable(cfdDeals, cfdTotals)
+              )}
+            </TabsContent>
+          </Tabs>
         )}
       </CardContent>
     </Card>
