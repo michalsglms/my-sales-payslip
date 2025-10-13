@@ -81,7 +81,6 @@ const DealsList = ({ deals }: DealsListProps) => {
                   <TableHead className="text-right">הפקדה ($)</TableHead>
                   <TableHead className="text-right">בונוס (₪)</TableHead>
                   <TableHead className="text-right">קישור</TableHead>
-                  <TableHead className="text-right">סטטוס</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -115,16 +114,6 @@ const DealsList = ({ deals }: DealsListProps) => {
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        {deal.is_new_client && (
-                          <Badge variant="outline">חדש</Badge>
-                        )}
-                        {deal.completed_within_4_days && (
-                          <Badge variant="outline">4 ימים</Badge>
-                        )}
-                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
