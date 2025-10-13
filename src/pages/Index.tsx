@@ -18,6 +18,7 @@ import TargetForm from "@/components/TargetForm";
 import TargetProgress from "@/components/TargetProgress";
 import ExportToExcel from "@/components/ExportToExcel";
 import ImportFromExcel from "@/components/ImportFromExcel";
+import DeleteAllDeals from "@/components/DeleteAllDeals";
 import EditBaseSalary from "@/components/EditBaseSalary";
 import { LogOut } from "lucide-react";
 
@@ -295,6 +296,7 @@ const Index = () => {
             />
             <ImportFromExcel userId={user.id} onImportComplete={fetchDeals} />
             <ExportToExcel deals={deals} userName={profile.full_name} />
+            <DeleteAllDeals userId={user.id} onDealsDeleted={fetchDeals} />
             <TargetForm userId={user.id} onTargetAdded={fetchTargets} />
             <DealForm userId={user.id} onDealAdded={fetchDeals} />
           </div>
