@@ -128,7 +128,16 @@ const Index = () => {
 
       <main className="container mx-auto px-4 py-8 space-y-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-semibold">חודש נוכחי</h2>
+          <h2 className="text-xl font-semibold">
+            {(() => {
+              const monthNames = [
+                'ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני',
+                'יולי', 'אוגוסט', 'סתמבר', 'אוקטובר', 'נובמבר', 'דצמבר'
+              ];
+              const currentDate = new Date();
+              return `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            })()}
+          </h2>
           <div className="flex gap-2">
             <EditBaseSalary 
               userId={user.id} 
