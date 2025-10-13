@@ -316,6 +316,8 @@ const Index = () => {
           monthlyCfdBonus={monthlyCfdBonus}
           quarterlyGeneralBonus={quarterlyGeneralBonus}
           quarterlyCfdBonus={quarterlyCfdBonus}
+          userId={user.id}
+          onSalaryUpdated={fetchProfile}
         />
 
         {dealsLoading ? (

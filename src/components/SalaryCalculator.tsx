@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import EditBaseSalary from "./EditBaseSalary";
 
 interface Deal {
   id: string;
@@ -17,9 +18,11 @@ interface SalaryCalculatorProps {
   monthlyCfdBonus?: number;
   quarterlyGeneralBonus?: number;
   quarterlyCfdBonus?: number;
+  userId: string;
+  onSalaryUpdated: () => void;
 }
 
-const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyCfdBonus = 0, quarterlyGeneralBonus = 0, quarterlyCfdBonus = 0 }: SalaryCalculatorProps) => {
+const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyCfdBonus = 0, quarterlyGeneralBonus = 0, quarterlyCfdBonus = 0, userId, onSalaryUpdated }: SalaryCalculatorProps) => {
   const calculations = useMemo(() => {
     let eqBonus = 0;
     let cfdBonus = 0;
@@ -82,7 +85,14 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
   return (
     <Card>
       <CardHeader>
-        <CardTitle>חישוב שכר נוכחי</CardTitle>
+        <div className="flex justify-between items-center">
+          <CardTitle>חישוב שכר נוכחי</CardTitle>
+          <EditBaseSalary 
+            userId={userId} 
+            currentBaseSalary={baseSalary} 
+            onSalaryUpdated={onSalaryUpdated}
+          />
+        </div>
       </CardHeader>
       <CardContent className="space-y-4" dir="rtl">
         <div className="grid grid-cols-2 gap-4">
