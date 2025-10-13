@@ -671,7 +671,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                   </div>
                 </div>
                 <div className="p-3 bg-green-500/10 rounded-lg">
-                  <p className="text-xs text-muted-foreground mb-1">מענק ליעד</p>
+                  <p className="text-xs text-muted-foreground mb-1">מענק הגעה ליעד</p>
                   <p className="text-xl font-bold text-green-600">₪{calculations.monthly.bonus.toLocaleString()}</p>
                 </div>
               </div>
@@ -785,7 +785,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                   </div>
                 </div>
                 <div className="p-3 bg-green-500/10 rounded-lg">
-                  <p className="text-xs text-muted-foreground mb-1">מענק ליעד</p>
+                  <p className="text-xs text-muted-foreground mb-1">מענק הגעה ליעד</p>
                   <p className="text-xl font-bold text-green-600">₪{calculations.quarterly.bonus.toLocaleString()}</p>
                 </div>
               </div>
