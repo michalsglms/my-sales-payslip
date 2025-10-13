@@ -48,6 +48,7 @@ interface Deal {
   created_at: string;
   client_link?: string;
   notes?: string;
+  campaign?: string;
 }
 
 interface DealsListProps {
@@ -69,6 +70,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
     traffic_source: "" as "AFF" | "RFF" | "PPC" | "ORG" | "",
     initial_deposit: "",
     client_link: "",
+    campaign: "",
   });
   const { toast } = useToast();
   
@@ -95,6 +97,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
         is_new_client: true,
         client_link: newDeal.client_link || null,
         completed_within_4_days: false,
+        campaign: newDeal.campaign || null,
       });
 
       if (error) throw error;
@@ -112,6 +115,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
         traffic_source: "",
         initial_deposit: "",
         client_link: "",
+        campaign: "",
       });
       setIsAddingDeal(false);
       onDealsChange();
@@ -132,6 +136,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
       traffic_source: "",
       initial_deposit: "",
       client_link: "",
+      campaign: "",
     });
     setIsAddingDeal(false);
   };
@@ -232,6 +237,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
             <TableHead className="text-right">טלפון הלקוח</TableHead>
             <TableHead className="text-right">סוג לקוח</TableHead>
             <TableHead className="text-right">מקור הגעה</TableHead>
+            <TableHead className="text-right">שם אפילייאט</TableHead>
             <TableHead className="text-right">הפקדה ($)</TableHead>
             <TableHead className="text-right">בונוס (₪)</TableHead>
             <TableHead className="text-right">קישור</TableHead>
@@ -283,6 +289,18 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
                     <SelectItem value="AFF">AFF</SelectItem>
                   </SelectContent>
                 </Select>
+              </TableCell>
+              <TableCell className="p-2">
+                {newDeal.traffic_source === "AFF" ? (
+                  <Input
+                    placeholder="שם אפילייאט"
+                    value={newDeal.campaign}
+                    onChange={(e) => setNewDeal({ ...newDeal, campaign: e.target.value })}
+                    className="h-9"
+                  />
+                ) : (
+                  <span className="text-sm text-muted-foreground">-</span>
+                )}
               </TableCell>
               <TableCell className="p-2">
                 <Input
@@ -341,6 +359,13 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
                 </Badge>
               </TableCell>
               <TableCell>{getTrafficSourceLabel(deal.traffic_source)}</TableCell>
+              <TableCell>
+                {deal.traffic_source === "AFF" && deal.campaign ? (
+                  <span className="text-sm">{deal.campaign}</span>
+                ) : (
+                  <span className="text-muted-foreground">-</span>
+                )}
+              </TableCell>
               <TableCell className="font-medium">
                 ${deal.initial_deposit.toLocaleString()}
               </TableCell>

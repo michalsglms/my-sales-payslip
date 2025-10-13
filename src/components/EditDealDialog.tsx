@@ -39,6 +39,7 @@ const dealSchema = z.object({
   initial_deposit: z.string().min(1, "יש להזין סכום הפקדה"),
   client_link: z.string().optional(),
   notes: z.string().optional(),
+  campaign: z.string().optional(),
 });
 
 type DealFormValues = z.infer<typeof dealSchema>;
@@ -52,6 +53,7 @@ interface Deal {
   initial_deposit: number;
   client_link?: string;
   notes?: string;
+  campaign?: string;
 }
 
 interface EditDealDialogProps {
@@ -74,6 +76,7 @@ const EditDealDialog = ({ deal, open, onOpenChange, onDealUpdated }: EditDealDia
       initial_deposit: deal.initial_deposit.toString(),
       client_link: deal.client_link || "",
       notes: deal.notes || "",
+      campaign: deal.campaign || "",
     },
   });
 
@@ -89,6 +92,7 @@ const EditDealDialog = ({ deal, open, onOpenChange, onDealUpdated }: EditDealDia
           initial_deposit: parseFloat(data.initial_deposit),
           client_link: data.client_link,
           notes: data.notes,
+          campaign: data.campaign,
         })
         .eq("id", deal.id);
 
@@ -192,6 +196,23 @@ const EditDealDialog = ({ deal, open, onOpenChange, onDealUpdated }: EditDealDia
                 </FormItem>
               )}
             />
+
+            {form.watch("traffic_source") === "AFF" && (
+              <FormField
+                control={form.control}
+                name="campaign"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>שם אפילייאט</FormLabel>
+                    <FormControl>
+                      <Input placeholder="הזן שם אפילייאט" {...field} />
+                    </FormControl>
+                    <FormDescription>שם האפילייאט שהפנה את הלקוח</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}
