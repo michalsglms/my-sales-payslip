@@ -408,7 +408,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
 
               <div className="border-t pt-4 space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="font-medium">יעד חודשי</span>
+                  <span className="font-medium">מענק הגעה ליעד חודשי</span>
                   <span className="text-2xl font-bold text-primary">
                     ₪{calculations.monthly.bonus.toLocaleString()}
                   </span>
@@ -523,7 +523,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
 
               <div className="border-t pt-4 space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="font-medium">יעד רבעוני</span>
+                  <span className="font-medium">מענק הגעה ליעד רבעוני</span>
                   <span className="text-2xl font-bold text-primary">
                     ₪{calculations.quarterly.bonus.toLocaleString()}
                   </span>
