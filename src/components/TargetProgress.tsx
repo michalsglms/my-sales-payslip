@@ -791,7 +791,6 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
               </div>
 
               <div className="border-t pt-4">
-                <h4 className="text-sm font-semibold mb-3">התקדמות נוכחית</h4>
                 <div className="space-y-3">
                   <div className="p-3 bg-muted/50 rounded-lg">
                     <div className="flex justify-between mb-2">
@@ -804,7 +803,9 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-muted-foreground">{calculations.quarterly.totalPercentage.toFixed(0)}%</span>
                       {calculations.quarterly.totalPercentage >= 100 && (
-                        <Badge variant="default" className="text-xs">הושג!</Badge>
+                        <Badge variant="default" className="text-xs">
+                          {calculations.quarterly.isCurrentPeriod ? "אתה אלוף" : "הושג!"}
+                        </Badge>
                       )}
                     </div>
                   </div>
@@ -820,7 +821,9 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-muted-foreground">{calculations.quarterly.cfdPercentage.toFixed(0)}%</span>
                       {calculations.quarterly.cfdPercentage >= 100 && (
-                        <Badge variant="default" className="text-xs">הושג!</Badge>
+                        <Badge variant="default" className="text-xs">
+                          {calculations.quarterly.isCurrentPeriod ? "אתה אלוף" : "הושג!"}
+                        </Badge>
                       )}
                     </div>
                   </div>
