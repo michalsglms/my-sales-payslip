@@ -92,7 +92,7 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
     <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
-          <CardTitle>חישוב שכר נוכחי</CardTitle>
+          <CardTitle>חישוב השכר</CardTitle>
           <EditBaseSalary 
             userId={userId} 
             currentBaseSalary={baseSalary} 
