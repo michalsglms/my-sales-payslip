@@ -115,16 +115,9 @@ const Index = () => {
     <div className="min-h-screen bg-muted/30" dir="rtl">
       <header className="border-b bg-background">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div>
-              <h1 className="text-2xl font-bold">מערכת ניהול שכר</h1>
-              <p className="text-sm text-muted-foreground">שלום, {profile.full_name}</p>
-            </div>
-            <EditBaseSalary 
-              userId={user.id} 
-              currentBaseSalary={parseFloat(profile.base_salary)}
-              onSalaryUpdated={fetchProfile}
-            />
+          <div>
+            <h1 className="text-2xl font-bold">מערכת ניהול שכר</h1>
+            <p className="text-sm text-muted-foreground">שלום, {profile.full_name}</p>
           </div>
           <Button variant="outline" onClick={signOut}>
             <LogOut className="ml-2 h-4 w-4" />
@@ -137,6 +130,11 @@ const Index = () => {
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">חודש נוכחי</h2>
           <div className="flex gap-2">
+            <EditBaseSalary 
+              userId={user.id} 
+              currentBaseSalary={parseFloat(profile.base_salary)}
+              onSalaryUpdated={fetchProfile}
+            />
             <ExportToExcel deals={deals} userName={profile.full_name} />
             <TargetForm userId={user.id} onTargetAdded={fetchTargets} />
             <DealForm userId={user.id} onDealAdded={fetchDeals} />
