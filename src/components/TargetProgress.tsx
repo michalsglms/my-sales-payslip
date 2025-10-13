@@ -364,22 +364,6 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
               </div>
 
               <div className="border-t pt-4">
-                <h4 className="text-sm font-semibold mb-3">תחזית לסוף התקופה (קצב: {calculations.monthly.dailyRate.toFixed(1)}/יום)</h4>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 bg-muted/50 rounded-lg">
-                    <p className="text-xs text-muted-foreground mb-1">יעד כללי צפוי</p>
-                    <p className="text-lg font-bold">{calculations.monthly.projectedTotal}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{calculations.monthly.projectedPercentage.toFixed(0)}%</p>
-                  </div>
-                  <div className="p-3 bg-muted/50 rounded-lg">
-                    <p className="text-xs text-muted-foreground mb-1">יעד CFD צפוי</p>
-                    <p className="text-lg font-bold">{calculations.monthly.projectedCFD}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{calculations.monthly.projectedCFDPercentage.toFixed(0)}%</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-t pt-4">
                 <h4 className="text-sm font-semibold mb-3">התקדמות נוכחית</h4>
                 <div className="space-y-3">
                   <div className="p-3 bg-muted/50 rounded-lg">
@@ -412,6 +396,22 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                         <Badge variant="default" className="text-xs">הושג!</Badge>
                       )}
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <h4 className="text-sm font-semibold mb-3">תחזית לסוף התקופה (קצב: {calculations.monthly.dailyRate.toFixed(1)}/יום)</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <p className="text-xs text-muted-foreground mb-1">יעד כללי צפוי</p>
+                    <p className="text-lg font-bold">{calculations.monthly.projectedTotal}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{calculations.monthly.projectedPercentage.toFixed(0)}%</p>
+                  </div>
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <p className="text-xs text-muted-foreground mb-1">יעד CFD צפוי</p>
+                    <p className="text-lg font-bold">{calculations.monthly.projectedCFD}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{calculations.monthly.projectedCFDPercentage.toFixed(0)}%</p>
                   </div>
                 </div>
               </div>
