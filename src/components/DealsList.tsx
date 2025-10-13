@@ -639,7 +639,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
         </div>
       </CardHeader>
       <CardContent dir="rtl">
-        {deals.length === 0 ? (
+        {deals.length === 0 && !isAddingDeal ? (
           <p className="text-center text-muted-foreground py-8">
             אין עסקאות להצגה. הוסף עסקה ראשונה!
           </p>
@@ -654,7 +654,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
               {renderTable(sortedDeals, allTotals)}
             </TabsContent>
             <TabsContent value="eq" className="mt-4">
-              {eqDeals.length === 0 ? (
+              {eqDeals.length === 0 && !isAddingDeal ? (
                 <p className="text-center text-muted-foreground py-8">
                   אין עסקאות EQ להצגה
                 </p>
@@ -663,7 +663,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
               )}
             </TabsContent>
             <TabsContent value="cfd" className="mt-4">
-              {cfdDeals.length === 0 ? (
+              {cfdDeals.length === 0 && !isAddingDeal ? (
                 <p className="text-center text-muted-foreground py-8">
                   אין עסקאות CFD להצגה
                 </p>
