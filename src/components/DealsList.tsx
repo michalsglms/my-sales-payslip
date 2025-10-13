@@ -416,7 +416,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
                 onClick={() => setIsAddingDeal(true)}
               >
                 <Plus className="ml-2 h-4 w-4" />
-                הוסף עסקה חדשה
+                הוסף לקוח חדש
               </Button>
             )}
             <Button
