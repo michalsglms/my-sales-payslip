@@ -149,9 +149,9 @@ const DealsList = ({ deals }: DealsListProps) => {
         ) : (
           <Tabs defaultValue="all" dir="rtl">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="all">כללי ({deals.length})</TabsTrigger>
-              <TabsTrigger value="eq">EQ ({eqDeals.length})</TabsTrigger>
-              <TabsTrigger value="cfd">CFD ({cfdDeals.length})</TabsTrigger>
+              <TabsTrigger value="all">כללי</TabsTrigger>
+              <TabsTrigger value="eq">EQ</TabsTrigger>
+              <TabsTrigger value="cfd">CFD</TabsTrigger>
             </TabsList>
             <TabsContent value="all" className="mt-4">
               {renderTable(deals, allTotals)}
