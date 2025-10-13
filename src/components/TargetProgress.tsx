@@ -362,21 +362,13 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                 </div>
               </div>
 
-              <div className="border-t pt-4 space-y-2">
+              <div className="border-t pt-4">
                 <div className="flex justify-between items-center">
                   <span className="font-medium">מענק חודשי פוטנציאלי</span>
                   <span className="text-2xl font-bold text-primary">
                     ₪{calculations.monthly.bonus.toLocaleString()}
                   </span>
                 </div>
-                {calculations.monthly.isCurrentPeriod && calculations.monthly.dailyRate > 0 && (
-                  <div className="flex justify-between items-center text-sm pt-2 border-t">
-                    <span className="text-muted-foreground">יעד צפוי לפי הקצב הנוכחי</span>
-                    <span className="font-semibold">
-                      {calculations.monthly.projectedTotal} עסקאות ({calculations.monthly.projectedPercentage.toFixed(0)}%)
-                    </span>
-                  </div>
-                )}
               </div>
             </>
           ) : (
@@ -477,21 +469,13 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                 </div>
               </div>
 
-              <div className="border-t pt-4 space-y-2">
+              <div className="border-t pt-4">
                 <div className="flex justify-between items-center">
                   <span className="font-medium">מענק רבעוני פוטנציאלי</span>
                   <span className="text-2xl font-bold text-primary">
                     ₪{calculations.quarterly.bonus.toLocaleString()}
                   </span>
                 </div>
-                {calculations.quarterly.isCurrentPeriod && calculations.quarterly.dailyRate > 0 && (
-                  <div className="flex justify-between items-center text-sm pt-2 border-t">
-                    <span className="text-muted-foreground">יעד צפוי לפי הקצב הנוכחי</span>
-                    <span className="font-semibold">
-                      {calculations.quarterly.projectedTotal} עסקאות ({calculations.quarterly.projectedPercentage.toFixed(0)}%)
-                    </span>
-                  </div>
-                )}
               </div>
             </>
           ) : (
