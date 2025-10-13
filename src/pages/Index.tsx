@@ -160,7 +160,7 @@ const Index = () => {
             </CardContent>
           </Card>
         ) : (
-          <DealsList deals={deals} />
+          <DealsList deals={deals} onDealsChange={fetchDeals} />
         )}
       </main>
     </div>

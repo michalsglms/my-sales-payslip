@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +12,21 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Pencil, Trash2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import EditDealDialog from "./EditDealDialog";
 
 interface Deal {
   id: string;
@@ -28,9 +44,35 @@ interface Deal {
 
 interface DealsListProps {
   deals: Deal[];
+  onDealsChange: () => void;
 }
 
-const DealsList = ({ deals }: DealsListProps) => {
+const DealsList = ({ deals, onDealsChange }: DealsListProps) => {
+  const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
+  const [deletingDealId, setDeletingDealId] = useState<string | null>(null);
+  const { toast } = useToast();
+  const handleDelete = async (dealId: string) => {
+    try {
+      const { error } = await supabase.from("deals").delete().eq("id", dealId);
+
+      if (error) throw error;
+
+      toast({
+        title: "עסקה נמחקה בהצלחה",
+        description: "העסקה הוסרה מהמערכת",
+      });
+
+      setDeletingDealId(null);
+      onDealsChange();
+    } catch (error: any) {
+      toast({
+        title: "שגיאה",
+        description: error.message || "אירעה שגיאה במחיקת העסקה",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getTrafficSourceLabel = (source: string) => {
     const labels: Record<string, string> = {
       RFF: "הפניה",
@@ -89,6 +131,7 @@ const DealsList = ({ deals }: DealsListProps) => {
             <TableHead className="text-right">הפקדה ($)</TableHead>
             <TableHead className="text-right">בונוס (₪)</TableHead>
             <TableHead className="text-right">קישור</TableHead>
+            <TableHead className="text-right">פעולות</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -129,6 +172,24 @@ const DealsList = ({ deals }: DealsListProps) => {
                   <span className="text-muted-foreground">-</span>
                 )}
               </TableCell>
+              <TableCell>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setEditingDeal(deal)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setDeletingDealId(deal.id)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+              </TableCell>
             </TableRow>
           ))}
           <TableRow className="bg-muted/50 font-bold">
@@ -153,7 +214,8 @@ const DealsList = ({ deals }: DealsListProps) => {
   );
 
   return (
-    <Card>
+    <>
+      <Card>
       <CardHeader>
         <CardTitle>עסקאות אחרונות</CardTitle>
       </CardHeader>
@@ -194,6 +256,36 @@ const DealsList = ({ deals }: DealsListProps) => {
         )}
       </CardContent>
     </Card>
+
+    {editingDeal && (
+      <EditDealDialog
+        deal={editingDeal}
+        open={!!editingDeal}
+        onOpenChange={(open) => !open && setEditingDeal(null)}
+        onDealUpdated={onDealsChange}
+      />
+    )}
+
+    <AlertDialog open={!!deletingDealId} onOpenChange={(open) => !open && setDeletingDealId(null)}>
+      <AlertDialogContent dir="rtl">
+        <AlertDialogHeader>
+          <AlertDialogTitle>האם אתה בטוח?</AlertDialogTitle>
+          <AlertDialogDescription>
+            פעולה זו תמחק את העסקה לצמיתות ולא ניתן יהיה לשחזר אותה.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>ביטול</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => deletingDealId && handleDelete(deletingDealId)}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            מחק
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 };
 
