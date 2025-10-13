@@ -19,8 +19,6 @@ const SalaryCalculator = ({ baseSalary, deals }: SalaryCalculatorProps) => {
   const calculations = useMemo(() => {
     let trafficSourceBonus = 0;
     let depositBonus = 0;
-    let totalEQBonus = 0;
-    let deduction = 0;
 
     deals.forEach((deal) => {
       if (!deal.is_new_client) return;
@@ -36,33 +34,15 @@ const SalaryCalculator = ({ baseSalary, deals }: SalaryCalculatorProps) => {
       if (deal.client_type === "EQ" && deal.initial_deposit >= 10000 && deal.completed_within_4_days) {
         depositBonus += 500;
       }
-
-      // Calculate total EQ bonus for deduction
-      if (deal.client_type === "EQ") {
-        let eqBonus = 0;
-        if (deal.traffic_source === "RFF" || deal.traffic_source === "PPC") {
-          eqBonus += 700;
-        } else if (deal.traffic_source === "ORG" || deal.traffic_source === "AFF") {
-          eqBonus += 400;
-        }
-        if (deal.initial_deposit >= 10000 && deal.completed_within_4_days) {
-          eqBonus += 500;
-        }
-        totalEQBonus += eqBonus;
-      }
     });
 
-    // Apply deduction (max 15,840 ILS and not more than total EQ bonus)
-    deduction = Math.min(totalEQBonus, 15840);
-
-    const totalBonus = trafficSourceBonus + depositBonus - deduction;
+    const totalBonus = trafficSourceBonus + depositBonus;
     const totalSalary = baseSalary + totalBonus;
 
     return {
       baseSalary,
       trafficSourceBonus,
       depositBonus,
-      deduction,
       totalBonus,
       totalSalary,
       newClientsCount: deals.filter(d => d.is_new_client).length,
@@ -95,12 +75,6 @@ const SalaryCalculator = ({ baseSalary, deals }: SalaryCalculatorProps) => {
             <span className="text-muted-foreground">תוספת הפקדה $10K+</span>
             <span className="font-medium">₪{calculations.depositBonus.toLocaleString()}</span>
           </div>
-          {calculations.deduction > 0 && (
-            <div className="flex justify-between text-destructive">
-              <span>קיזוז EQ</span>
-              <span className="font-medium">-₪{calculations.deduction.toLocaleString()}</span>
-            </div>
-          )}
         </div>
 
         <div className="border-t pt-4">
