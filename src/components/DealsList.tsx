@@ -26,7 +26,6 @@ import {
 import { Pencil, Trash2, ArrowUpDown, Calendar, Plus, Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import EditDealDialog from "./EditDealDialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -58,7 +57,7 @@ interface DealsListProps {
 }
 
 const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
-  const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
+  const [editingDealId, setEditingDealId] = useState<string | null>(null);
   const [deletingDealId, setDeletingDealId] = useState<string | null>(null);
   const [sortByName, setSortByName] = useState(false);
   const [sortByDate, setSortByDate] = useState(false);
@@ -72,6 +71,15 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
     client_link: "",
     campaign: "",
   });
+  const [editDeal, setEditDeal] = useState<{
+    client_name: string;
+    client_phone: string;
+    client_type: "EQ" | "CFD";
+    traffic_source: "AFF" | "RFF" | "PPC" | "ORG";
+    initial_deposit: string;
+    client_link: string;
+    campaign: string;
+  } | null>(null);
   const { toast } = useToast();
   
   const handleAddDeal = async () => {
@@ -126,6 +134,71 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleStartEdit = (deal: Deal) => {
+    setEditingDealId(deal.id);
+    setEditDeal({
+      client_name: deal.client_name || "",
+      client_phone: deal.client_phone || "",
+      client_type: deal.client_type,
+      traffic_source: deal.traffic_source,
+      initial_deposit: deal.initial_deposit.toString(),
+      client_link: deal.client_link || "",
+      campaign: deal.campaign || "",
+    });
+  };
+
+  const handleSaveEdit = async (dealId: string) => {
+    if (!editDeal) return;
+
+    try {
+      // Validate required fields
+      if (!editDeal.client_name || !editDeal.client_phone || !editDeal.client_type || 
+          !editDeal.traffic_source || !editDeal.initial_deposit) {
+        toast({
+          title: "שגיאה",
+          description: "יש למלא את כל השדות החובה",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from("deals")
+        .update({
+          client_name: editDeal.client_name,
+          client_phone: editDeal.client_phone,
+          client_type: editDeal.client_type,
+          traffic_source: editDeal.traffic_source,
+          initial_deposit: parseFloat(editDeal.initial_deposit),
+          client_link: editDeal.client_link || null,
+          campaign: editDeal.campaign || null,
+        })
+        .eq("id", dealId);
+
+      if (error) throw error;
+
+      toast({
+        title: "עסקה עודכנה בהצלחה!",
+        description: "השינויים נשמרו במערכת",
+      });
+
+      setEditingDealId(null);
+      setEditDeal(null);
+      onDealsChange();
+    } catch (error: any) {
+      toast({
+        title: "שגיאה",
+        description: error.message || "אירעה שגיאה בעדכון העסקה",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingDealId(null);
+    setEditDeal(null);
   };
 
   const handleCancelAdd = () => {
@@ -343,67 +416,169 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
             </TableRow>
           )}
           {dealsArray.map((deal) => (
-            <TableRow key={deal.id}>
-              <TableCell>
-                {format(new Date(deal.created_at), "dd/MM/yyyy HH:mm", { locale: he })}
-              </TableCell>
-              <TableCell>
-                {deal.client_name || <span className="text-muted-foreground">-</span>}
-              </TableCell>
-              <TableCell>
-                {deal.client_phone || <span className="text-muted-foreground">-</span>}
-              </TableCell>
-              <TableCell>
-                <Badge variant={deal.client_type === "EQ" ? "default" : "secondary"}>
-                  {deal.client_type}
-                </Badge>
-              </TableCell>
-              <TableCell>{getTrafficSourceLabel(deal.traffic_source)}</TableCell>
-              <TableCell>
-                {deal.traffic_source === "AFF" && deal.campaign ? (
-                  <span className="text-sm">{deal.campaign}</span>
-                ) : (
-                  <span className="text-muted-foreground">-</span>
-                )}
-              </TableCell>
-              <TableCell className="font-medium">
-                ${deal.initial_deposit.toLocaleString()}
-              </TableCell>
-              <TableCell className="font-bold text-primary">
-                ₪{calculateBonus(deal).toLocaleString()}
-              </TableCell>
-              <TableCell>
-                {deal.client_link ? (
-                  <a 
-                    href={deal.client_link} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    פתח
-                  </a>
-                ) : (
-                  <span className="text-muted-foreground">-</span>
-                )}
-              </TableCell>
-              <TableCell>
-                <div className="flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setEditingDeal(deal)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setDeletingDealId(deal.id)}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              </TableCell>
+            <TableRow key={deal.id} className={editingDealId === deal.id ? "bg-primary/5" : ""}>
+              {editingDealId === deal.id && editDeal ? (
+                <>
+                  <TableCell className="p-2">
+                    <span className="text-sm text-muted-foreground">
+                      {format(new Date(deal.created_at), "dd/MM/yyyy HH:mm", { locale: he })}
+                    </span>
+                  </TableCell>
+                  <TableCell className="p-2">
+                    <Input
+                      placeholder="שם הלקוח"
+                      value={editDeal.client_name}
+                      onChange={(e) => setEditDeal({ ...editDeal, client_name: e.target.value })}
+                      className="h-9"
+                    />
+                  </TableCell>
+                  <TableCell className="p-2">
+                    <Input
+                      placeholder="טלפון"
+                      value={editDeal.client_phone}
+                      onChange={(e) => setEditDeal({ ...editDeal, client_phone: e.target.value })}
+                      className="h-9"
+                    />
+                  </TableCell>
+                  <TableCell className="p-2">
+                    <Select value={editDeal.client_type} onValueChange={(value: "EQ" | "CFD") => setEditDeal({ ...editDeal, client_type: value })}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="בחר" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="EQ">EQ</SelectItem>
+                        <SelectItem value="CFD">CFD</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell className="p-2">
+                    <Select value={editDeal.traffic_source} onValueChange={(value: "AFF" | "RFF" | "PPC" | "ORG") => setEditDeal({ ...editDeal, traffic_source: value })}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="בחר" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="RFF">RFF</SelectItem>
+                        <SelectItem value="PPC">PPC</SelectItem>
+                        <SelectItem value="ORG">ORG</SelectItem>
+                        <SelectItem value="AFF">AFF</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell className="p-2">
+                    {editDeal.traffic_source === "AFF" ? (
+                      <Input
+                        placeholder="שם אפילייאט"
+                        value={editDeal.campaign}
+                        onChange={(e) => setEditDeal({ ...editDeal, campaign: e.target.value })}
+                        className="h-9"
+                      />
+                    ) : (
+                      <span className="text-sm text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="p-2">
+                    <Input
+                      type="number"
+                      placeholder="סכום"
+                      value={editDeal.initial_deposit}
+                      onChange={(e) => setEditDeal({ ...editDeal, initial_deposit: e.target.value })}
+                      className="h-9"
+                    />
+                  </TableCell>
+                  <TableCell className="p-2">-</TableCell>
+                  <TableCell className="p-2">
+                    <Input
+                      placeholder="קישור"
+                      value={editDeal.client_link}
+                      onChange={(e) => setEditDeal({ ...editDeal, client_link: e.target.value })}
+                      className="h-9"
+                    />
+                  </TableCell>
+                  <TableCell className="p-2">
+                    <div className="flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSaveEdit(deal.id)}
+                        className="h-9 w-9 p-0"
+                      >
+                        <Check className="h-4 w-4 text-green-600" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleCancelEdit}
+                        className="h-9 w-9 p-0"
+                      >
+                        <X className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </>
+              ) : (
+                <>
+                  <TableCell>
+                    {format(new Date(deal.created_at), "dd/MM/yyyy HH:mm", { locale: he })}
+                  </TableCell>
+                  <TableCell>
+                    {deal.client_name || <span className="text-muted-foreground">-</span>}
+                  </TableCell>
+                  <TableCell>
+                    {deal.client_phone || <span className="text-muted-foreground">-</span>}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={deal.client_type === "EQ" ? "default" : "secondary"}>
+                      {deal.client_type}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{getTrafficSourceLabel(deal.traffic_source)}</TableCell>
+                  <TableCell>
+                    {deal.traffic_source === "AFF" && deal.campaign ? (
+                      <span className="text-sm">{deal.campaign}</span>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    ${deal.initial_deposit.toLocaleString()}
+                  </TableCell>
+                  <TableCell className="font-bold text-primary">
+                    ₪{calculateBonus(deal).toLocaleString()}
+                  </TableCell>
+                  <TableCell>
+                    {deal.client_link ? (
+                      <a 
+                        href={deal.client_link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        פתח
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleStartEdit(deal)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setDeletingDealId(deal.id)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </>
+              )}
             </TableRow>
           ))}
           <TableRow className="bg-muted/50 font-bold">
@@ -500,15 +675,6 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
         )}
       </CardContent>
     </Card>
-
-    {editingDeal && (
-      <EditDealDialog
-        deal={editingDeal}
-        open={!!editingDeal}
-        onOpenChange={(open) => !open && setEditingDeal(null)}
-        onDealUpdated={onDealsChange}
-      />
-    )}
 
     <AlertDialog open={!!deletingDealId} onOpenChange={(open) => !open && setDeletingDealId(null)}>
       <AlertDialogContent dir="rtl">
