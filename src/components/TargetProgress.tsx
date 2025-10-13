@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Calendar, TrendingUp, Target, Award, Briefcase, Pencil } from "lucide-react";
+import confetti from "canvas-confetti";
 import EditTargetDialog from "@/components/EditTargetDialog";
 import TargetForm from "@/components/TargetForm";
 
@@ -50,6 +51,8 @@ interface TargetProgressProps {
 
 const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdated, selectedYear, selectedMonth, userId }: TargetProgressProps) => {
   const [targetFormOpen, setTargetFormOpen] = useState(false);
+  const [hasPlayedMonthlyConfetti, setHasPlayedMonthlyConfetti] = useState(false);
+  const [hasPlayedQuarterlyConfetti, setHasPlayedQuarterlyConfetti] = useState(false);
   const now = new Date();
   const currentMonth = now.getMonth() + 1;
   const currentYear = now.getFullYear();
@@ -319,6 +322,65 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
       },
     };
   }, [deals, monthlyTargets, quarterlyTargets, selectedYear, selectedMonth, selectedQuarterYearNum, selectedQuarterNum, currentYear, currentMonth, currentQuarter]);
+
+  // Play confetti and sound when target is reached
+  useEffect(() => {
+    const playApplause = () => {
+      const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3');
+      audio.volume = 0.5;
+      audio.play().catch(err => console.log('Audio play failed:', err));
+    };
+
+    const fireConfetti = () => {
+      const duration = 3000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+      function randomInRange(min: number, max: number) {
+        return Math.random() * (max - min) + min;
+      }
+
+      const interval: any = setInterval(function() {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+          return clearInterval(interval);
+        }
+
+        const particleCount = 50 * (timeLeft / duration);
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+        });
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+        });
+      }, 250);
+    };
+
+    // Check monthly target
+    if (calculations.monthly.target && 
+        calculations.monthly.totalPercentage >= 100 && 
+        !hasPlayedMonthlyConfetti &&
+        calculations.monthly.isCurrentPeriod) {
+      setHasPlayedMonthlyConfetti(true);
+      fireConfetti();
+      playApplause();
+    }
+
+    // Check quarterly target
+    if (calculations.quarterly.target && 
+        calculations.quarterly.totalPercentage >= 100 && 
+        !hasPlayedQuarterlyConfetti &&
+        calculations.quarterly.isCurrentPeriod) {
+      setHasPlayedQuarterlyConfetti(true);
+      fireConfetti();
+      playApplause();
+    }
+  }, [calculations, hasPlayedMonthlyConfetti, hasPlayedQuarterlyConfetti]);
 
   return (
     <>
