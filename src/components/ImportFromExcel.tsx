@@ -34,6 +34,26 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
     return mapping[label] || "RFF";
   };
 
+  // Helper: robustly find a value by header candidates (handles RTL invisible chars)
+  const getHeaderValue = (row: any, candidates: string[]): string => {
+    const keys = Object.keys(row);
+    const normalize = (s: any) =>
+      s?.toString()
+        .replace(/[\u200e\u200f\u202a-\u202e]/g, "")
+        .trim()
+        .replace(/\s+/g, " ")
+        .toLowerCase();
+    const map = new Map(keys.map((k) => [normalize(k), row[k]]));
+    for (const c of candidates) {
+      const n = normalize(c);
+      if (map.has(n)) return String(map.get(n) ?? "");
+      for (const [nk, val] of map) {
+        if (nk.includes(n)) return String(val ?? "");
+      }
+    }
+    return "";
+  };
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -51,8 +71,8 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
         const clientTypeValue = row["סוג הלקוח"] || row["סוג לקוח"] || "";
         const clientType = (clientTypeValue === "AQ" || clientTypeValue === "EQ") ? "EQ" : "CFD";
         
-        // Get traffic source from the Hebrew column
-        const trafficSourceLabel = row["מקור הגעה"] || "";
+        // Get traffic source (supporting variations/invisible RTL chars)
+        const trafficSourceLabel = getHeaderValue(row, ["מקור הגעה", "מקור", "traffic source", "source"]);
         const trafficSource = getTrafficSourceCode(trafficSourceLabel);
         
         // Get deposit amount
