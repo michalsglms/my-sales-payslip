@@ -38,6 +38,28 @@ const DealsList = ({ deals }: DealsListProps) => {
     return labels[source] || source;
   };
 
+  const calculateBonus = (deal: Deal) => {
+    let bonus = 0;
+    
+    // Traffic source bonus
+    if (deal.initial_deposit >= 10000) {
+      bonus += 700;
+    } else {
+      if (deal.traffic_source === "RFF" || deal.traffic_source === "PPC") {
+        bonus += 700;
+      } else if (deal.traffic_source === "ORG" || deal.traffic_source === "AFF") {
+        bonus += 400;
+      }
+    }
+    
+    // Additional bonus for EQ clients with $10,000+
+    if (deal.client_type === "EQ" && deal.initial_deposit >= 10000) {
+      bonus += 500;
+    }
+    
+    return bonus;
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -57,6 +79,7 @@ const DealsList = ({ deals }: DealsListProps) => {
                   <TableHead className="text-right">סוג לקוח</TableHead>
                   <TableHead className="text-right">מקור הגעה</TableHead>
                   <TableHead className="text-right">הפקדה ($)</TableHead>
+                  <TableHead className="text-right">בונוס (₪)</TableHead>
                   <TableHead className="text-right">קישור</TableHead>
                   <TableHead className="text-right">סטטוס</TableHead>
                 </TableRow>
@@ -75,6 +98,9 @@ const DealsList = ({ deals }: DealsListProps) => {
                     <TableCell>{getTrafficSourceLabel(deal.traffic_source)}</TableCell>
                     <TableCell className="font-medium">
                       ${deal.initial_deposit.toLocaleString()}
+                    </TableCell>
+                    <TableCell className="font-bold text-primary">
+                      ₪{calculateBonus(deal).toLocaleString()}
                     </TableCell>
                     <TableCell>
                       {deal.client_link ? (
