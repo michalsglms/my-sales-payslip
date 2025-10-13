@@ -75,6 +75,7 @@ export type Database = {
           id: string
           month: number
           sales_rep_id: string
+          workdays_in_period: number | null
           year: number
         }
         Insert: {
@@ -84,6 +85,7 @@ export type Database = {
           id?: string
           month: number
           sales_rep_id: string
+          workdays_in_period?: number | null
           year: number
         }
         Update: {
@@ -93,6 +95,7 @@ export type Database = {
           id?: string
           month?: number
           sales_rep_id?: string
+          workdays_in_period?: number | null
           year?: number
         }
         Relationships: [
@@ -137,6 +140,7 @@ export type Database = {
           id: string
           quarter: number
           sales_rep_id: string
+          workdays_in_period: number | null
           year: number
         }
         Insert: {
@@ -146,6 +150,7 @@ export type Database = {
           id?: string
           quarter: number
           sales_rep_id: string
+          workdays_in_period?: number | null
           year: number
         }
         Update: {
@@ -155,6 +160,7 @@ export type Database = {
           id?: string
           quarter?: number
           sales_rep_id?: string
+          workdays_in_period?: number | null
           year?: number
         }
         Relationships: [

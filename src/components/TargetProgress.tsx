@@ -17,6 +17,7 @@ interface MonthlyTarget {
   year: number;
   general_target_amount: number;
   cfd_target_amount: number;
+  workdays_in_period?: number;
 }
 
 interface QuarterlyTarget {
@@ -25,6 +26,7 @@ interface QuarterlyTarget {
   year: number;
   general_target_amount: number;
   cfd_target_amount: number;
+  workdays_in_period?: number;
 }
 
 interface TargetProgressProps {
@@ -35,11 +37,39 @@ interface TargetProgressProps {
 }
 
 const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdated }: TargetProgressProps) => {
+  // Calculate workdays in a period (excluding Friday and Saturday)
+  const calculateWorkdays = (startDate: Date, endDate: Date): number => {
+    let workdays = 0;
+    const current = new Date(startDate);
+    
+    while (current <= endDate) {
+      const dayOfWeek = current.getDay();
+      // 5 = Friday, 6 = Saturday
+      if (dayOfWeek !== 5 && dayOfWeek !== 6) {
+        workdays++;
+      }
+      current.setDate(current.getDate() + 1);
+    }
+    
+    return workdays;
+  };
+
   const calculations = useMemo(() => {
     const now = new Date();
     const currentMonth = now.getMonth() + 1;
     const currentYear = now.getFullYear();
     const currentQuarter = Math.ceil(currentMonth / 3);
+
+    // Calculate current month workdays
+    const monthStart = new Date(currentYear, currentMonth - 1, 1);
+    const monthEnd = new Date(currentYear, currentMonth, 0);
+    const currentMonthWorkdays = calculateWorkdays(monthStart, monthEnd);
+
+    // Calculate current quarter workdays
+    const quarterStartMonth = (currentQuarter - 1) * 3;
+    const quarterStart = new Date(currentYear, quarterStartMonth, 1);
+    const quarterEnd = new Date(currentYear, quarterStartMonth + 3, 0);
+    const currentQuarterWorkdays = calculateWorkdays(quarterStart, quarterEnd);
 
     // Get current month's target
     const monthlyTarget = monthlyTargets.find(
@@ -62,13 +92,13 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
     });
 
     // Count deals for current quarter
-    const quarterStartMonth = (currentQuarter - 1) * 3 + 1;
     const quarterlyDeals = deals.filter((deal) => {
       const dealDate = new Date(deal.created_at);
       const dealMonth = dealDate.getMonth() + 1;
+      const quarterDealStartMonth = (currentQuarter - 1) * 3 + 1;
       return (
-        dealMonth >= quarterStartMonth &&
-        dealMonth < quarterStartMonth + 3 &&
+        dealMonth >= quarterDealStartMonth &&
+        dealMonth < quarterDealStartMonth + 3 &&
         dealDate.getFullYear() === currentYear &&
         deal.is_new_client
       );
@@ -143,6 +173,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
         totalPercentage: Math.min(monthlyPercentage, 100),
         cfdPercentage: Math.min(monthlyCFDPercentage, 100),
         bonus: monthlyBonus,
+        workdays: monthlyTarget?.workdays_in_period || currentMonthWorkdays,
       },
       quarterly: {
         target: quarterlyTarget,
@@ -151,6 +182,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
         totalPercentage: Math.min(quarterlyPercentage, 100),
         cfdPercentage: Math.min(quarterlyCFDPercentage, 100),
         bonus: quarterlyBonus,
+        workdays: quarterlyTarget?.workdays_in_period || currentQuarterWorkdays,
       },
     };
   }, [deals, monthlyTargets, quarterlyTargets]);
@@ -167,6 +199,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                 targetType="monthly"
                 currentGeneralTarget={calculations.monthly.target.general_target_amount}
                 currentCfdTarget={calculations.monthly.target.cfd_target_amount}
+                currentWorkdays={calculations.monthly.target.workdays_in_period}
                 period="חודשי"
                 onTargetUpdated={onTargetUpdated}
               />
@@ -176,6 +209,13 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
         <CardContent className="space-y-4" dir="rtl">
           {calculations.monthly.target ? (
             <>
+              <div className="mb-4 p-3 bg-muted/50 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">ימי עבודה בחודש</span>
+                  <span className="font-bold text-lg">{calculations.monthly.workdays}</span>
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>יעד כללי (EQ + CFD)</span>
@@ -235,6 +275,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                 targetType="quarterly"
                 currentGeneralTarget={calculations.quarterly.target.general_target_amount}
                 currentCfdTarget={calculations.quarterly.target.cfd_target_amount}
+                currentWorkdays={calculations.quarterly.target.workdays_in_period}
                 period="רבעוני"
                 onTargetUpdated={onTargetUpdated}
               />
@@ -244,6 +285,13 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
         <CardContent className="space-y-4" dir="rtl">
           {calculations.quarterly.target ? (
             <>
+              <div className="mb-4 p-3 bg-muted/50 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-muted-foreground">ימי עבודה ברבעון</span>
+                  <span className="font-bold text-lg">{calculations.quarterly.workdays}</span>
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>יעד כללי (EQ + CFD)</span>

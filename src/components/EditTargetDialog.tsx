@@ -28,6 +28,7 @@ import { Pencil } from "lucide-react";
 const targetSchema = z.object({
   general_target_amount: z.string().min(1, "יש להזין יעד כללי"),
   cfd_target_amount: z.string().min(1, "יש להזין יעד CFD"),
+  workdays_in_period: z.string().optional(),
 });
 
 type TargetValues = z.infer<typeof targetSchema>;
@@ -37,6 +38,7 @@ interface EditTargetDialogProps {
   targetType: "monthly" | "quarterly";
   currentGeneralTarget: number;
   currentCfdTarget: number;
+  currentWorkdays?: number;
   period: string;
   onTargetUpdated: () => void;
 }
@@ -46,6 +48,7 @@ const EditTargetDialog = ({
   targetType,
   currentGeneralTarget,
   currentCfdTarget,
+  currentWorkdays,
   period,
   onTargetUpdated,
 }: EditTargetDialogProps) => {
@@ -57,6 +60,7 @@ const EditTargetDialog = ({
     defaultValues: {
       general_target_amount: currentGeneralTarget.toString(),
       cfd_target_amount: currentCfdTarget.toString(),
+      workdays_in_period: currentWorkdays?.toString() || "",
     },
   });
 
@@ -64,12 +68,18 @@ const EditTargetDialog = ({
     try {
       const tableName = targetType === "monthly" ? "monthly_targets" : "quarterly_targets";
       
+      const updateData: any = {
+        general_target_amount: parseFloat(data.general_target_amount),
+        cfd_target_amount: parseFloat(data.cfd_target_amount),
+      };
+
+      if (data.workdays_in_period) {
+        updateData.workdays_in_period = parseInt(data.workdays_in_period);
+      }
+
       const { error } = await supabase
         .from(tableName)
-        .update({
-          general_target_amount: parseFloat(data.general_target_amount),
-          cfd_target_amount: parseFloat(data.cfd_target_amount),
-        })
+        .update(updateData)
         .eq("id", targetId);
 
       if (error) throw error;
@@ -128,6 +138,20 @@ const EditTargetDialog = ({
                     <Input type="number" placeholder="5" {...field} />
                   </FormControl>
                   <FormDescription>מספר לקוחות CFD בלבד ליעד</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="workdays_in_period"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>ימי עבודה בתקופה (לא כולל שישי-שבת)</FormLabel>
+                  <FormControl>
+                    <Input type="number" placeholder="22" {...field} />
+                  </FormControl>
+                  <FormDescription>מספר ימי העבודה בחודש/רבעון</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

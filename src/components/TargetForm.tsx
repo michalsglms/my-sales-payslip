@@ -31,6 +31,7 @@ const monthlyTargetSchema = z.object({
   year: z.string().min(1, "יש לבחור שנה"),
   general_target_amount: z.string().min(1, "יש להזין יעד כללי"),
   cfd_target_amount: z.string().min(1, "יש להזין יעד CFD"),
+  workdays_in_period: z.string().optional(),
 });
 
 const quarterlyTargetSchema = z.object({
@@ -38,6 +39,7 @@ const quarterlyTargetSchema = z.object({
   year: z.string().min(1, "יש לבחור שנה"),
   general_target_amount: z.string().min(1, "יש להזין יעד כללי"),
   cfd_target_amount: z.string().min(1, "יש להזין יעד CFD"),
+  workdays_in_period: z.string().optional(),
 });
 
 type MonthlyTargetValues = z.infer<typeof monthlyTargetSchema>;
@@ -62,13 +64,19 @@ const TargetForm = ({ userId, onTargetAdded }: TargetFormProps) => {
 
   const onMonthlySubmit = async (data: MonthlyTargetValues) => {
     try {
-      const { error } = await supabase.from("monthly_targets").insert({
+      const insertData: any = {
         sales_rep_id: userId,
         month: parseInt(data.month),
         year: parseInt(data.year),
         general_target_amount: parseFloat(data.general_target_amount),
         cfd_target_amount: parseFloat(data.cfd_target_amount),
-      });
+      };
+
+      if (data.workdays_in_period) {
+        insertData.workdays_in_period = parseInt(data.workdays_in_period);
+      }
+
+      const { error } = await supabase.from("monthly_targets").insert(insertData);
 
       if (error) throw error;
 
@@ -91,13 +99,19 @@ const TargetForm = ({ userId, onTargetAdded }: TargetFormProps) => {
 
   const onQuarterlySubmit = async (data: QuarterlyTargetValues) => {
     try {
-      const { error } = await supabase.from("quarterly_targets").insert({
+      const insertData: any = {
         sales_rep_id: userId,
         quarter: parseInt(data.quarter),
         year: parseInt(data.year),
         general_target_amount: parseFloat(data.general_target_amount),
         cfd_target_amount: parseFloat(data.cfd_target_amount),
-      });
+      };
+
+      if (data.workdays_in_period) {
+        insertData.workdays_in_period = parseInt(data.workdays_in_period);
+      }
+
+      const { error } = await supabase.from("quarterly_targets").insert(insertData);
 
       if (error) throw error;
 
@@ -195,6 +209,20 @@ const TargetForm = ({ userId, onTargetAdded }: TargetFormProps) => {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={monthlyForm.control}
+                  name="workdays_in_period"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>ימי עבודה בחודש (אופציונלי)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="22" {...field} />
+                      </FormControl>
+                      <FormDescription>לא כולל שישי-שבת. ישמש לחישובים עתידיים</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <Button type="submit" className="w-full">
                   שמור יעד חודשי
                 </Button>
@@ -256,6 +284,20 @@ const TargetForm = ({ userId, onTargetAdded }: TargetFormProps) => {
                         <Input type="number" placeholder="15" {...field} />
                       </FormControl>
                       <FormDescription>מספר לקוחות CFD בלבד ליעד</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={quarterlyForm.control}
+                  name="workdays_in_period"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>ימי עבודה ברבעון (אופציונלי)</FormLabel>
+                      <FormControl>
+                        <Input type="number" placeholder="65" {...field} />
+                      </FormControl>
+                      <FormDescription>לא כולל שישי-שבת. ישמש לחישובים עתידיים</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
