@@ -113,21 +113,15 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
         </div>
 
         <div className="border-t pt-4 space-y-2">
-          <div className="flex justify-between">
+          <div className="flex items-center justify-between">
             <span className="text-muted-foreground">סך הכל בונוס EQ</span>
+            <span className="w-16 text-center font-medium">{calculations.eqCount}</span>
             <span className="font-medium">₪{calculations.eqBonus.toLocaleString()}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">לקוחות חדשים EQ</span>
-            <span className="font-medium">{calculations.eqCount}</span>
-          </div>
-          <div className="flex justify-between">
+          <div className="flex items-center justify-between">
             <span className="text-muted-foreground">סך הכל בונוס CFD</span>
+            <span className="w-16 text-center font-medium">{calculations.cfdCount}</span>
             <span className="font-medium">₪{calculations.cfdBonus.toLocaleString()}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">לקוחות חדשים CFD</span>
-            <span className="font-medium">{calculations.cfdCount}</span>
           </div>
         </div>
 
