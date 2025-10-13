@@ -30,7 +30,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
 
@@ -38,7 +37,6 @@ const dealSchema = z.object({
   client_type: z.enum(["EQ", "CFD"], { required_error: "יש לבחור סוג לקוח" }),
   traffic_source: z.enum(["AFF", "RFF", "PPC", "ORG"], { required_error: "יש לבחור מקור הגעה" }),
   initial_deposit: z.string().min(1, "יש להזין סכום הפקדה"),
-  is_new_client: z.boolean().default(true),
   client_link: z.string().optional(),
   notes: z.string().optional(),
 });
@@ -56,9 +54,6 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
 
   const form = useForm<DealFormValues>({
     resolver: zodResolver(dealSchema),
-    defaultValues: {
-      is_new_client: true,
-    },
   });
 
   const onSubmit = async (data: DealFormValues) => {
@@ -68,7 +63,7 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
         client_type: data.client_type,
         traffic_source: data.traffic_source,
         initial_deposit: parseFloat(data.initial_deposit),
-        is_new_client: data.is_new_client,
+        is_new_client: true, // כל עסקה חדשה היא לקוח חדש
         client_link: data.client_link,
         notes: data.notes,
       });
@@ -164,22 +159,6 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
                   </FormControl>
                   <FormDescription>הזן סכום בדולרים</FormDescription>
                   <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="is_new_client"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                  </FormControl>
-                  <div className="space-y-1 leading-none mr-3">
-                    <FormLabel>לקוח חדש</FormLabel>
-                    <FormDescription>האם זה לקוח חדש לחברה?</FormDescription>
-                  </div>
                 </FormItem>
               )}
             />
