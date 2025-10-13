@@ -51,9 +51,9 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
   const currentYear = now.getFullYear();
   const currentQuarter = Math.ceil(currentMonth / 3);
 
-  // State for selected quarter
+  // Calculate the quarter based on selected month
   const selectedQuarter = Math.ceil(selectedMonth / 3);
-  const [selectedQuarterYear, setSelectedQuarterYear] = useState(`${selectedYear}-${selectedQuarter}`);
+  const selectedQuarterYear = `${selectedYear}-${selectedQuarter}`;
 
   // Generate list of available quarters (last 8 quarters)
   const availableQuarters = useMemo(() => {
@@ -381,33 +381,19 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
 
       <Card>
         <CardHeader>
-          <div className="flex justify-between items-center gap-2">
-            <CardTitle>יעד רבעוני</CardTitle>
-            <div className="flex items-center gap-2">
-              <Select value={selectedQuarterYear} onValueChange={setSelectedQuarterYear}>
-                <SelectTrigger className="w-[150px] h-9">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-background z-50">
-                  {availableQuarters.map((quarter) => (
-                    <SelectItem key={quarter.value} value={quarter.value}>
-                      {quarter.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {calculations.quarterly.target && (
-                <EditTargetDialog
-                  targetId={calculations.quarterly.target.id}
-                  targetType="quarterly"
-                  currentGeneralTarget={calculations.quarterly.target.general_target_amount}
-                  currentCfdTarget={calculations.quarterly.target.cfd_target_amount}
-                  currentWorkdays={calculations.quarterly.target.workdays_in_period}
-                  period="רבעוני"
-                  onTargetUpdated={onTargetUpdated}
-                />
-              )}
-            </div>
+          <div className="flex justify-between items-center">
+            <CardTitle>יעד רבעוני - רבעון {selectedQuarterNum}/{selectedQuarterYearNum}</CardTitle>
+            {calculations.quarterly.target && (
+              <EditTargetDialog
+                targetId={calculations.quarterly.target.id}
+                targetType="quarterly"
+                currentGeneralTarget={calculations.quarterly.target.general_target_amount}
+                currentCfdTarget={calculations.quarterly.target.cfd_target_amount}
+                currentWorkdays={calculations.quarterly.target.workdays_in_period}
+                period="רבעוני"
+                onTargetUpdated={onTargetUpdated}
+              />
+            )}
           </div>
         </CardHeader>
         <CardContent className="space-y-4" dir="rtl">
