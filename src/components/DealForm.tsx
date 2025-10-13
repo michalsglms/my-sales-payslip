@@ -39,7 +39,6 @@ const dealSchema = z.object({
   traffic_source: z.enum(["AFF", "RFF", "PPC", "ORG"], { required_error: "יש לבחור מקור הגעה" }),
   initial_deposit: z.string().min(1, "יש להזין סכום הפקדה"),
   is_new_client: z.boolean().default(true),
-  completed_within_4_days: z.boolean().default(false),
   client_link: z.string().optional(),
   notes: z.string().optional(),
 });
@@ -59,7 +58,6 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
     resolver: zodResolver(dealSchema),
     defaultValues: {
       is_new_client: true,
-      completed_within_4_days: false,
     },
   });
 
@@ -71,7 +69,6 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
         traffic_source: data.traffic_source,
         initial_deposit: parseFloat(data.initial_deposit),
         is_new_client: data.is_new_client,
-        completed_within_4_days: data.completed_within_4_days,
         client_link: data.client_link,
         notes: data.notes,
       });
@@ -182,22 +179,6 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
                   <div className="space-y-1 leading-none mr-3">
                     <FormLabel>לקוח חדש</FormLabel>
                     <FormDescription>האם זה לקוח חדש לחברה?</FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="completed_within_4_days"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                  </FormControl>
-                  <div className="space-y-1 leading-none mr-3">
-                    <FormLabel>הושלם תוך 4 ימים</FormLabel>
-                    <FormDescription>האם ההפקדה הושלמה תוך 4 ימים?</FormDescription>
                   </div>
                 </FormItem>
               )}
