@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { format } from "date-fns";
 import { he } from "date-fns/locale";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,7 +23,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, ArrowUpDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import EditDealDialog from "./EditDealDialog";
@@ -50,6 +50,7 @@ interface DealsListProps {
 const DealsList = ({ deals, onDealsChange }: DealsListProps) => {
   const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
   const [deletingDealId, setDeletingDealId] = useState<string | null>(null);
+  const [sortByName, setSortByName] = useState(false);
   const { toast } = useToast();
   const handleDelete = async (dealId: string) => {
     try {
@@ -104,8 +105,17 @@ const DealsList = ({ deals, onDealsChange }: DealsListProps) => {
     return bonus;
   };
 
-  const eqDeals = deals.filter(d => d.client_type === "EQ");
-  const cfdDeals = deals.filter(d => d.client_type === "CFD");
+  const sortedDeals = useMemo(() => {
+    if (!sortByName) return deals;
+    return [...deals].sort((a, b) => {
+      const nameA = (a.client_name || "").toLowerCase();
+      const nameB = (b.client_name || "").toLowerCase();
+      return nameA.localeCompare(nameB, 'he');
+    });
+  }, [deals, sortByName]);
+
+  const eqDeals = sortedDeals.filter(d => d.client_type === "EQ");
+  const cfdDeals = sortedDeals.filter(d => d.client_type === "CFD");
 
   const calculateTotals = (dealsArray: Deal[]) => {
     const totalDeposit = dealsArray.reduce((sum, deal) => sum + deal.initial_deposit, 0);
@@ -113,7 +123,7 @@ const DealsList = ({ deals, onDealsChange }: DealsListProps) => {
     return { totalDeposit, totalBonus };
   };
 
-  const allTotals = calculateTotals(deals);
+  const allTotals = calculateTotals(sortedDeals);
   const eqTotals = calculateTotals(eqDeals);
   const cfdTotals = calculateTotals(cfdDeals);
 
@@ -216,7 +226,17 @@ const DealsList = ({ deals, onDealsChange }: DealsListProps) => {
     <>
       <Card>
       <CardHeader>
-        <CardTitle>עסקאות אחרונות</CardTitle>
+        <div className="flex justify-between items-center">
+          <CardTitle>עסקאות אחרונות</CardTitle>
+          <Button
+            variant={sortByName ? "default" : "outline"}
+            size="sm"
+            onClick={() => setSortByName(!sortByName)}
+          >
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+            מיון לפי שם
+          </Button>
+        </div>
       </CardHeader>
       <CardContent dir="rtl">
         {deals.length === 0 ? (
@@ -231,7 +251,7 @@ const DealsList = ({ deals, onDealsChange }: DealsListProps) => {
               <TabsTrigger value="cfd">CFD</TabsTrigger>
             </TabsList>
             <TabsContent value="all" className="mt-4">
-              {renderTable(deals, allTotals)}
+              {renderTable(sortedDeals, allTotals)}
             </TabsContent>
             <TabsContent value="eq" className="mt-4">
               {eqDeals.length === 0 ? (
