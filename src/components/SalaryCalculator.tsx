@@ -26,6 +26,8 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
   const calculations = useMemo(() => {
     let eqBonus = 0;
     let cfdBonus = 0;
+    let eqCount = 0;
+    let cfdCount = 0;
 
     deals.forEach((deal) => {
       if (!deal.is_new_client) return;
@@ -58,8 +60,10 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
       // Add to appropriate category
       if (deal.client_type === "EQ") {
         eqBonus += dealBonus;
+        eqCount++;
       } else {
         cfdBonus += dealBonus;
+        cfdCount++;
       }
     });
 
@@ -71,6 +75,8 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
       baseSalary,
       eqBonus,
       cfdBonus,
+      eqCount,
+      cfdCount,
       totalBonus,
       monthlyGeneralBonus,
       monthlyCfdBonus,
@@ -111,9 +117,15 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
             <span className="text-muted-foreground">סך הכל בונוס EQ</span>
             <span className="font-medium">₪{calculations.eqBonus.toLocaleString()}</span>
           </div>
+          <div className="text-xs text-muted-foreground text-left mb-2">
+            {calculations.eqCount} לקוחות EQ
+          </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">סך הכל בונוס CFD</span>
             <span className="font-medium">₪{calculations.cfdBonus.toLocaleString()}</span>
+          </div>
+          <div className="text-xs text-muted-foreground text-left">
+            {calculations.cfdCount} לקוחות CFD
           </div>
         </div>
 
