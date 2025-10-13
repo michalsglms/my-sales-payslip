@@ -23,6 +23,11 @@ const SalaryCalculator = ({ baseSalary, deals }: SalaryCalculatorProps) => {
     deals.forEach((deal) => {
       if (!deal.is_new_client) return;
 
+      // No commission for deposits under $2,950
+      if (deal.initial_deposit < 2950) {
+        return;
+      }
+
       let dealBonus = 0;
 
       // Traffic source bonus (includes 60 ILS base per new client)

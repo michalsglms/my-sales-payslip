@@ -84,6 +84,11 @@ const DealsList = ({ deals, onDealsChange }: DealsListProps) => {
   };
 
   const calculateBonus = (deal: Deal) => {
+    // No commission for deposits under $2,950
+    if (deal.initial_deposit < 2950) {
+      return 0;
+    }
+
     let bonus = 0;
     
     // Traffic source bonus
