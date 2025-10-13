@@ -182,10 +182,10 @@ const EditDealDialog = ({ deal, open, onOpenChange, onDealUpdated }: EditDealDia
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="RFF">RFF - הפניה</SelectItem>
-                      <SelectItem value="PPC">PPC - פרסום ממומן</SelectItem>
-                      <SelectItem value="ORG">ORG - אורגני</SelectItem>
-                      <SelectItem value="AFF">AFF - שיווק שותפים</SelectItem>
+                      <SelectItem value="RFF">RFF</SelectItem>
+                      <SelectItem value="PPC">PPC</SelectItem>
+                      <SelectItem value="ORG">ORG</SelectItem>
+                      <SelectItem value="AFF">AFF</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

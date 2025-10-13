@@ -74,13 +74,7 @@ const DealsList = ({ deals, onDealsChange }: DealsListProps) => {
   };
 
   const getTrafficSourceLabel = (source: string) => {
-    const labels: Record<string, string> = {
-      RFF: "הפניה",
-      PPC: "פרסום ממומן",
-      ORG: "אורגני",
-      AFF: "שיווק שותפים",
-    };
-    return labels[source] || source;
+    return source;
   };
 
   const calculateBonus = (deal: Deal) => {
