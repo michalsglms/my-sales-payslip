@@ -297,7 +297,6 @@ const Index = () => {
             <ImportFromExcel userId={user.id} onImportComplete={fetchDeals} />
             <ExportToExcel deals={deals} userName={profile.full_name} />
             <DeleteAllDeals userId={user.id} onDealsDeleted={fetchDeals} />
-            <TargetForm userId={user.id} onTargetAdded={fetchTargets} />
             <DealForm userId={user.id} onDealAdded={fetchDeals} />
           </div>
         </div>
@@ -309,6 +308,7 @@ const Index = () => {
           onTargetUpdated={fetchTargets}
           selectedYear={selectedYear}
           selectedMonth={selectedMonth}
+          userId={user.id}
         />
 
         <SalaryCalculator

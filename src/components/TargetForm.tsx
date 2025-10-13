@@ -48,10 +48,11 @@ type QuarterlyTargetValues = z.infer<typeof quarterlyTargetSchema>;
 interface TargetFormProps {
   userId: string;
   onTargetAdded: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-const TargetForm = ({ userId, onTargetAdded }: TargetFormProps) => {
-  const [open, setOpen] = useState(false);
+const TargetForm = ({ userId, onTargetAdded, open, onOpenChange }: TargetFormProps) => {
   const { toast } = useToast();
 
   const monthlyForm = useForm<MonthlyTargetValues>({
@@ -86,7 +87,7 @@ const TargetForm = ({ userId, onTargetAdded }: TargetFormProps) => {
       });
 
       monthlyForm.reset();
-      setOpen(false);
+      onOpenChange(false);
       onTargetAdded();
     } catch (error: any) {
       toast({
@@ -121,7 +122,7 @@ const TargetForm = ({ userId, onTargetAdded }: TargetFormProps) => {
       });
 
       quarterlyForm.reset();
-      setOpen(false);
+      onOpenChange(false);
       onTargetAdded();
     } catch (error: any) {
       toast({
@@ -133,13 +134,7 @@ const TargetForm = ({ userId, onTargetAdded }: TargetFormProps) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <Target className="ml-2 h-4 w-4" />
-          הגדר יעדים
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md" dir="rtl">
         <DialogHeader>
           <DialogTitle>הגדרת יעדים</DialogTitle>

@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import EditTargetDialog from "@/components/EditTargetDialog";
+import TargetForm from "@/components/TargetForm";
 
 interface Deal {
   id: string;
@@ -43,9 +44,11 @@ interface TargetProgressProps {
   onTargetUpdated: () => void;
   selectedYear: number;
   selectedMonth: number;
+  userId: string;
 }
 
-const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdated, selectedYear, selectedMonth }: TargetProgressProps) => {
+const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdated, selectedYear, selectedMonth, userId }: TargetProgressProps) => {
+  const [targetFormOpen, setTargetFormOpen] = useState(false);
   const now = new Date();
   const currentMonth = now.getMonth() + 1;
   const currentYear = now.getFullYear();
@@ -317,25 +320,29 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
   }, [deals, monthlyTargets, quarterlyTargets, selectedYear, selectedMonth, selectedQuarterYearNum, selectedQuarterNum, currentYear, currentMonth, currentQuarter]);
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle>יעד חודשי</CardTitle>
-            {calculations.monthly.target && (
-              <EditTargetDialog
-                targetId={calculations.monthly.target.id}
-                targetType="monthly"
-                currentGeneralTarget={calculations.monthly.target.general_target_amount}
-                currentCfdTarget={calculations.monthly.target.cfd_target_amount}
-                currentWorkdays={calculations.monthly.target.workdays_in_period}
-                period="חודשי"
-                onTargetUpdated={onTargetUpdated}
-              />
-            )}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4" dir="rtl">
+    <>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card 
+          className={!calculations.monthly.target ? "cursor-pointer hover:bg-muted/50 transition-colors" : ""}
+          onClick={() => !calculations.monthly.target && setTargetFormOpen(true)}
+        >
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle>יעד חודשי</CardTitle>
+              {calculations.monthly.target && (
+                <EditTargetDialog
+                  targetId={calculations.monthly.target.id}
+                  targetType="monthly"
+                  currentGeneralTarget={calculations.monthly.target.general_target_amount}
+                  currentCfdTarget={calculations.monthly.target.cfd_target_amount}
+                  currentWorkdays={calculations.monthly.target.workdays_in_period}
+                  period="חודשי"
+                  onTargetUpdated={onTargetUpdated}
+                />
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4" dir="rtl">
           {calculations.monthly.target ? (
             <>
               <div className="mb-4 p-3 bg-muted/50 rounded-lg">
@@ -425,13 +432,16 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
             </>
           ) : (
             <p className="text-center text-muted-foreground py-8">
-              לא הוגדר יעד חודשי לחודש הנוכחי
+              לא הוגדר יעד חודשי לחודש הנוכחי. לחץ להגדרה.
             </p>
           )}
         </CardContent>
       </Card>
 
-      <Card>
+      <Card
+        className={!calculations.quarterly.target ? "cursor-pointer hover:bg-muted/50 transition-colors" : ""}
+        onClick={() => !calculations.quarterly.target && setTargetFormOpen(true)}
+      >
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle>יעד רבעוני - רבעון {selectedQuarterNum}/{selectedQuarterYearNum}</CardTitle>
@@ -540,12 +550,20 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
             </>
           ) : (
             <p className="text-center text-muted-foreground py-8">
-              לא הוגדר יעד רבעוני לרבעון הנוכחי
+              לא הוגדר יעד רבעוני לרבעון הנוכחי. לחץ להגדרה.
             </p>
           )}
         </CardContent>
       </Card>
     </div>
+
+    <TargetForm
+      userId={userId}
+      onTargetAdded={onTargetUpdated}
+      open={targetFormOpen}
+      onOpenChange={setTargetFormOpen}
+    />
+  </>
   );
 };
 
