@@ -326,9 +326,42 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
   // Play confetti and sound when target is reached
   useEffect(() => {
     const playApplause = () => {
-      const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3');
-      audio.volume = 0.5;
-      audio.play().catch(err => console.log('Audio play failed:', err));
+      // Create a simple celebratory sound using Web Audio API
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      
+      // Create oscillator for celebratory sound
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 523.25; // C5 note
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.5);
+      
+      // Add a second note for harmony
+      setTimeout(() => {
+        const osc2 = audioContext.createOscillator();
+        const gain2 = audioContext.createGain();
+        
+        osc2.connect(gain2);
+        gain2.connect(audioContext.destination);
+        
+        osc2.frequency.value = 659.25; // E5 note
+        osc2.type = 'sine';
+        
+        gain2.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+        
+        osc2.start(audioContext.currentTime);
+        osc2.stop(audioContext.currentTime + 0.5);
+      }, 200);
     };
 
     const fireConfetti = () => {
