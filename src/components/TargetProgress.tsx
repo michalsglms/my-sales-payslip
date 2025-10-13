@@ -64,12 +64,21 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
     const monthStart = new Date(currentYear, currentMonth - 1, 1);
     const monthEnd = new Date(currentYear, currentMonth, 0);
     const currentMonthWorkdays = calculateWorkdays(monthStart, monthEnd);
+    
+    // Calculate workdays passed so far this month
+    const today = new Date();
+    const monthWorkdaysPassed = calculateWorkdays(monthStart, today);
+    const monthWorkdaysRemaining = currentMonthWorkdays - monthWorkdaysPassed;
 
     // Calculate current quarter workdays
     const quarterStartMonth = (currentQuarter - 1) * 3;
     const quarterStart = new Date(currentYear, quarterStartMonth, 1);
     const quarterEnd = new Date(currentYear, quarterStartMonth + 3, 0);
     const currentQuarterWorkdays = calculateWorkdays(quarterStart, quarterEnd);
+    
+    // Calculate workdays passed so far this quarter
+    const quarterWorkdaysPassed = calculateWorkdays(quarterStart, today);
+    const quarterWorkdaysRemaining = currentQuarterWorkdays - quarterWorkdaysPassed;
 
     // Get current month's target
     const monthlyTarget = monthlyTargets.find(
@@ -113,6 +122,22 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
       ? (monthlyCFDCount / monthlyTarget.cfd_target_amount) * 100
       : 0;
 
+    // Calculate monthly projection
+    const monthlyDailyRate = monthWorkdaysPassed > 0 ? monthlyTotalCount / monthWorkdaysPassed : 0;
+    const monthlyCFDDailyRate = monthWorkdaysPassed > 0 ? monthlyCFDCount / monthWorkdaysPassed : 0;
+    const monthlyProjectedTotal = monthWorkdaysPassed > 0 
+      ? Math.round(monthlyTotalCount + (monthlyDailyRate * monthWorkdaysRemaining))
+      : 0;
+    const monthlyProjectedCFD = monthWorkdaysPassed > 0
+      ? Math.round(monthlyCFDCount + (monthlyCFDDailyRate * monthWorkdaysRemaining))
+      : 0;
+    const monthlyProjectedPercentage = monthlyTarget
+      ? (monthlyProjectedTotal / monthlyTarget.general_target_amount) * 100
+      : 0;
+    const monthlyProjectedCFDPercentage = monthlyTarget
+      ? (monthlyProjectedCFD / monthlyTarget.cfd_target_amount) * 100
+      : 0;
+
     const quarterlyTotalCount = quarterlyDeals.length;
     const quarterlyCFDCount = quarterlyDeals.filter((d) => d.client_type === "CFD").length;
     const quarterlyPercentage = quarterlyTarget
@@ -120,6 +145,22 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
       : 0;
     const quarterlyCFDPercentage = quarterlyTarget
       ? (quarterlyCFDCount / quarterlyTarget.cfd_target_amount) * 100
+      : 0;
+
+    // Calculate quarterly projection
+    const quarterlyDailyRate = quarterWorkdaysPassed > 0 ? quarterlyTotalCount / quarterWorkdaysPassed : 0;
+    const quarterlyCFDDailyRate = quarterWorkdaysPassed > 0 ? quarterlyCFDCount / quarterWorkdaysPassed : 0;
+    const quarterlyProjectedTotal = quarterWorkdaysPassed > 0
+      ? Math.round(quarterlyTotalCount + (quarterlyDailyRate * quarterWorkdaysRemaining))
+      : 0;
+    const quarterlyProjectedCFD = quarterWorkdaysPassed > 0
+      ? Math.round(quarterlyCFDCount + (quarterlyCFDDailyRate * quarterWorkdaysRemaining))
+      : 0;
+    const quarterlyProjectedPercentage = quarterlyTarget
+      ? (quarterlyProjectedTotal / quarterlyTarget.general_target_amount) * 100
+      : 0;
+    const quarterlyProjectedCFDPercentage = quarterlyTarget
+      ? (quarterlyProjectedCFD / quarterlyTarget.cfd_target_amount) * 100
       : 0;
 
     // Calculate monthly bonuses
@@ -174,6 +215,13 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
         cfdPercentage: Math.min(monthlyCFDPercentage, 100),
         bonus: monthlyBonus,
         workdays: monthlyTarget?.workdays_in_period || currentMonthWorkdays,
+        workdaysPassed: monthWorkdaysPassed,
+        workdaysRemaining: monthWorkdaysRemaining,
+        projectedTotal: monthlyProjectedTotal,
+        projectedCFD: monthlyProjectedCFD,
+        projectedPercentage: Math.min(monthlyProjectedPercentage, 100),
+        projectedCFDPercentage: Math.min(monthlyProjectedCFDPercentage, 100),
+        dailyRate: monthlyDailyRate,
       },
       quarterly: {
         target: quarterlyTarget,
@@ -183,6 +231,13 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
         cfdPercentage: Math.min(quarterlyCFDPercentage, 100),
         bonus: quarterlyBonus,
         workdays: quarterlyTarget?.workdays_in_period || currentQuarterWorkdays,
+        workdaysPassed: quarterWorkdaysPassed,
+        workdaysRemaining: quarterWorkdaysRemaining,
+        projectedTotal: quarterlyProjectedTotal,
+        projectedCFD: quarterlyProjectedCFD,
+        projectedPercentage: Math.min(quarterlyProjectedPercentage, 100),
+        projectedCFDPercentage: Math.min(quarterlyProjectedCFDPercentage, 100),
+        dailyRate: quarterlyDailyRate,
       },
     };
   }, [deals, monthlyTargets, quarterlyTargets]);
@@ -210,11 +265,40 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
           {calculations.monthly.target ? (
             <>
               <div className="mb-4 p-3 bg-muted/50 rounded-lg">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">ימי עבודה בחודש</span>
-                  <span className="font-bold text-lg">{calculations.monthly.workdays}</span>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-muted-foreground">ימי עבודה</span>
+                  <span className="font-bold">{calculations.monthly.workdays} ימים</span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-muted-foreground">עברו: {calculations.monthly.workdaysPassed}</span>
+                  <span className="text-muted-foreground">נותרו: {calculations.monthly.workdaysRemaining}</span>
                 </div>
               </div>
+
+              {calculations.monthly.workdaysPassed > 0 && (
+                <div className="mb-4 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">תחזית לסוף החודש</span>
+                    <span className="text-xs text-muted-foreground">
+                      (קצב: {calculations.monthly.dailyRate.toFixed(1)} עסקאות/יום)
+                    </span>
+                  </div>
+                  <div className="space-y-1 text-sm">
+                    <div className="flex justify-between">
+                      <span>יעד כללי צפוי:</span>
+                      <span className="font-bold">
+                        {calculations.monthly.projectedTotal} ({calculations.monthly.projectedPercentage.toFixed(0)}%)
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>יעד CFD צפוי:</span>
+                      <span className="font-bold">
+                        {calculations.monthly.projectedCFD} ({calculations.monthly.projectedCFDPercentage.toFixed(0)}%)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
@@ -286,11 +370,40 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
           {calculations.quarterly.target ? (
             <>
               <div className="mb-4 p-3 bg-muted/50 rounded-lg">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">ימי עבודה ברבעון</span>
-                  <span className="font-bold text-lg">{calculations.quarterly.workdays}</span>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-muted-foreground">ימי עבודה</span>
+                  <span className="font-bold">{calculations.quarterly.workdays} ימים</span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-muted-foreground">עברו: {calculations.quarterly.workdaysPassed}</span>
+                  <span className="text-muted-foreground">נותרו: {calculations.quarterly.workdaysRemaining}</span>
                 </div>
               </div>
+
+              {calculations.quarterly.workdaysPassed > 0 && (
+                <div className="mb-4 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">תחזית לסוף הרבעון</span>
+                    <span className="text-xs text-muted-foreground">
+                      (קצב: {calculations.quarterly.dailyRate.toFixed(1)} עסקאות/יום)
+                    </span>
+                  </div>
+                  <div className="space-y-1 text-sm">
+                    <div className="flex justify-between">
+                      <span>יעד כללי צפוי:</span>
+                      <span className="font-bold">
+                        {calculations.quarterly.projectedTotal} ({calculations.quarterly.projectedPercentage.toFixed(0)}%)
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>יעד CFD צפוי:</span>
+                      <span className="font-bold">
+                        {calculations.quarterly.projectedCFD} ({calculations.quarterly.projectedCFDPercentage.toFixed(0)}%)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
