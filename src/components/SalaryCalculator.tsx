@@ -17,38 +17,47 @@ interface SalaryCalculatorProps {
 
 const SalaryCalculator = ({ baseSalary, deals }: SalaryCalculatorProps) => {
   const calculations = useMemo(() => {
-    let trafficSourceBonus = 0;
-    let depositBonus = 0;
+    let eqBonus = 0;
+    let cfdBonus = 0;
 
     deals.forEach((deal) => {
       if (!deal.is_new_client) return;
 
+      let dealBonus = 0;
+
       // Traffic source bonus (includes 60 ILS base per new client)
       // For deposits $10,000+, bonus is 700 ILS regardless of traffic source
       if (deal.initial_deposit >= 10000) {
-        trafficSourceBonus += 700;
+        dealBonus += 700;
       } else {
         // For deposits under $10,000
         if (deal.traffic_source === "RFF" || deal.traffic_source === "PPC") {
-          trafficSourceBonus += 700;
+          dealBonus += 700;
         } else if (deal.traffic_source === "ORG" || deal.traffic_source === "AFF") {
-          trafficSourceBonus += 400;
+          dealBonus += 400;
         }
       }
 
       // Additional 500 ILS bonus ONLY for EQ clients with $10,000+ (not CFD)
       if (deal.client_type === "EQ" && deal.initial_deposit >= 10000) {
-        depositBonus += 500;
+        dealBonus += 500;
+      }
+
+      // Add to appropriate category
+      if (deal.client_type === "EQ") {
+        eqBonus += dealBonus;
+      } else {
+        cfdBonus += dealBonus;
       }
     });
 
-    const totalBonus = trafficSourceBonus + depositBonus;
+    const totalBonus = eqBonus + cfdBonus;
     const totalSalary = baseSalary + totalBonus;
 
     return {
       baseSalary,
-      trafficSourceBonus,
-      depositBonus,
+      eqBonus,
+      cfdBonus,
       totalBonus,
       totalSalary,
       newClientsCount: deals.filter(d => d.is_new_client).length,
@@ -74,12 +83,12 @@ const SalaryCalculator = ({ baseSalary, deals }: SalaryCalculatorProps) => {
 
         <div className="border-t pt-4 space-y-2">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">בונוס מקור הגעה</span>
-            <span className="font-medium">₪{calculations.trafficSourceBonus.toLocaleString()}</span>
+            <span className="text-muted-foreground">סך הכל בונוס EQ</span>
+            <span className="font-medium">₪{calculations.eqBonus.toLocaleString()}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">תוספת EQ על $10K+</span>
-            <span className="font-medium">₪{calculations.depositBonus.toLocaleString()}</span>
+            <span className="text-muted-foreground">סך הכל בונוס CFD</span>
+            <span className="font-medium">₪{calculations.cfdBonus.toLocaleString()}</span>
           </div>
         </div>
 
