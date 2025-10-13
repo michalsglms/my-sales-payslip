@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Calendar, TrendingUp, Target, Award, Briefcase, Pencil } from "lucide-react";
 import EditTargetDialog from "@/components/EditTargetDialog";
 import TargetForm from "@/components/TargetForm";
 
@@ -323,12 +324,22 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
     <>
       <div className="grid gap-4 md:grid-cols-2">
         <Card 
-          className={!calculations.monthly.target ? "cursor-pointer hover:bg-muted/50 transition-colors" : ""}
+          className={!calculations.monthly.target ? "cursor-pointer hover:bg-muted/50 transition-colors border-2 border-dashed" : "bg-gradient-to-br from-background to-muted/20"}
           onClick={() => !calculations.monthly.target && setTargetFormOpen(true)}
         >
-          <CardHeader>
+          <CardHeader className="pb-3">
             <div className="flex justify-between items-center">
-              <CardTitle>יעד חודשי</CardTitle>
+              <div className="flex items-center gap-2">
+                <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Calendar className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">יעד חודשי</CardTitle>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {calculations.monthly.workdays} ימי עבודה
+                  </p>
+                </div>
+              </div>
               {calculations.monthly.target && (
                 <EditTargetDialog
                   targetId={calculations.monthly.target.id}
@@ -345,98 +356,101 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
           <CardContent className="space-y-4" dir="rtl">
           {calculations.monthly.target ? (
             <>
-              <div className="mb-4 p-3 bg-muted/50 rounded-lg">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-muted-foreground">ימי עבודה</span>
-                  <span className="font-bold">{calculations.monthly.workdays} ימים</span>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 bg-primary/5 rounded-lg border border-primary/10">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Briefcase className="h-4 w-4 text-primary" />
+                    <span className="text-xs text-muted-foreground">ימי עבודה</span>
+                  </div>
+                  <p className="text-2xl font-bold">{calculations.monthly.workdays}</p>
+                  <div className="flex gap-2 mt-1 text-xs text-muted-foreground">
+                    <span>עברו {calculations.monthly.workdaysPassed}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-muted-foreground">עברו: {calculations.monthly.workdaysPassed}</span>
-                  <span className="text-muted-foreground">נותרו: {calculations.monthly.workdaysRemaining}</span>
+                <div className="p-3 bg-green-500/5 rounded-lg border border-green-500/10">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Award className="h-4 w-4 text-green-600" />
+                    <span className="text-xs text-muted-foreground">מענק צפוי</span>
+                  </div>
+                  <p className="text-2xl font-bold text-green-600">₪{calculations.monthly.bonus.toLocaleString()}</p>
                 </div>
               </div>
 
               {calculations.monthly.isCurrentPeriod && calculations.monthly.workdaysPassed > 0 && (
-                <div className="mb-4 p-3 bg-primary/5 rounded-lg border border-primary/20">
-                  <div className="flex justify-between items-center mb-2">
+                <div className="p-3 bg-blue-500/5 rounded-lg border border-blue-500/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp className="h-4 w-4 text-blue-600" />
                     <span className="text-sm font-medium">תחזית לסוף החודש</span>
-                    <span className="text-xs text-muted-foreground">
-                      (קצב: {calculations.monthly.dailyRate.toFixed(1)} עסקאות/יום)
-                    </span>
                   </div>
-                  <div className="space-y-1 text-sm">
-                    <div className="flex justify-between">
-                      <span>יעד כללי צפוי:</span>
-                      <span className="font-bold">
+                  <div className="text-xs text-muted-foreground mb-2">
+                    קצב: {calculations.monthly.dailyRate.toFixed(1)} עסקאות/יום
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className="p-2 bg-background rounded">
+                      <div className="text-xs text-muted-foreground">יעד כללי צפוי</div>
+                      <div className="font-bold text-blue-600">
                         {calculations.monthly.projectedTotal} ({calculations.monthly.projectedPercentage.toFixed(0)}%)
-                      </span>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span>יעד CFD צפוי:</span>
-                      <span className="font-bold">
+                    <div className="p-2 bg-background rounded">
+                      <div className="text-xs text-muted-foreground">יעד CFD צפוי</div>
+                      <div className="font-bold text-blue-600">
                         {calculations.monthly.projectedCFD} ({calculations.monthly.projectedCFDPercentage.toFixed(0)}%)
-                      </span>
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
 
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>יעד כללי (EQ + CFD)</span>
-                  <span className="font-medium">
-                    {calculations.monthly.totalCount} / {calculations.monthly.target.general_target_amount}
-                  </span>
-                </div>
-                <Progress value={calculations.monthly.totalPercentage} />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{calculations.monthly.totalPercentage.toFixed(0)}%</span>
-                  {calculations.monthly.totalPercentage >= 100 && (
-                    <Badge variant="default">הושג!</Badge>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>יעד CFD</span>
-                  <span className="font-medium">
-                    {calculations.monthly.cfdCount} / {calculations.monthly.target.cfd_target_amount}
-                  </span>
-                </div>
-                <Progress value={calculations.monthly.cfdPercentage} />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>{calculations.monthly.cfdPercentage.toFixed(0)}%</span>
-                  {calculations.monthly.cfdPercentage >= 100 && (
-                    <Badge variant="default">הושג!</Badge>
-                  )}
-                </div>
-              </div>
-
-              <div className="border-t pt-4 space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">מענק הגעה ליעד חודשי</span>
-                  <span className="text-2xl font-bold text-primary">
-                    ₪{calculations.monthly.bonus.toLocaleString()}
-                  </span>
-                </div>
-                {calculations.monthly.isCurrentPeriod && calculations.monthly.projectedBonus > 0 && (
-                  <div className="flex justify-between items-center p-3 bg-primary/5 rounded-lg border border-primary/20">
-                    <span className="text-sm font-medium">מענק צפוי לפי הקצב הנוכחי</span>
-                    <span className="text-xl font-bold text-primary">
-                      ₪{calculations.monthly.projectedBonus.toLocaleString()}
+              <div className="space-y-3">
+                <div className="p-3 bg-muted/30 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Target className="h-4 w-4 text-primary" />
+                      <span className="text-sm font-medium">יעד כללי (EQ + CFD)</span>
+                    </div>
+                    <span className="text-sm font-bold">
+                      {calculations.monthly.totalCount} / {calculations.monthly.target.general_target_amount}
                     </span>
                   </div>
-                )}
+                  <Progress value={calculations.monthly.totalPercentage} className="h-2 mb-1" />
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">{calculations.monthly.totalPercentage.toFixed(0)}%</span>
+                    {calculations.monthly.totalPercentage >= 100 && (
+                      <Badge variant="default" className="text-xs">הושג!</Badge>
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-3 bg-muted/30 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <Target className="h-4 w-4 text-blue-600" />
+                      <span className="text-sm font-medium">יעד CFD</span>
+                    </div>
+                    <span className="text-sm font-bold">
+                      {calculations.monthly.cfdCount} / {calculations.monthly.target.cfd_target_amount}
+                    </span>
+                  </div>
+                  <Progress value={calculations.monthly.cfdPercentage} className="h-2 mb-1" />
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">{calculations.monthly.cfdPercentage.toFixed(0)}%</span>
+                    {calculations.monthly.cfdPercentage >= 100 && (
+                      <Badge variant="default" className="text-xs">הושג!</Badge>
+                    )}
+                  </div>
+                </div>
               </div>
             </>
           ) : (
-            <p className="text-center text-muted-foreground py-8">
-              לא הוגדר יעד חודשי לחודש הנוכחי. לחץ להגדרה.
-            </p>
+            <div className="text-center py-8">
+              <Target className="h-12 w-12 mx-auto mb-3 text-muted-foreground/50" />
+              <p className="text-muted-foreground mb-2">לא הוגדר יעד חודשי</p>
+              <p className="text-sm text-muted-foreground">לחץ כאן להוספת יעד</p>
+            </div>
           )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
       <Card
         className={!calculations.quarterly.target ? "cursor-pointer hover:bg-muted/50 transition-colors" : ""}
