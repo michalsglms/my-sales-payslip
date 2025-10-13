@@ -638,7 +638,12 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                 <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
                   <Calendar className="h-5 w-5 text-primary" />
                 </div>
-                <CardTitle className="text-lg">יעד חודשי</CardTitle>
+                <div>
+                  <CardTitle className="text-lg">יעד חודשי</CardTitle>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {new Date(selectedYear, selectedMonth - 1).toLocaleDateString('he-IL', { month: 'long', year: 'numeric' })}
+                  </p>
+                </div>
               </div>
               {calculations.monthly.target && (
                 <EditTargetDialog
