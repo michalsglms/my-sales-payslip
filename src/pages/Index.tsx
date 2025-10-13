@@ -136,7 +136,7 @@ const Index = () => {
   };
 
   // Calculate bonuses for the selected month
-  const { monthlyBonus, quarterlyBonus } = useMemo(() => {
+  const { monthlyGeneralBonus, monthlyCfdBonus, quarterlyGeneralBonus, quarterlyCfdBonus } = useMemo(() => {
     const selectedQuarter = Math.ceil(selectedMonth / 3);
     
     // Get selected month's target
@@ -185,50 +185,58 @@ const Index = () => {
       ? (quarterlyCFDCount / quarterlyTarget.cfd_target_amount) * 100
       : 0;
 
-    // Calculate monthly bonuses
-    let calculatedMonthlyBonus = 0;
+    // Calculate monthly bonuses - separated by general and CFD
+    let calculatedMonthlyGeneralBonus = 0;
+    let calculatedMonthlyCfdBonus = 0;
     if (monthlyTarget) {
+      // General target bonus
       if (monthlyPercentage >= 100) {
-        calculatedMonthlyBonus += 2000;
+        calculatedMonthlyGeneralBonus += 2000;
       } else if (monthlyPercentage >= 90) {
-        calculatedMonthlyBonus += 1000;
+        calculatedMonthlyGeneralBonus += 1000;
       }
 
+      // CFD specific bonus
       if (monthlyCFDPercentage >= 100) {
-        calculatedMonthlyBonus += 1000;
+        calculatedMonthlyCfdBonus += 1000;
       } else if (monthlyCFDPercentage >= 90) {
-        calculatedMonthlyBonus += 500;
+        calculatedMonthlyCfdBonus += 500;
       }
 
-      // 70% bonus (valid until 30.9.25)
+      // 70% bonus (valid until 30.9.25) - goes to general
       const now = new Date();
       const validUntil = new Date(2025, 8, 30);
       if (now <= validUntil && monthlyPercentage >= 70) {
-        calculatedMonthlyBonus += 2000;
+        calculatedMonthlyGeneralBonus += 2000;
       }
     }
 
-    // Calculate quarterly bonuses (starts from July 2025)
-    let calculatedQuarterlyBonus = 0;
+    // Calculate quarterly bonuses - separated by general and CFD (starts from July 2025)
+    let calculatedQuarterlyGeneralBonus = 0;
+    let calculatedQuarterlyCfdBonus = 0;
     const now = new Date();
     const quarterlyStartDate = new Date(2025, 6, 1);
     if (quarterlyTarget && now >= quarterlyStartDate) {
+      // General target bonus
       if (quarterlyPercentage >= 100) {
-        calculatedQuarterlyBonus += 6000;
+        calculatedQuarterlyGeneralBonus += 6000;
       } else if (quarterlyPercentage >= 90) {
-        calculatedQuarterlyBonus += 3000;
+        calculatedQuarterlyGeneralBonus += 3000;
       }
 
+      // CFD specific bonus
       if (quarterlyCFDPercentage >= 100) {
-        calculatedQuarterlyBonus += 3000;
+        calculatedQuarterlyCfdBonus += 3000;
       } else if (quarterlyCFDPercentage >= 90) {
-        calculatedQuarterlyBonus += 1500;
+        calculatedQuarterlyCfdBonus += 1500;
       }
     }
 
     return {
-      monthlyBonus: calculatedMonthlyBonus,
-      quarterlyBonus: calculatedQuarterlyBonus,
+      monthlyGeneralBonus: calculatedMonthlyGeneralBonus,
+      monthlyCfdBonus: calculatedMonthlyCfdBonus,
+      quarterlyGeneralBonus: calculatedQuarterlyGeneralBonus,
+      quarterlyCfdBonus: calculatedQuarterlyCfdBonus,
     };
   }, [deals, monthlyTargets, quarterlyTargets, selectedYear, selectedMonth]);
 
@@ -302,8 +310,10 @@ const Index = () => {
         <SalaryCalculator
           baseSalary={parseFloat(profile.base_salary)}
           deals={deals}
-          monthlyBonus={monthlyBonus}
-          quarterlyBonus={quarterlyBonus}
+          monthlyGeneralBonus={monthlyGeneralBonus}
+          monthlyCfdBonus={monthlyCfdBonus}
+          quarterlyGeneralBonus={quarterlyGeneralBonus}
+          quarterlyCfdBonus={quarterlyCfdBonus}
         />
 
         {dealsLoading ? (

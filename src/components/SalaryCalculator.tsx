@@ -13,11 +13,13 @@ interface Deal {
 interface SalaryCalculatorProps {
   baseSalary: number;
   deals: Deal[];
-  monthlyBonus?: number;
-  quarterlyBonus?: number;
+  monthlyGeneralBonus?: number;
+  monthlyCfdBonus?: number;
+  quarterlyGeneralBonus?: number;
+  quarterlyCfdBonus?: number;
 }
 
-const SalaryCalculator = ({ baseSalary, deals, monthlyBonus = 0, quarterlyBonus = 0 }: SalaryCalculatorProps) => {
+const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyCfdBonus = 0, quarterlyGeneralBonus = 0, quarterlyCfdBonus = 0 }: SalaryCalculatorProps) => {
   const calculations = useMemo(() => {
     let eqBonus = 0;
     let cfdBonus = 0;
@@ -59,7 +61,7 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyBonus = 0, quarterlyBonus 
     });
 
     const totalBonus = eqBonus + cfdBonus;
-    const targetBonuses = monthlyBonus + quarterlyBonus;
+    const targetBonuses = monthlyGeneralBonus + monthlyCfdBonus + quarterlyGeneralBonus + quarterlyCfdBonus;
     const totalSalary = baseSalary + totalBonus + targetBonuses;
 
     return {
@@ -67,13 +69,15 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyBonus = 0, quarterlyBonus 
       eqBonus,
       cfdBonus,
       totalBonus,
-      monthlyBonus,
-      quarterlyBonus,
+      monthlyGeneralBonus,
+      monthlyCfdBonus,
+      quarterlyGeneralBonus,
+      quarterlyCfdBonus,
       targetBonuses,
       totalSalary,
       newClientsCount: deals.filter(d => d.is_new_client).length,
     };
-  }, [baseSalary, deals, monthlyBonus, quarterlyBonus]);
+  }, [baseSalary, deals, monthlyGeneralBonus, monthlyCfdBonus, quarterlyGeneralBonus, quarterlyCfdBonus]);
 
   return (
     <Card>
@@ -106,12 +110,20 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyBonus = 0, quarterlyBonus 
         {calculations.targetBonuses > 0 && (
           <div className="border-t pt-4 space-y-2">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">בונוס יעדים חודשי</span>
-              <span className="font-medium">₪{calculations.monthlyBonus.toLocaleString()}</span>
+              <span className="text-muted-foreground">בונוס יעד חודשי טוטאל</span>
+              <span className="font-medium">₪{calculations.monthlyGeneralBonus.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">בונוס יעדים רבעוני</span>
-              <span className="font-medium">₪{calculations.quarterlyBonus.toLocaleString()}</span>
+              <span className="text-muted-foreground">בונוס יעד חודשי CFD</span>
+              <span className="font-medium">₪{calculations.monthlyCfdBonus.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">בונוס יעד רבעוני טוטאל</span>
+              <span className="font-medium">₪{calculations.quarterlyGeneralBonus.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">בונוס יעד רבעוני CFD</span>
+              <span className="font-medium">₪{calculations.quarterlyCfdBonus.toLocaleString()}</span>
             </div>
           </div>
         )}
