@@ -17,7 +17,6 @@ interface SalaryCalculatorProps {
 
 const SalaryCalculator = ({ baseSalary, deals }: SalaryCalculatorProps) => {
   const calculations = useMemo(() => {
-    let specialBonus = 0;
     let trafficSourceBonus = 0;
     let depositBonus = 0;
     let totalEQBonus = 0;
@@ -26,14 +25,11 @@ const SalaryCalculator = ({ baseSalary, deals }: SalaryCalculatorProps) => {
     deals.forEach((deal) => {
       if (!deal.is_new_client) return;
 
-      // Special bonus: 60 ILS per new client
-      specialBonus += 60;
-
-      // Traffic source bonus
+      // Traffic source bonus (includes 60 ILS base per new client)
       if (deal.traffic_source === "RFF" || deal.traffic_source === "PPC") {
-        trafficSourceBonus += 640;
+        trafficSourceBonus += 700; // 640 + 60
       } else if (deal.traffic_source === "ORG" || deal.traffic_source === "AFF") {
-        trafficSourceBonus += 340;
+        trafficSourceBonus += 400; // 340 + 60
       }
 
       // Deposit bonus for EQ clients with $10,000+
@@ -43,11 +39,11 @@ const SalaryCalculator = ({ baseSalary, deals }: SalaryCalculatorProps) => {
 
       // Calculate total EQ bonus for deduction
       if (deal.client_type === "EQ") {
-        let eqBonus = 60; // special bonus
+        let eqBonus = 0;
         if (deal.traffic_source === "RFF" || deal.traffic_source === "PPC") {
-          eqBonus += 640;
+          eqBonus += 700;
         } else if (deal.traffic_source === "ORG" || deal.traffic_source === "AFF") {
-          eqBonus += 340;
+          eqBonus += 400;
         }
         if (deal.initial_deposit >= 10000 && deal.completed_within_4_days) {
           eqBonus += 500;
@@ -59,12 +55,11 @@ const SalaryCalculator = ({ baseSalary, deals }: SalaryCalculatorProps) => {
     // Apply deduction (max 15,840 ILS and not more than total EQ bonus)
     deduction = Math.min(totalEQBonus, 15840);
 
-    const totalBonus = specialBonus + trafficSourceBonus + depositBonus - deduction;
+    const totalBonus = trafficSourceBonus + depositBonus - deduction;
     const totalSalary = baseSalary + totalBonus;
 
     return {
       baseSalary,
-      specialBonus,
       trafficSourceBonus,
       depositBonus,
       deduction,
@@ -93,11 +88,7 @@ const SalaryCalculator = ({ baseSalary, deals }: SalaryCalculatorProps) => {
 
         <div className="border-t pt-4 space-y-2">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">תמריץ מיוחד (60₪ × {calculations.newClientsCount})</span>
-            <span className="font-medium">₪{calculations.specialBonus.toLocaleString()}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">תוספת מקור הגעה</span>
+            <span className="text-muted-foreground">בונוס מקור הגעה</span>
             <span className="font-medium">₪{calculations.trafficSourceBonus.toLocaleString()}</span>
           </div>
           <div className="flex justify-between">
