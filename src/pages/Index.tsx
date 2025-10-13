@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import SalaryCalculator from "@/components/SalaryCalculator";
 import DealForm from "@/components/DealForm";
 import DealsList from "@/components/DealsList";
+import TargetForm from "@/components/TargetForm";
+import TargetProgress from "@/components/TargetProgress";
 import { LogOut } from "lucide-react";
 
 const Index = () => {
@@ -15,6 +17,8 @@ const Index = () => {
   const [profile, setProfile] = useState<any>(null);
   const [deals, setDeals] = useState<any[]>([]);
   const [dealsLoading, setDealsLoading] = useState(true);
+  const [monthlyTargets, setMonthlyTargets] = useState<any[]>([]);
+  const [quarterlyTargets, setQuarterlyTargets] = useState<any[]>([]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -26,6 +30,7 @@ const Index = () => {
     if (user) {
       fetchProfile();
       fetchDeals();
+      fetchTargets();
     }
   }, [user]);
 
@@ -64,6 +69,34 @@ const Index = () => {
     setDealsLoading(false);
   };
 
+  const fetchTargets = async () => {
+    if (!user) return;
+
+    // Fetch monthly targets
+    const { data: monthlyData } = await supabase
+      .from("monthly_targets")
+      .select("*")
+      .eq("sales_rep_id", user.id)
+      .order("year", { ascending: false })
+      .order("month", { ascending: false });
+
+    if (monthlyData) {
+      setMonthlyTargets(monthlyData);
+    }
+
+    // Fetch quarterly targets
+    const { data: quarterlyData } = await supabase
+      .from("quarterly_targets")
+      .select("*")
+      .eq("sales_rep_id", user.id)
+      .order("year", { ascending: false })
+      .order("quarter", { ascending: false });
+
+    if (quarterlyData) {
+      setQuarterlyTargets(quarterlyData);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -94,8 +127,17 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8 space-y-6">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-semibold">חודש נוכחי</h2>
-          <DealForm userId={user.id} onDealAdded={fetchDeals} />
+          <div className="flex gap-2">
+            <TargetForm userId={user.id} onTargetAdded={fetchTargets} />
+            <DealForm userId={user.id} onDealAdded={fetchDeals} />
+          </div>
         </div>
+
+        <TargetProgress
+          deals={deals}
+          monthlyTargets={monthlyTargets}
+          quarterlyTargets={quarterlyTargets}
+        />
 
         <SalaryCalculator
           baseSalary={parseFloat(profile.base_salary)}
