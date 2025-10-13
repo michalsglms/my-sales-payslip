@@ -128,19 +128,19 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
         {calculations.targetBonuses > 0 && (
           <div className="border-t pt-4 space-y-2">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">בונוס יעד חודשי טוטאל</span>
+              <span className="text-muted-foreground">מענק הגעה ליעד חודשי טוטאל</span>
               <span className="font-medium">₪{calculations.monthlyGeneralBonus.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">בונוס יעד חודשי CFD</span>
+              <span className="text-muted-foreground">מענק הגעה ליעד חודשי CFD</span>
               <span className="font-medium">₪{calculations.monthlyCfdBonus.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">בונוס יעד רבעוני טוטאל</span>
+              <span className="text-muted-foreground">מענק הגעה ליעד רבעוני טוטאל</span>
               <span className="font-medium">₪{calculations.quarterlyGeneralBonus.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">בונוס יעד רבעוני CFD</span>
+              <span className="text-muted-foreground">מענק הגעה ליעד רבעוני CFD</span>
               <span className="font-medium">₪{calculations.quarterlyCfdBonus.toLocaleString()}</span>
             </div>
           </div>
