@@ -582,25 +582,26 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
   return (
     <>
       <Dialog open={congratsDialogOpen} onOpenChange={setCongratsDialogOpen}>
-        <DialogContent className="sm:max-w-lg text-center border-2 border-primary/20 bg-gradient-to-br from-background via-primary/5 to-background shadow-2xl" dir="rtl">
-          <DialogHeader className="space-y-6">
+        <DialogContent className="sm:max-w-lg border-2 border-primary/20 bg-gradient-to-br from-background via-primary/5 to-background shadow-2xl" dir="rtl">
+          <DialogHeader className="space-y-6 text-center">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 blur-xl animate-pulse" />
-              <DialogTitle className="relative text-4xl font-extrabold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent leading-relaxed py-2">
+              <DialogTitle className="relative text-4xl font-extrabold bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent leading-relaxed py-2 text-center">
                 {congratsMessage}
               </DialogTitle>
             </div>
-            <DialogDescription className="text-2xl font-semibold text-foreground/90">
+            <DialogDescription className="text-2xl font-semibold text-foreground/90 text-center">
               עבודה מצוינת! המשך כך! 💪✨
             </DialogDescription>
-            {congratsSubMessage && (
-              <div className="mt-4 p-4 rounded-lg bg-muted/50 border border-primary/30">
-                <p className="text-lg font-medium text-primary">
-                  {congratsSubMessage}
-                </p>
-              </div>
-            )}
           </DialogHeader>
+          
+          {congratsSubMessage && (
+            <div className="mt-2 p-4 rounded-lg bg-muted/50 border border-primary/30 text-center">
+              <p className="text-lg font-medium text-primary">
+                {congratsSubMessage}
+              </p>
+            </div>
+          )}
           
           <div className="flex justify-center items-center gap-4 my-8">
             <div className="text-7xl animate-bounce" style={{ animationDuration: '0.6s' }}>
@@ -614,7 +615,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
             </div>
           </div>
           
-          <div className="mt-4 p-4 rounded-lg bg-primary/10 border border-primary/20">
+          <div className="mt-4 p-4 rounded-lg bg-primary/10 border border-primary/20 text-center">
             <p className="text-lg font-medium text-primary">
               אתה מדהים! 🌟
             </p>
