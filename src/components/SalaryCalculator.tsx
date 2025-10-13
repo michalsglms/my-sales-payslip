@@ -23,8 +23,8 @@ const SalaryCalculator = ({ baseSalary, deals }: SalaryCalculatorProps) => {
     deals.forEach((deal) => {
       if (!deal.is_new_client) return;
 
-      // No commission for deposits under $2,950
-      if (deal.initial_deposit < 2950) {
+      // No commission for EQ deposits under $2,950 (CFD has no minimum)
+      if (deal.client_type === "EQ" && deal.initial_deposit < 2950) {
         return;
       }
 

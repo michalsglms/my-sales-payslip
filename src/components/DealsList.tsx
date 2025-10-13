@@ -84,8 +84,8 @@ const DealsList = ({ deals, onDealsChange }: DealsListProps) => {
   };
 
   const calculateBonus = (deal: Deal) => {
-    // No commission for deposits under $2,950
-    if (deal.initial_deposit < 2950) {
+    // No commission for EQ deposits under $2,950 (CFD has no minimum)
+    if (deal.client_type === "EQ" && deal.initial_deposit < 2950) {
       return 0;
     }
 
