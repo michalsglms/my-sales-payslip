@@ -407,7 +407,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
       <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
-          <CardTitle>עסקאות אחרונות</CardTitle>
+          <CardTitle>הפקדות חדשות</CardTitle>
           <div className="flex gap-2">
             {!isAddingDeal && (
               <Button
