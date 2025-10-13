@@ -23,10 +23,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Pencil, Trash2, ArrowUpDown, Calendar } from "lucide-react";
+import { Pencil, Trash2, ArrowUpDown, Calendar, Plus, Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import EditDealDialog from "./EditDealDialog";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Deal {
   id: string;
@@ -45,14 +53,89 @@ interface Deal {
 interface DealsListProps {
   deals: Deal[];
   onDealsChange: () => void;
+  userId: string;
 }
 
-const DealsList = ({ deals, onDealsChange }: DealsListProps) => {
+const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
   const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
   const [deletingDealId, setDeletingDealId] = useState<string | null>(null);
   const [sortByName, setSortByName] = useState(false);
   const [sortByDate, setSortByDate] = useState(false);
+  const [isAddingDeal, setIsAddingDeal] = useState(false);
+  const [newDeal, setNewDeal] = useState({
+    client_name: "",
+    client_phone: "",
+    client_type: "" as "EQ" | "CFD" | "",
+    traffic_source: "" as "AFF" | "RFF" | "PPC" | "ORG" | "",
+    initial_deposit: "",
+    client_link: "",
+  });
   const { toast } = useToast();
+  
+  const handleAddDeal = async () => {
+    try {
+      // Validate required fields
+      if (!newDeal.client_name || !newDeal.client_phone || !newDeal.client_type || 
+          !newDeal.traffic_source || !newDeal.initial_deposit) {
+        toast({
+          title: "שגיאה",
+          description: "יש למלא את כל השדות החובה",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase.from("deals").insert({
+        sales_rep_id: userId,
+        client_name: newDeal.client_name,
+        client_phone: newDeal.client_phone,
+        client_type: newDeal.client_type as "EQ" | "CFD",
+        traffic_source: newDeal.traffic_source as "AFF" | "RFF" | "PPC" | "ORG",
+        initial_deposit: parseFloat(newDeal.initial_deposit),
+        is_new_client: true,
+        client_link: newDeal.client_link || null,
+        completed_within_4_days: false,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "עסקה נוספה בהצלחה!",
+        description: "העסקה החדשה נוספה למערכת",
+      });
+
+      // Reset form
+      setNewDeal({
+        client_name: "",
+        client_phone: "",
+        client_type: "",
+        traffic_source: "",
+        initial_deposit: "",
+        client_link: "",
+      });
+      setIsAddingDeal(false);
+      onDealsChange();
+    } catch (error: any) {
+      toast({
+        title: "שגיאה",
+        description: error.message || "אירעה שגיאה בהוספת העסקה",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleCancelAdd = () => {
+    setNewDeal({
+      client_name: "",
+      client_phone: "",
+      client_type: "",
+      traffic_source: "",
+      initial_deposit: "",
+      client_link: "",
+    });
+    setIsAddingDeal(false);
+  };
+
   const handleDelete = async (dealId: string) => {
     try {
       const { error } = await supabase.from("deals").delete().eq("id", dealId);
@@ -156,6 +239,91 @@ const DealsList = ({ deals, onDealsChange }: DealsListProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
+          {isAddingDeal && (
+            <TableRow className="bg-primary/5">
+              <TableCell className="p-2">
+                <span className="text-sm text-muted-foreground">עכשיו</span>
+              </TableCell>
+              <TableCell className="p-2">
+                <Input
+                  placeholder="שם הלקוח"
+                  value={newDeal.client_name}
+                  onChange={(e) => setNewDeal({ ...newDeal, client_name: e.target.value })}
+                  className="h-9"
+                />
+              </TableCell>
+              <TableCell className="p-2">
+                <Input
+                  placeholder="טלפון"
+                  value={newDeal.client_phone}
+                  onChange={(e) => setNewDeal({ ...newDeal, client_phone: e.target.value })}
+                  className="h-9"
+                />
+              </TableCell>
+              <TableCell className="p-2">
+                <Select value={newDeal.client_type} onValueChange={(value: "EQ" | "CFD") => setNewDeal({ ...newDeal, client_type: value })}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="בחר" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="EQ">EQ</SelectItem>
+                    <SelectItem value="CFD">CFD</SelectItem>
+                  </SelectContent>
+                </Select>
+              </TableCell>
+              <TableCell className="p-2">
+                <Select value={newDeal.traffic_source} onValueChange={(value: "AFF" | "RFF" | "PPC" | "ORG") => setNewDeal({ ...newDeal, traffic_source: value })}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="בחר" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="RFF">RFF</SelectItem>
+                    <SelectItem value="PPC">PPC</SelectItem>
+                    <SelectItem value="ORG">ORG</SelectItem>
+                    <SelectItem value="AFF">AFF</SelectItem>
+                  </SelectContent>
+                </Select>
+              </TableCell>
+              <TableCell className="p-2">
+                <Input
+                  type="number"
+                  placeholder="סכום"
+                  value={newDeal.initial_deposit}
+                  onChange={(e) => setNewDeal({ ...newDeal, initial_deposit: e.target.value })}
+                  className="h-9"
+                />
+              </TableCell>
+              <TableCell className="p-2">-</TableCell>
+              <TableCell className="p-2">
+                <Input
+                  placeholder="קישור"
+                  value={newDeal.client_link}
+                  onChange={(e) => setNewDeal({ ...newDeal, client_link: e.target.value })}
+                  className="h-9"
+                />
+              </TableCell>
+              <TableCell className="p-2">
+                <div className="flex gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleAddDeal}
+                    className="h-9 w-9 p-0"
+                  >
+                    <Check className="h-4 w-4 text-green-600" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleCancelAdd}
+                    className="h-9 w-9 p-0"
+                  >
+                    <X className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          )}
           {dealsArray.map((deal) => (
             <TableRow key={deal.id}>
               <TableCell>
@@ -241,6 +409,16 @@ const DealsList = ({ deals, onDealsChange }: DealsListProps) => {
         <div className="flex justify-between items-center">
           <CardTitle>עסקאות אחרונות</CardTitle>
           <div className="flex gap-2">
+            {!isAddingDeal && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => setIsAddingDeal(true)}
+              >
+                <Plus className="ml-2 h-4 w-4" />
+                הוסף עסקה חדשה
+              </Button>
+            )}
             <Button
               variant={sortByDate ? "default" : "outline"}
               size="sm"

@@ -12,7 +12,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import SalaryCalculator from "@/components/SalaryCalculator";
-import DealForm from "@/components/DealForm";
 import DealsList from "@/components/DealsList";
 import TargetForm from "@/components/TargetForm";
 import TargetProgress from "@/components/TargetProgress";
@@ -297,7 +296,6 @@ const Index = () => {
             <ImportFromExcel userId={user.id} onImportComplete={fetchDeals} />
             <ExportToExcel deals={deals} userName={profile.full_name} />
             <DeleteAllDeals userId={user.id} onDealsDeleted={fetchDeals} />
-            <DealForm userId={user.id} onDealAdded={fetchDeals} />
           </div>
         </div>
 
@@ -327,7 +325,7 @@ const Index = () => {
             </CardContent>
           </Card>
         ) : (
-          <DealsList deals={deals} onDealsChange={fetchDeals} />
+          <DealsList deals={deals} onDealsChange={fetchDeals} userId={user.id} />
         )}
       </main>
     </div>
