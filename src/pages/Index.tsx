@@ -18,7 +18,6 @@ import TargetProgress from "@/components/TargetProgress";
 import ExportToExcel from "@/components/ExportToExcel";
 import ImportFromExcel from "@/components/ImportFromExcel";
 import DeleteAllDeals from "@/components/DeleteAllDeals";
-import EditBaseSalary from "@/components/EditBaseSalary";
 import { LogOut } from "lucide-react";
 
 const Index = () => {
@@ -288,11 +287,6 @@ const Index = () => {
             </Select>
           </div>
           <div className="flex gap-2">
-            <EditBaseSalary 
-              userId={user.id} 
-              currentBaseSalary={parseFloat(profile.base_salary)}
-              onSalaryUpdated={fetchProfile}
-            />
             <ImportFromExcel userId={user.id} onImportComplete={fetchDeals} />
             <ExportToExcel deals={deals} userName={profile.full_name} />
             <DeleteAllDeals userId={user.id} onDealsDeleted={fetchDeals} />
