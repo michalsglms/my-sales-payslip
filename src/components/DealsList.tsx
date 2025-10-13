@@ -14,6 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Deal {
   id: string;
+  client_name?: string;
+  client_phone?: string;
   client_type: "EQ" | "CFD";
   traffic_source: "AFF" | "RFF" | "PPC" | "ORG";
   initial_deposit: number;
@@ -80,6 +82,8 @@ const DealsList = ({ deals }: DealsListProps) => {
         <TableHeader>
           <TableRow>
             <TableHead className="text-right">תאריך</TableHead>
+            <TableHead className="text-right">שם הלקוח</TableHead>
+            <TableHead className="text-right">טלפון הלקוח</TableHead>
             <TableHead className="text-right">סוג לקוח</TableHead>
             <TableHead className="text-right">מקור הגעה</TableHead>
             <TableHead className="text-right">הפקדה ($)</TableHead>
@@ -92,6 +96,12 @@ const DealsList = ({ deals }: DealsListProps) => {
             <TableRow key={deal.id}>
               <TableCell>
                 {format(new Date(deal.created_at), "dd/MM/yyyy HH:mm", { locale: he })}
+              </TableCell>
+              <TableCell>
+                {deal.client_name || <span className="text-muted-foreground">-</span>}
+              </TableCell>
+              <TableCell>
+                {deal.client_phone || <span className="text-muted-foreground">-</span>}
               </TableCell>
               <TableCell>
                 <Badge variant={deal.client_type === "EQ" ? "default" : "secondary"}>
@@ -123,6 +133,8 @@ const DealsList = ({ deals }: DealsListProps) => {
           ))}
           <TableRow className="bg-muted/50 font-bold">
             <TableCell className="text-right">סה"כ</TableCell>
+            <TableCell></TableCell>
+            <TableCell></TableCell>
             <TableCell>
               <Badge variant="outline">{dealsArray.length}</Badge>
             </TableCell>
