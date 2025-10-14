@@ -52,6 +52,7 @@ interface TargetProgressProps {
 
 const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdated, selectedYear, selectedMonth, userId }: TargetProgressProps) => {
   const [targetFormOpen, setTargetFormOpen] = useState(false);
+  const [targetFormType, setTargetFormType] = useState<'monthly' | 'quarterly'>('monthly');
   const [congratsDialogOpen, setCongratsDialogOpen] = useState(false);
   const [congratsMessage, setCongratsMessage] = useState("");
   const [congratsSubMessage, setCongratsSubMessage] = useState("");
@@ -648,7 +649,12 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
       <div className="grid gap-4 md:grid-cols-2">
         <Card 
           className={!calculations.monthly.target ? "cursor-pointer hover:bg-muted/50 transition-colors border-2 border-dashed" : ""}
-          onClick={() => !calculations.monthly.target && setTargetFormOpen(true)}
+          onClick={() => {
+            if (!calculations.monthly.target) {
+              setTargetFormType('monthly');
+              setTargetFormOpen(true);
+            }
+          }}
         >
           <CardHeader className="pb-3">
             <div className="flex justify-between items-center">
@@ -762,7 +768,12 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
 
       <Card
         className={!calculations.quarterly.target ? "cursor-pointer hover:bg-muted/50 transition-colors border-2 border-dashed" : ""}
-        onClick={() => !calculations.quarterly.target && setTargetFormOpen(true)}
+        onClick={() => {
+          if (!calculations.quarterly.target) {
+            setTargetFormType('quarterly');
+            setTargetFormOpen(true);
+          }
+        }}
       >
         <CardHeader className="pb-3">
           <div className="flex justify-between items-center">
@@ -880,6 +891,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
       onTargetAdded={onTargetUpdated}
       open={targetFormOpen}
       onOpenChange={setTargetFormOpen}
+      defaultTab={targetFormType}
     />
   </>
   );

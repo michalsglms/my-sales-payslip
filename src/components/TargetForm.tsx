@@ -50,9 +50,10 @@ interface TargetFormProps {
   onTargetAdded: () => void;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  defaultTab?: 'monthly' | 'quarterly';
 }
 
-const TargetForm = ({ userId, onTargetAdded, open, onOpenChange }: TargetFormProps) => {
+const TargetForm = ({ userId, onTargetAdded, open, onOpenChange, defaultTab = 'monthly' }: TargetFormProps) => {
   const { toast } = useToast();
 
   const monthlyForm = useForm<MonthlyTargetValues>({
@@ -140,7 +141,7 @@ const TargetForm = ({ userId, onTargetAdded, open, onOpenChange }: TargetFormPro
           <DialogTitle>הגדרת יעדים</DialogTitle>
           <DialogDescription>הגדר יעדים חודשיים ורבעוניים</DialogDescription>
         </DialogHeader>
-        <Tabs defaultValue="monthly" dir="rtl">
+        <Tabs defaultValue={defaultTab} dir="rtl">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="monthly">חודשי</TabsTrigger>
             <TabsTrigger value="quarterly">רבעוני</TabsTrigger>
