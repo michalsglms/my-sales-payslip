@@ -21,9 +21,10 @@ interface SalaryCalculatorProps {
   quarterlyCfdBonus?: number;
   userId: string;
   onSalaryUpdated: () => void;
+  selectedMonth: number;
 }
 
-const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBonus = 0, monthlyCfdBonus = 0, quarterlyGeneralBonus = 0, quarterlyCfdBonus = 0, userId, onSalaryUpdated }: SalaryCalculatorProps) => {
+const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBonus = 0, monthlyCfdBonus = 0, quarterlyGeneralBonus = 0, quarterlyCfdBonus = 0, userId, onSalaryUpdated, selectedMonth }: SalaryCalculatorProps) => {
   const calculations = useMemo(() => {
     let eqBonus = 0;
     let cfdBonus = 0;
@@ -68,9 +69,14 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
       }
     });
 
+    // Check if current month is end of quarter (March=3, June=6, September=9, December=12)
+    const isQuarterEnd = selectedMonth === 3 || selectedMonth === 6 || selectedMonth === 9 || selectedMonth === 12;
+    const appliedQuarterlyGeneralBonus = isQuarterEnd ? quarterlyGeneralBonus : 0;
+    const appliedQuarterlyCfdBonus = isQuarterEnd ? quarterlyCfdBonus : 0;
+
     const eqBonusAfterDeduction = Math.max(0, eqBonus - deductionAmount);
     const totalBonus = eqBonusAfterDeduction + cfdBonus;
-    const targetBonuses = monthlyGeneralBonus + monthlyCfdBonus + quarterlyGeneralBonus + quarterlyCfdBonus;
+    const targetBonuses = monthlyGeneralBonus + monthlyCfdBonus + appliedQuarterlyGeneralBonus + appliedQuarterlyCfdBonus;
     const totalSalary = baseSalary + totalBonus + targetBonuses;
 
     return {
@@ -84,13 +90,14 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
       totalBonus,
       monthlyGeneralBonus,
       monthlyCfdBonus,
-      quarterlyGeneralBonus,
-      quarterlyCfdBonus,
+      quarterlyGeneralBonus: appliedQuarterlyGeneralBonus,
+      quarterlyCfdBonus: appliedQuarterlyCfdBonus,
       targetBonuses,
       totalSalary,
       newClientsCount: deals.filter(d => d.is_new_client).length,
+      isQuarterEnd,
     };
-  }, [baseSalary, deductionAmount, deals, monthlyGeneralBonus, monthlyCfdBonus, quarterlyGeneralBonus, quarterlyCfdBonus]);
+  }, [baseSalary, deductionAmount, deals, monthlyGeneralBonus, monthlyCfdBonus, quarterlyGeneralBonus, quarterlyCfdBonus, selectedMonth]);
 
   return (
     <Card>
@@ -143,7 +150,7 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
           </div>
         </div>
 
-        {calculations.targetBonuses > 0 && (
+        {(calculations.targetBonuses > 0 || calculations.isQuarterEnd) && (
           <div className="border-t pt-4 space-y-2">
             <div className="flex justify-between">
               <span className="text-muted-foreground">מענק הגעה ליעד חודשי טוטאל</span>
@@ -153,14 +160,18 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
               <span className="text-muted-foreground">מענק הגעה ליעד חודשי CFD</span>
               <span className="font-medium">₪{calculations.monthlyCfdBonus.toLocaleString()}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">מענק הגעה ליעד רבעוני טוטאל</span>
-              <span className="font-medium">₪{calculations.quarterlyGeneralBonus.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">מענק הגעה ליעד רבעוני CFD</span>
-              <span className="font-medium">₪{calculations.quarterlyCfdBonus.toLocaleString()}</span>
-            </div>
+            {calculations.isQuarterEnd && (
+              <>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">מענק הגעה ליעד רבעוני טוטאל</span>
+                  <span className="font-medium">₪{calculations.quarterlyGeneralBonus.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">מענק הגעה ליעד רבעוני CFD</span>
+                  <span className="font-medium">₪{calculations.quarterlyCfdBonus.toLocaleString()}</span>
+                </div>
+              </>
+            )}
           </div>
         )}
 
