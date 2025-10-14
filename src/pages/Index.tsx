@@ -32,6 +32,7 @@ const Index = () => {
   const [monthlyTargets, setMonthlyTargets] = useState<any[]>([]);
   const [quarterlyTargets, setQuarterlyTargets] = useState<any[]>([]);
   const [kpisBonus, setKpisBonus] = useState(0);
+  const [kpisData, setKpisData] = useState<any>(null);
 
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1;
@@ -98,8 +99,10 @@ const Index = () => {
       // work_excellence is now a percentage (0-100)
       if (data.work_excellence) bonus += Math.round(1600 * (data.work_excellence / 100));
       setKpisBonus(bonus);
+      setKpisData(data);
     } else {
       setKpisBonus(0);
+      setKpisData(null);
     }
   };
 
@@ -349,6 +352,7 @@ const Index = () => {
           selectedMonth={selectedMonth}
           selectedYear={selectedYear}
           kpisBonus={kpisBonus}
+          kpisData={kpisData}
         />
 
         {dealsLoading ? (

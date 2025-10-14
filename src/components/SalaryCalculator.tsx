@@ -1,5 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 import EditBaseSalary from "./EditBaseSalary";
 
 interface Deal {
@@ -9,6 +11,14 @@ interface Deal {
   initial_deposit: number;
   is_new_client: boolean;
   completed_within_4_days: boolean;
+}
+
+interface KpisData {
+  avg_call_time_minutes: boolean;
+  avg_calls_count: boolean;
+  ppc_conversion_rate: boolean;
+  aff_conversion_rate: boolean;
+  work_excellence: number | null;
 }
 
 interface SalaryCalculatorProps {
@@ -24,9 +34,12 @@ interface SalaryCalculatorProps {
   selectedMonth: number;
   selectedYear: number;
   kpisBonus?: number;
+  kpisData?: KpisData | null;
 }
 
-const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBonus = 0, monthlyCfdBonus = 0, quarterlyGeneralBonus = 0, quarterlyCfdBonus = 0, userId, onSalaryUpdated, selectedMonth, selectedYear, kpisBonus = 0 }: SalaryCalculatorProps) => {
+const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBonus = 0, monthlyCfdBonus = 0, quarterlyGeneralBonus = 0, quarterlyCfdBonus = 0, userId, onSalaryUpdated, selectedMonth, selectedYear, kpisBonus = 0, kpisData }: SalaryCalculatorProps) => {
+  const [isKpisOpen, setIsKpisOpen] = useState(false);
+  
   const calculations = useMemo(() => {
     let eqBonus = 0;
     let cfdBonus = 0;
@@ -180,10 +193,53 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
 
         {calculations.kpisBonus > 0 && (
           <div className="border-t pt-4">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">בונוס KPIS</span>
-              <span className="font-medium">₪{calculations.kpisBonus.toLocaleString()}</span>
-            </div>
+            <Collapsible open={isKpisOpen} onOpenChange={setIsKpisOpen}>
+              <CollapsibleTrigger className="flex justify-between items-center w-full hover:opacity-80 transition-opacity">
+                <span className="text-muted-foreground">בונוס KPIS</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">₪{calculations.kpisBonus.toLocaleString()}</span>
+                  <ChevronDown 
+                    className={`h-4 w-4 transition-transform duration-200 ${isKpisOpen ? 'rotate-180' : ''}`} 
+                  />
+                </div>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="pt-2 space-y-1 mr-4">
+                {kpisData && (
+                  <>
+                    {kpisData.avg_call_time_minutes && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">ממוצע זמן שיחה</span>
+                        <span>₪600</span>
+                      </div>
+                    )}
+                    {kpisData.avg_calls_count && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">ממוצע כמות שיחות</span>
+                        <span>₪600</span>
+                      </div>
+                    )}
+                    {kpisData.ppc_conversion_rate && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">יחס המרה PPC</span>
+                        <span>₪600</span>
+                      </div>
+                    )}
+                    {kpisData.aff_conversion_rate && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">יחס המרה AFF</span>
+                        <span>₪600</span>
+                      </div>
+                    )}
+                    {kpisData.work_excellence && kpisData.work_excellence > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">הערכת מנהל ({kpisData.work_excellence}%)</span>
+                        <span>₪{Math.round(1600 * (kpisData.work_excellence / 100)).toLocaleString()}</span>
+                      </div>
+                    )}
+                  </>
+                )}
+              </CollapsibleContent>
+            </Collapsible>
           </div>
         )}
 
