@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import EditBaseSalary from "./EditBaseSalary";
-import EditDeduction from "./EditDeduction";
 
 interface Deal {
   id: string;
@@ -100,7 +99,8 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
           <CardTitle>חישוב השכר</CardTitle>
           <EditBaseSalary 
             userId={userId} 
-            currentBaseSalary={baseSalary} 
+            currentBaseSalary={baseSalary}
+            currentDeduction={deductionAmount}
             onSalaryUpdated={onSalaryUpdated}
           />
         </div>
@@ -118,16 +118,9 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
         </div>
 
         <div className="border-t pt-4">
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">סכום הקיזוז</span>
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold">₪{calculations.deductionAmount.toLocaleString()}</span>
-              <EditDeduction 
-                userId={userId} 
-                currentDeduction={deductionAmount} 
-                onDeductionUpdated={onSalaryUpdated}
-              />
-            </div>
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground">סכום הקיזוז</p>
+            <p className="text-lg font-bold">₪{calculations.deductionAmount.toLocaleString()}</p>
           </div>
         </div>
 

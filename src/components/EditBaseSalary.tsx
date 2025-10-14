@@ -25,43 +25,47 @@ import {
 import { Input } from "@/components/ui/input";
 import { Pencil } from "lucide-react";
 
-const baseSalarySchema = z.object({
+const salarySchema = z.object({
   base_salary: z.string().min(1, "יש להזין שכר בסיס"),
+  deduction_amount: z.string().min(0, "סכום קיזוז לא תקין"),
 });
 
-type BaseSalaryValues = z.infer<typeof baseSalarySchema>;
+type SalaryValues = z.infer<typeof salarySchema>;
 
 interface EditBaseSalaryProps {
   userId: string;
   currentBaseSalary: number;
+  currentDeduction: number;
   onSalaryUpdated: () => void;
 }
 
-const EditBaseSalary = ({ userId, currentBaseSalary, onSalaryUpdated }: EditBaseSalaryProps) => {
+const EditBaseSalary = ({ userId, currentBaseSalary, currentDeduction, onSalaryUpdated }: EditBaseSalaryProps) => {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
 
-  const form = useForm<BaseSalaryValues>({
-    resolver: zodResolver(baseSalarySchema),
+  const form = useForm<SalaryValues>({
+    resolver: zodResolver(salarySchema),
     defaultValues: {
       base_salary: currentBaseSalary.toString(),
+      deduction_amount: currentDeduction.toString(),
     },
   });
 
-  const onSubmit = async (data: BaseSalaryValues) => {
+  const onSubmit = async (data: SalaryValues) => {
     try {
       const { error } = await supabase
         .from("profiles")
         .update({
           base_salary: parseFloat(data.base_salary),
+          deduction_amount: parseFloat(data.deduction_amount),
         })
         .eq("id", userId);
 
       if (error) throw error;
 
       toast({
-        title: "שכר בסיס עודכן בהצלחה!",
-        description: "שכר הבסיס עודכן במערכת",
+        title: "הנתונים עודכנו בהצלחה!",
+        description: "שכר הבסיס וסכום הקיזוז עודכנו במערכת",
       });
 
       setOpen(false);
@@ -69,7 +73,7 @@ const EditBaseSalary = ({ userId, currentBaseSalary, onSalaryUpdated }: EditBase
     } catch (error: any) {
       toast({
         title: "שגיאה",
-        description: error.message || "אירעה שגיאה בעדכון שכר הבסיס",
+        description: error.message || "אירעה שגיאה בעדכון הנתונים",
         variant: "destructive",
       });
     }
@@ -85,7 +89,7 @@ const EditBaseSalary = ({ userId, currentBaseSalary, onSalaryUpdated }: EditBase
       <DialogContent className="max-w-md" dir="rtl">
         <DialogHeader>
           <DialogTitle>עריכת שכר בסיס</DialogTitle>
-          <DialogDescription>עדכן את שכר הבסיס החודשי</DialogDescription>
+          <DialogDescription>עדכן את שכר הבסיס החודשי ואת סכום הקיזוז</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -99,6 +103,20 @@ const EditBaseSalary = ({ userId, currentBaseSalary, onSalaryUpdated }: EditBase
                     <Input type="number" step="0.01" placeholder="9000" {...field} />
                   </FormControl>
                   <FormDescription>שכר הבסיס החודשי בשקלים</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="deduction_amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>סכום קיזוז חודשי (₪)</FormLabel>
+                  <FormControl>
+                    <Input type="number" step="0.01" placeholder="0" {...field} />
+                  </FormControl>
+                  <FormDescription>סכום שיקוזז מבונוס EQ</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
