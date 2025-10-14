@@ -687,7 +687,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
             <>
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 bg-muted/50 rounded-lg">
-                  <p className="text-xs text-muted-foreground mb-1">ימי עבודה</p>
+                  <p className="text-xs text-muted-foreground mb-1">💼 ימי עבודה</p>
                   <p className="text-xl font-bold">{calculations.monthly.workdays}</p>
                   <div className="mt-1 text-xs text-muted-foreground text-right space-y-0.5">
                     <div>עברו {calculations.monthly.workdaysPassed}</div>
@@ -695,7 +695,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                   </div>
                 </div>
                 <div className="p-3 bg-green-500/10 rounded-lg">
-                  <p className="text-xs text-muted-foreground mb-1">מענק ליעד</p>
+                  <p className="text-xs text-muted-foreground mb-1">💰 מענק ליעד</p>
                   <p className="text-xl font-bold text-green-600">₪{calculations.monthly.bonus.toLocaleString()}</p>
                 </div>
               </div>
@@ -806,7 +806,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
             <>
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 bg-muted/50 rounded-lg">
-                  <p className="text-xs text-muted-foreground mb-1">ימי עבודה</p>
+                  <p className="text-xs text-muted-foreground mb-1">💼 ימי עבודה</p>
                   <p className="text-xl font-bold">{calculations.quarterly.workdays}</p>
                   <div className="mt-1 text-xs text-muted-foreground text-right space-y-0.5">
                     <div>עברו {calculations.quarterly.workdaysPassed}</div>
@@ -814,7 +814,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                   </div>
                 </div>
                 <div className="p-3 bg-green-500/10 rounded-lg">
-                  <p className="text-xs text-muted-foreground mb-1">מענק ליעד</p>
+                  <p className="text-xs text-muted-foreground mb-1">💰 מענק ליעד</p>
                   <p className="text-xl font-bold text-green-600">₪{calculations.quarterly.bonus.toLocaleString()}</p>
                 </div>
               </div>
