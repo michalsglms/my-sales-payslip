@@ -206,36 +206,26 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
               <CollapsibleContent className="pt-2 space-y-1 mr-4">
                 {kpisData && (
                   <>
-                    {kpisData.avg_call_time_minutes && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">ממוצע זמן שיחה</span>
-                        <span>₪600</span>
-                      </div>
-                    )}
-                    {kpisData.avg_calls_count && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">ממוצע כמות שיחות</span>
-                        <span>₪600</span>
-                      </div>
-                    )}
-                    {kpisData.ppc_conversion_rate && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">יחס המרה PPC</span>
-                        <span>₪600</span>
-                      </div>
-                    )}
-                    {kpisData.aff_conversion_rate && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">יחס המרה AFF</span>
-                        <span>₪600</span>
-                      </div>
-                    )}
-                    {kpisData.work_excellence && kpisData.work_excellence > 0 && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">הערכת מנהל ({kpisData.work_excellence}%)</span>
-                        <span>₪{Math.round(1600 * (kpisData.work_excellence / 100)).toLocaleString()}</span>
-                      </div>
-                    )}
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">ממוצע זמן שיחה</span>
+                      <span>₪{kpisData.avg_call_time_minutes ? '600' : '0'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">ממוצע כמות שיחות</span>
+                      <span>₪{kpisData.avg_calls_count ? '600' : '0'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">יחס המרה PPC</span>
+                      <span>₪{kpisData.ppc_conversion_rate ? '600' : '0'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">יחס המרה AFF</span>
+                      <span>₪{kpisData.aff_conversion_rate ? '600' : '0'}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">הערכת מנהל ({kpisData.work_excellence || 0}%)</span>
+                      <span>₪{kpisData.work_excellence ? Math.round(1600 * (kpisData.work_excellence / 100)).toLocaleString() : '0'}</span>
+                    </div>
                   </>
                 )}
               </CollapsibleContent>
