@@ -22,8 +22,6 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { email, resetLink }: PasswordResetRequest = await req.json();
 
-    console.log("Sending password reset email to:", email);
-
     const emailResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -98,11 +96,8 @@ const handler = async (req: Request): Promise<Response> => {
     const result = await emailResponse.json();
     
     if (!emailResponse.ok) {
-      console.error("Resend API error:", result);
       throw new Error(result.message || "Failed to send email");
     }
-
-    console.log("Email sent successfully:", result);
 
     return new Response(JSON.stringify(result), {
       status: 200,
@@ -112,7 +107,6 @@ const handler = async (req: Request): Promise<Response> => {
       },
     });
   } catch (error: any) {
-    console.error("Error in send-password-reset function:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {

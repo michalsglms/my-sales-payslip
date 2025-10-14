@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { FileUp, Loader2 } from "lucide-react";
 import * as XLSX from "xlsx";
+import { z } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -28,6 +29,14 @@ interface ImportKpisFromExcelProps {
   onImportComplete: () => void;
 }
 
+const kpiImportSchema = z.object({
+  work_excellence: z.number().min(0).max(100),
+  avg_call_time_minutes: z.boolean(),
+  avg_calls_count: z.boolean(),
+  ppc_conversion_rate: z.boolean(),
+  aff_conversion_rate: z.boolean(),
+});
+
 const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromExcelProps) => {
   const [isImporting, setIsImporting] = useState(false);
   const [open, setOpen] = useState(false);
@@ -37,7 +46,6 @@ const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromEx
     const file = e.target.files?.[0];
     if (!file) return;
 
-    console.log('Starting KPIS import for month:', month, 'year:', year);
     setIsImporting(true);
 
     try {
@@ -45,8 +53,6 @@ const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromEx
       const workbook = XLSX.read(data);
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
-
-      console.log('Parsed Excel data:', jsonData);
 
       if (jsonData.length === 0) {
         toast({
@@ -96,21 +102,27 @@ const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromEx
       // For now, use a simpler approach - require sales_rep_id in the Excel file
       const kpisRecords = jsonData
         .filter(row => row["user_id"] || row["מזהה נציג"])
-        .map(row => ({
-          sales_rep_id: (row["user_id"] || row["מזהה נציג"]) as string,
-          month,
-          year,
-          avg_call_time_minutes: row["ממוצע זמן שיחה"] === "כן" || row["avg_call_time_minutes"] === true,
-          avg_calls_count: row["ממוצע כמות שיחות"] === "כן" || row["avg_calls_count"] === true,
-          ppc_conversion_rate: row["יחס המרה PPC"] === "כן" || row["ppc_conversion_rate"] === true,
-          aff_conversion_rate: row["יחס המרה AFF"] === "כן" || row["aff_conversion_rate"] === true,
-          work_excellence: parseFloat(row["הערכת מנהל"] || row["work_excellence"] || "0"),
-        }));
+        .map(row => {
+          const kpiData = {
+            avg_call_time_minutes: row["ממוצע זמן שיחה"] === "כן" || row["avg_call_time_minutes"] === true,
+            avg_calls_count: row["ממוצע כמות שיחות"] === "כן" || row["avg_calls_count"] === true,
+            ppc_conversion_rate: row["יחס המרה PPC"] === "כן" || row["ppc_conversion_rate"] === true,
+            aff_conversion_rate: row["יחס המרה AFF"] === "כן" || row["aff_conversion_rate"] === true,
+            work_excellence: parseFloat(row["הערכת מנהל"] || row["work_excellence"] || "0"),
+          };
 
-      console.log('KPIS records to upsert:', kpisRecords);
+          // Validate data
+          const validated = kpiImportSchema.parse(kpiData);
+
+          return {
+            sales_rep_id: (row["user_id"] || row["מזהה נציג"]) as string,
+            month,
+            year,
+            ...validated,
+          };
+        });
 
       if (kpisRecords.length === 0) {
-        console.log('No valid records found');
         toast({
           title: "לא נמצאו רשומות תקינות",
           description: "וודא שהקובץ מכיל עמודה 'מזהה נציג' או 'user_id'",
@@ -121,19 +133,15 @@ const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromEx
       }
 
       // Upsert KPIS data
-      console.log('Upserting KPIS data...');
-      const { data: upsertedData, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from("monthly_kpis")
         .upsert(kpisRecords, {
           onConflict: "sales_rep_id,month,year",
         });
 
       if (insertError) {
-        console.error('Upsert error:', insertError);
         throw insertError;
       }
-
-      console.log('KPIS upserted successfully:', upsertedData);
 
       toast({
         title: "ייבוא הצליח!",
@@ -143,10 +151,15 @@ const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromEx
       setOpen(false);
       onImportComplete();
     } catch (error: any) {
-      console.error("Error importing KPIS:", error);
+      let errorMessage = error.message || "אירעה שגיאה בעת ייבוא הנתונים";
+      
+      if (error instanceof z.ZodError) {
+        errorMessage = "נתונים לא תקינים בקובץ: " + error.errors[0].message;
+      }
+      
       toast({
         title: "שגיאה בייבוא",
-        description: error.message || "אירעה שגיאה בעת ייבוא הנתונים",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

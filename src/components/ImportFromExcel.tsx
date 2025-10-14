@@ -4,11 +4,22 @@ import * as XLSX from "xlsx";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { z } from "zod";
 
 interface ImportFromExcelProps {
   userId: string;
   onImportComplete: () => void;
 }
+
+const dealImportSchema = z.object({
+  client_name: z.string().max(100).optional().nullable(),
+  client_phone: z.string().max(20).optional().nullable(),
+  client_link: z.string().max(500).optional().nullable(),
+  notes: z.string().max(1000).optional().nullable(),
+  initial_deposit: z.number().positive().max(10000000),
+  traffic_source: z.enum(["AFF", "RFF", "PPC", "ORG"]),
+  client_type: z.enum(["EQ", "CFD"]),
+});
 
 const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => {
   const { toast } = useToast();
@@ -79,17 +90,30 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
         const depositValue = row["הפקדה ראשונית"] || row["הפקדה ($)"] || row["Deposits"] || 0;
         const initialDeposit = parseFloat(depositValue.toString().replace(/[^\d.-]/g, '')) || 0;
         
-        return {
-          sales_rep_id: userId,
-          client_type: clientType,
-          traffic_source: trafficSource,
-          initial_deposit: initialDeposit,
-          is_new_client: true,
-          completed_within_4_days: false,
-          client_link: row["קישור ללקוח"] || row["קישור"] || null,
+        const dealData = {
           client_name: row["שם הלקוח"] || null,
           client_phone: row["טלפון הלקוח"] || null,
+          client_link: row["קישור ללקוח"] || row["קישור"] || null,
           notes: row["הערות"] || null,
+          initial_deposit: initialDeposit,
+          traffic_source: trafficSource,
+          client_type: clientType,
+        };
+
+        // Validate data
+        const validated = dealImportSchema.parse(dealData);
+        
+        return {
+          sales_rep_id: userId,
+          client_type: validated.client_type,
+          traffic_source: validated.traffic_source,
+          initial_deposit: validated.initial_deposit,
+          is_new_client: true,
+          completed_within_4_days: false,
+          client_link: validated.client_link,
+          client_name: validated.client_name,
+          client_phone: validated.client_phone,
+          notes: validated.notes,
           created_at: row["תאריך"] ? new Date(row["תאריך"]).toISOString() : new Date().toISOString(),
         };
       });
@@ -107,10 +131,15 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
 
       onImportComplete();
     } catch (error) {
-      console.error("Error importing data:", error);
+      let errorMessage = "אירעה שגיאה בייבוא הנתונים. אנא בדוק את הקובץ ונסה שוב.";
+      
+      if (error instanceof z.ZodError) {
+        errorMessage = "נתונים לא תקינים בקובץ: " + error.errors[0].message;
+      }
+      
       toast({
         title: "שגיאה בייבוא",
-        description: "אירעה שגיאה בייבוא הנתונים. אנא בדוק את הקובץ ונסה שוב.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
