@@ -287,29 +287,31 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30" dir="rtl">
-      <header className="border-b bg-background">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">מערכת ניהול שכר</h1>
-            <p className="text-sm text-muted-foreground">שלום, {profile.full_name}</p>
+    <div className="min-h-screen bg-background" dir="rtl">
+      <header className="border-b bg-card shadow-card sticky top-0 z-40 backdrop-blur-sm bg-card/95">
+        <div className="container mx-auto px-4 py-5 flex items-center justify-between">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold tracking-tight">
+              <span className="text-gradient-success">המדד להצלחה שלי</span>
+            </h1>
+            <p className="text-sm font-medium text-muted-foreground">שלום, {profile.full_name} 👋</p>
           </div>
-          <Button variant="outline" onClick={signOut}>
+          <Button variant="outline" onClick={signOut} className="hover:shadow-card transition-all">
             <LogOut className="ml-2 h-4 w-4" />
             התנתק
           </Button>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 space-y-6">
-        <div className="flex justify-between items-center">
+      <main className="container mx-auto px-4 py-8 space-y-8">
+        <div className="flex justify-between items-center bg-card p-4 rounded-xl shadow-card border animate-fade-in">
           <Select value={selectedMonthYear} onValueChange={setSelectedMonthYear}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[200px] font-semibold">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-background z-50">
+            <SelectContent className="bg-card z-50">
               {availableMonths.map((month) => (
-                <SelectItem key={month.value} value={month.value}>
+                <SelectItem key={month.value} value={month.value} className="font-medium">
                   {month.label}
                 </SelectItem>
               ))}
