@@ -66,9 +66,9 @@ const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromEx
         email: row["אימייל"] || row["email"] || "",
         avg_call_time_minutes: row["ממוצע זמן שיחה"] === "כן" || row["avg_call_time_minutes"] === true,
         avg_calls_count: row["ממוצע כמות שיחות"] === "כן" || row["avg_calls_count"] === true,
-        ppc_conversion_rate: row["יחס הפרדה PPC"] === "כן" || row["ppc_conversion_rate"] === true,
-        aff_conversion_rate: row["יחס הפרדה AFF"] === "כן" || row["aff_conversion_rate"] === true,
-        work_excellence: row["הגדרת מהלך"] === "כן" || row["work_excellence"] === true,
+        ppc_conversion_rate: row["יחס המרה PPC"] === "כן" || row["ppc_conversion_rate"] === true,
+        aff_conversion_rate: row["יחס המרה AFF"] === "כן" || row["aff_conversion_rate"] === true,
+        work_excellence: row["הגדרת מנהל"] === "כן" || row["work_excellence"] === true,
       }));
 
       // Get user IDs from emails
@@ -99,9 +99,9 @@ const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromEx
           year,
           avg_call_time_minutes: row["ממוצע זמן שיחה"] === "כן" || row["avg_call_time_minutes"] === true,
           avg_calls_count: row["ממוצע כמות שיחות"] === "כן" || row["avg_calls_count"] === true,
-          ppc_conversion_rate: row["יחס הפרדה PPC"] === "כן" || row["ppc_conversion_rate"] === true,
-          aff_conversion_rate: row["יחס הפרדה AFF"] === "כן" || row["aff_conversion_rate"] === true,
-          work_excellence: row["הגדרת מהלך"] === "כן" || row["work_excellence"] === true,
+          ppc_conversion_rate: row["יחס המרה PPC"] === "כן" || row["ppc_conversion_rate"] === true,
+          aff_conversion_rate: row["יחס המרה AFF"] === "כן" || row["aff_conversion_rate"] === true,
+          work_excellence: row["הגדרת מנהל"] === "כן" || row["work_excellence"] === true,
         }));
 
       if (kpisRecords.length === 0) {
@@ -148,9 +148,9 @@ const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromEx
         "מזהה נציג": "user-id-here",
         "ממוצע זמן שיחה": "כן",
         "ממוצע כמות שיחות": "לא",
-        "יחס הפרדה PPC": "כן",
-        "יחס הפרדה AFF": "כן",
-        "הגדרת מהלך": "לא",
+        "יחס המרה PPC": "כן",
+        "יחס המרה AFF": "כן",
+        "הגדרת מנהל": "לא",
       },
     ];
 
@@ -216,9 +216,9 @@ const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromEx
               <li>מזהה נציג - ID של הנציג מהמערכת</li>
               <li>ממוצע זמן שיחה - "כן" או "לא"</li>
               <li>ממוצע כמות שיחות - "כן" או "לא"</li>
-              <li>יחס הפרדה PPC - "כן" או "לא"</li>
-              <li>יחס הפרדה AFF - "כן" או "לא"</li>
-              <li>הגדרת מהלך - "כן" או "לא"</li>
+              <li>יחס המרה PPC - "כן" או "לא"</li>
+              <li>יחס המרה AFF - "כן" או "לא"</li>
+              <li>הגדרת מנהל - "כן" או "לא"</li>
             </ul>
           </div>
         </div>
