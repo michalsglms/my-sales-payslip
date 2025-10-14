@@ -95,7 +95,8 @@ const Index = () => {
       if (data.avg_calls_count) bonus += 600;
       if (data.ppc_conversion_rate) bonus += 600;
       if (data.aff_conversion_rate) bonus += 600;
-      if (data.work_excellence) bonus += 1600;
+      // work_excellence is now a percentage (0-100)
+      if (data.work_excellence) bonus += Math.round(1600 * (data.work_excellence / 100));
       setKpisBonus(bonus);
     } else {
       setKpisBonus(0);

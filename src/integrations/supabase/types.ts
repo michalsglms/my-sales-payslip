@@ -81,7 +81,7 @@ export type Database = {
           ppc_conversion_rate: boolean | null
           sales_rep_id: string
           updated_at: string
-          work_excellence: boolean | null
+          work_excellence: number | null
           year: number
         }
         Insert: {
@@ -94,7 +94,7 @@ export type Database = {
           ppc_conversion_rate?: boolean | null
           sales_rep_id: string
           updated_at?: string
-          work_excellence?: boolean | null
+          work_excellence?: number | null
           year: number
         }
         Update: {
@@ -107,7 +107,7 @@ export type Database = {
           ppc_conversion_rate?: boolean | null
           sales_rep_id?: string
           updated_at?: string
-          work_excellence?: boolean | null
+          work_excellence?: number | null
           year?: number
         }
         Relationships: []

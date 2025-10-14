@@ -19,7 +19,7 @@ interface KpisRow {
   avg_calls_count: boolean;
   ppc_conversion_rate: boolean;
   aff_conversion_rate: boolean;
-  work_excellence: boolean;
+  work_excellence: number; // 0-100
 }
 
 interface ImportKpisFromExcelProps {
@@ -71,7 +71,7 @@ const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromEx
         avg_calls_count: row["ממוצע כמות שיחות"] === "כן" || row["avg_calls_count"] === true,
         ppc_conversion_rate: row["יחס המרה PPC"] === "כן" || row["ppc_conversion_rate"] === true,
         aff_conversion_rate: row["יחס המרה AFF"] === "כן" || row["aff_conversion_rate"] === true,
-        work_excellence: row["הערכת מנהל"] === "כן" || row["work_excellence"] === true,
+        work_excellence: parseFloat(row["הערכת מנהל"] || row["work_excellence"] || "0"),
       }));
 
       // Get user IDs from emails
@@ -104,7 +104,7 @@ const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromEx
           avg_calls_count: row["ממוצע כמות שיחות"] === "כן" || row["avg_calls_count"] === true,
           ppc_conversion_rate: row["יחס המרה PPC"] === "כן" || row["ppc_conversion_rate"] === true,
           aff_conversion_rate: row["יחס המרה AFF"] === "כן" || row["aff_conversion_rate"] === true,
-          work_excellence: row["הערכת מנהל"] === "כן" || row["work_excellence"] === true,
+          work_excellence: parseFloat(row["הערכת מנהל"] || row["work_excellence"] || "0"),
         }));
 
       console.log('KPIS records to upsert:', kpisRecords);
@@ -162,7 +162,7 @@ const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromEx
         "ממוצע כמות שיחות": "לא",
         "יחס המרה PPC": "כן",
         "יחס המרה AFF": "כן",
-        "הערכת מנהל": "לא",
+        "הערכת מנהל": 80,
       },
     ];
 
@@ -230,7 +230,7 @@ const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromEx
               <li>ממוצע כמות שיחות - "כן" או "לא"</li>
               <li>יחס המרה PPC - "כן" או "לא"</li>
               <li>יחס המרה AFF - "כן" או "לא"</li>
-              <li>הערכת מנהל - "כן" או "לא"</li>
+              <li>הערכת מנהל - מספר בין 0-100 (אחוזים)</li>
             </ul>
           </div>
         </div>
