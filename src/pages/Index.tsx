@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
@@ -298,9 +298,11 @@ const Index = () => {
           </div>
           <div className="flex gap-2">
             {isAdmin && (
-              <Button variant="outline" onClick={() => navigate("/admin")} className="hover:shadow-card transition-all">
-                <Settings className="ml-2 h-4 w-4" />
-                פאנל ניהול
+              <Button variant="outline" asChild className="hover:shadow-card transition-all">
+                <Link to="/admin">
+                  <Settings className="ml-2 h-4 w-4" />
+                  פאנל ניהול
+                </Link>
               </Button>
             )}
             <Button variant="outline" onClick={signOut} className="hover:shadow-card transition-all">

@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
 import { ArrowRight, LogOut } from "lucide-react";
 import ImportKpisFromExcel from "@/components/ImportKpisFromExcel";
 
@@ -27,6 +28,7 @@ const Admin = () => {
   const { user, loading, signOut } = useAuth();
   const { isAdmin, isLoading: roleLoading } = useUserRole(user?.id);
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [kpisData, setKpisData] = useState<any[]>([]);
   const [profiles, setProfiles] = useState<any[]>([]);
 
@@ -82,11 +84,16 @@ const Admin = () => {
       .from("profiles")
       .select("*");
 
-    if (data) {
-      setProfiles(data);
+    if (error) {
+      console.error("Admin: error loading profiles", error);
+      toast({ title: "שגיאה בטעינת פרופילים", description: error.message, variant: "destructive" });
+      setProfiles([]);
+      return;
     }
-  };
 
+    console.log("Admin: loaded profiles", data?.length ?? 0);
+    setProfiles(data ?? []);
+  };
   const fetchAllKpis = async () => {
     const { data, error } = await supabase
       .from("monthly_kpis")
@@ -94,11 +101,16 @@ const Admin = () => {
       .eq("month", selectedMonth)
       .eq("year", selectedYear);
 
-    if (data) {
-      setKpisData(data);
+    if (error) {
+      console.error("Admin: error loading KPIs", error);
+      toast({ title: "שגיאה בטעינת KPIs", description: error.message, variant: "destructive" });
+      setKpisData([]);
+      return;
     }
-  };
 
+    console.log("Admin: loaded KPIs", data?.length ?? 0, { selectedMonth, selectedYear });
+    setKpisData(data ?? []);
+  };
   const getProfileName = (salesRepId: string) => {
     const profile = profiles.find(p => p.id === salesRepId);
     return profile ? profile.full_name : "לא ידוע";
