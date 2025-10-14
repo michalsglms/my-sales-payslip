@@ -20,7 +20,7 @@ import ExportToExcel from "@/components/ExportToExcel";
 import ImportFromExcel from "@/components/ImportFromExcel";
 import ImportKpisFromExcel from "@/components/ImportKpisFromExcel";
 import DeleteAllDeals from "@/components/DeleteAllDeals";
-import { LogOut } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
 
 const Index = () => {
   const { user, loading, signOut } = useAuth();
@@ -296,10 +296,18 @@ const Index = () => {
             </h1>
             <p className="text-sm font-medium text-muted-foreground">שלום, {profile.full_name} 👋</p>
           </div>
-          <Button variant="outline" onClick={signOut} className="hover:shadow-card transition-all">
-            <LogOut className="ml-2 h-4 w-4" />
-            התנתק
-          </Button>
+          <div className="flex gap-2">
+            {isAdmin && (
+              <Button variant="outline" onClick={() => navigate("/admin")} className="hover:shadow-card transition-all">
+                <Settings className="ml-2 h-4 w-4" />
+                פאנל ניהול
+              </Button>
+            )}
+            <Button variant="outline" onClick={signOut} className="hover:shadow-card transition-all">
+              <LogOut className="ml-2 h-4 w-4" />
+              התנתק
+            </Button>
+          </div>
         </div>
       </header>
 
