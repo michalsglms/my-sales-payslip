@@ -20,6 +20,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -101,70 +102,148 @@ const Auth = () => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      z.string().email("כתובת אימייל לא תקינה").parse(email);
+
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "המייל נשלח בהצלחה!",
+        description: "בדוק את תיבת הדואר שלך לאיפוס הסיסמה",
+      });
+      
+      setIsForgotPassword(false);
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "שגיאה בטופס",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "שגיאה",
+          description: error.message || "אירעה שגיאה בשליחת המייל",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4" dir="rtl">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">
-            {isLogin ? "התחברות" : "הרשמה"}
+            {isForgotPassword ? "איפוס סיסמה" : isLogin ? "התחברות" : "הרשמה"}
           </CardTitle>
           <CardDescription>
-            {isLogin
+            {isForgotPassword
+              ? "הזן את כתובת האימייל שלך לאיפוס הסיסמה"
+              : isLogin
               ? "הזן את פרטי ההתחברות שלך"
               : "צור חשבון חדש במערכת"}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleAuth} className="space-y-4">
-            {!isLogin && (
+          {isForgotPassword ? (
+            <form onSubmit={handleForgotPassword} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="fullName">שם מלא</Label>
+                <Label htmlFor="email">אימייל</Label>
                 <Input
-                  id="fullName"
-                  type="text"
-                  placeholder="שם מלא"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required={!isLogin}
+                  id="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
               </div>
-            )}
-            <div className="space-y-2">
-              <Label htmlFor="email">אימייל</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">סיסמה</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "מעבד..." : isLogin ? "התחבר" : "הירשם"}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full"
-              onClick={() => setIsLogin(!isLogin)}
-            >
-              {isLogin
-                ? "אין לך חשבון? הירשם כאן"
-                : "יש לך חשבון? התחבר כאן"}
-            </Button>
-          </form>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "שולח..." : "שלח קישור לאיפוס"}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full"
+                onClick={() => setIsForgotPassword(false)}
+              >
+                חזור להתחברות
+              </Button>
+            </form>
+          ) : (
+            <form onSubmit={handleAuth} className="space-y-4">
+              {!isLogin && (
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">שם מלא</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="שם מלא"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required={!isLogin}
+                  />
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label htmlFor="email">אימייל</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">סיסמה</Label>
+                  {isLogin && (
+                    <button
+                      type="button"
+                      onClick={() => setIsForgotPassword(true)}
+                      className="text-sm text-primary hover:underline"
+                    >
+                      שכחתי סיסמה
+                    </button>
+                  )}
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "מעבד..." : isLogin ? "התחבר" : "הירשם"}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full"
+                onClick={() => setIsLogin(!isLogin)}
+              >
+                {isLogin
+                  ? "אין לך חשבון? הירשם כאן"
+                  : "יש לך חשבון? התחבר כאן"}
+              </Button>
+            </form>
+          )}
         </CardContent>
       </Card>
     </div>
