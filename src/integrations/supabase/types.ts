@@ -115,6 +115,7 @@ export type Database = {
         Row: {
           base_salary: number
           created_at: string
+          deduction_amount: number
           full_name: string
           id: string
           updated_at: string
@@ -122,6 +123,7 @@ export type Database = {
         Insert: {
           base_salary?: number
           created_at?: string
+          deduction_amount?: number
           full_name: string
           id: string
           updated_at?: string
@@ -129,6 +131,7 @@ export type Database = {
         Update: {
           base_salary?: number
           created_at?: string
+          deduction_amount?: number
           full_name?: string
           id?: string
           updated_at?: string

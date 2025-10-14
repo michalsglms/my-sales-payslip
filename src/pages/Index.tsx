@@ -300,6 +300,7 @@ const Index = () => {
 
         <SalaryCalculator
           baseSalary={parseFloat(profile.base_salary)}
+          deductionAmount={parseFloat(profile.deduction_amount || "0")}
           deals={deals}
           monthlyGeneralBonus={monthlyGeneralBonus}
           monthlyCfdBonus={monthlyCfdBonus}

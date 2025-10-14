@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import EditBaseSalary from "./EditBaseSalary";
+import EditDeduction from "./EditDeduction";
 
 interface Deal {
   id: string;
@@ -13,6 +14,7 @@ interface Deal {
 
 interface SalaryCalculatorProps {
   baseSalary: number;
+  deductionAmount: number;
   deals: Deal[];
   monthlyGeneralBonus?: number;
   monthlyCfdBonus?: number;
@@ -22,7 +24,7 @@ interface SalaryCalculatorProps {
   onSalaryUpdated: () => void;
 }
 
-const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyCfdBonus = 0, quarterlyGeneralBonus = 0, quarterlyCfdBonus = 0, userId, onSalaryUpdated }: SalaryCalculatorProps) => {
+const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBonus = 0, monthlyCfdBonus = 0, quarterlyGeneralBonus = 0, quarterlyCfdBonus = 0, userId, onSalaryUpdated }: SalaryCalculatorProps) => {
   const calculations = useMemo(() => {
     let eqBonus = 0;
     let cfdBonus = 0;
@@ -67,13 +69,16 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
       }
     });
 
-    const totalBonus = eqBonus + cfdBonus;
+    const eqBonusAfterDeduction = Math.max(0, eqBonus - deductionAmount);
+    const totalBonus = eqBonusAfterDeduction + cfdBonus;
     const targetBonuses = monthlyGeneralBonus + monthlyCfdBonus + quarterlyGeneralBonus + quarterlyCfdBonus;
     const totalSalary = baseSalary + totalBonus + targetBonuses;
 
     return {
       baseSalary,
+      deductionAmount,
       eqBonus,
+      eqBonusAfterDeduction,
       cfdBonus,
       eqCount,
       cfdCount,
@@ -86,7 +91,7 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
       totalSalary,
       newClientsCount: deals.filter(d => d.is_new_client).length,
     };
-  }, [baseSalary, deals, monthlyGeneralBonus, monthlyCfdBonus, quarterlyGeneralBonus, quarterlyCfdBonus]);
+  }, [baseSalary, deductionAmount, deals, monthlyGeneralBonus, monthlyCfdBonus, quarterlyGeneralBonus, quarterlyCfdBonus]);
 
   return (
     <Card>
@@ -112,12 +117,32 @@ const SalaryCalculator = ({ baseSalary, deals, monthlyGeneralBonus = 0, monthlyC
           </div>
         </div>
 
+        <div className="border-t pt-4">
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-muted-foreground">סכום הקיזוז</span>
+            <div className="flex items-center gap-2">
+              <span className="text-lg font-bold">₪{calculations.deductionAmount.toLocaleString()}</span>
+              <EditDeduction 
+                userId={userId} 
+                currentDeduction={deductionAmount} 
+                onDeductionUpdated={onSalaryUpdated}
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="border-t pt-4 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">סך הכל בונוס EQ</span>
             <span className="w-16 text-center font-medium">{calculations.eqCount}</span>
             <span className="font-medium">₪{calculations.eqBonus.toLocaleString()}</span>
           </div>
+          {calculations.deductionAmount > 0 && (
+            <div className="flex items-center justify-between text-sm mr-4">
+              <span className="text-muted-foreground">בונוס EQ לאחר קיזוז</span>
+              <span className="font-medium">₪{calculations.eqBonusAfterDeduction.toLocaleString()}</span>
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">סך הכל בונוס CFD</span>
             <span className="w-16 text-center font-medium">{calculations.cfdCount}</span>
