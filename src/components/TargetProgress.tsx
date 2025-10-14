@@ -498,12 +498,30 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
     const qp = calculations.quarterly.totalPercentage;
     const qpCFD = calculations.quarterly.cfdPercentage;
 
+    // Check if we crossed the threshold (either from below 100 or this is the first check)
     const crossedMonthly = mp >= 100 && prevMonthlyPct.current < 100 && !!calculations.monthly.target;
     const crossedMonthlyCFD = mpCFD >= 100 && prevMonthlyPctCFD.current < 100 && !!calculations.monthly.target;
     const crossedQuarterly = qp >= 100 && prevQuarterlyPct.current < 100 && !!calculations.quarterly.target;
     const crossedQuarterlyCFD = qpCFD >= 100 && prevQuarterlyPctCFD.current < 100 && !!calculations.quarterly.target;
 
-    console.log('Confetti check', { mp, mpCFD, qp, qpCFD, crossedMonthly, crossedMonthlyCFD, crossedQuarterly, crossedQuarterlyCFD });
+    console.log('Confetti check:', { 
+      mp, 
+      mpCFD, 
+      qp, 
+      qpCFD, 
+      prevMonthly: prevMonthlyPct.current,
+      prevMonthlyCFD: prevMonthlyPctCFD.current,
+      prevQuarterly: prevQuarterlyPct.current,
+      prevQuarterlyCFD: prevQuarterlyPctCFD.current,
+      crossedMonthly, 
+      crossedMonthlyCFD, 
+      crossedQuarterly, 
+      crossedQuarterlyCFD,
+      hasPlayedMonthlyConfetti,
+      hasPlayedMonthlyConfettiCFD,
+      hasPlayedQuarterlyConfetti,
+      hasPlayedQuarterlyConfettiCFD
+    });
 
     if (crossedMonthly && !hasPlayedMonthlyConfetti) {
       setHasPlayedMonthlyConfetti(true);
