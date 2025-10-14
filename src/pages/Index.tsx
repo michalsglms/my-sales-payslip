@@ -296,10 +296,17 @@ const Index = () => {
             </h1>
             <p className="text-sm font-medium text-muted-foreground">שלום, {profile.full_name} 👋</p>
           </div>
-          <Button variant="outline" onClick={signOut} className="hover:shadow-card transition-all">
-            <LogOut className="ml-2 h-4 w-4" />
-            התנתק
-          </Button>
+          <div className="flex gap-2">
+            {isAdmin && (
+              <Button variant="default" onClick={() => navigate("/admin")}>
+                דשבורד מנהל
+              </Button>
+            )}
+            <Button variant="outline" onClick={signOut} className="hover:shadow-card transition-all">
+              <LogOut className="ml-2 h-4 w-4" />
+              התנתק
+            </Button>
+          </div>
         </div>
       </header>
 
