@@ -37,6 +37,7 @@ const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromEx
     const file = e.target.files?.[0];
     if (!file) return;
 
+    console.log('Starting KPIS import for month:', month, 'year:', year);
     setIsImporting(true);
 
     try {
@@ -44,6 +45,8 @@ const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromEx
       const workbook = XLSX.read(data);
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
+
+      console.log('Parsed Excel data:', jsonData);
 
       if (jsonData.length === 0) {
         toast({
@@ -104,7 +107,10 @@ const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromEx
           work_excellence: row["הערכת מנהל"] === "כן" || row["work_excellence"] === true,
         }));
 
+      console.log('KPIS records to upsert:', kpisRecords);
+
       if (kpisRecords.length === 0) {
+        console.log('No valid records found');
         toast({
           title: "לא נמצאו רשומות תקינות",
           description: "וודא שהקובץ מכיל עמודה 'מזהה נציג' או 'user_id'",
@@ -115,13 +121,19 @@ const ImportKpisFromExcel = ({ month, year, onImportComplete }: ImportKpisFromEx
       }
 
       // Upsert KPIS data
-      const { error: insertError } = await supabase
+      console.log('Upserting KPIS data...');
+      const { data: upsertedData, error: insertError } = await supabase
         .from("monthly_kpis")
         .upsert(kpisRecords, {
           onConflict: "sales_rep_id,month,year",
         });
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('Upsert error:', insertError);
+        throw insertError;
+      }
+
+      console.log('KPIS upserted successfully:', upsertedData);
 
       toast({
         title: "ייבוא הצליח!",
