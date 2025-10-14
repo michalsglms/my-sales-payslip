@@ -582,12 +582,11 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
             </TableRow>
           ))}
           <TableRow className="bg-muted/50 font-bold">
-            <TableCell className="text-right">סה"כ</TableCell>
-            <TableCell></TableCell>
-            <TableCell></TableCell>
+            <TableCell className="text-right" colSpan={3}>סה"כ</TableCell>
             <TableCell>
               <Badge variant="outline">{dealsArray.length}</Badge>
             </TableCell>
+            <TableCell></TableCell>
             <TableCell></TableCell>
             <TableCell className="font-bold">
               ${totals.totalDeposit.toLocaleString()}
@@ -595,7 +594,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
             <TableCell className="font-bold text-primary">
               ₪{totals.totalBonus.toLocaleString()}
             </TableCell>
-            <TableCell></TableCell>
+            <TableCell colSpan={2}></TableCell>
           </TableRow>
         </TableBody>
       </Table>
