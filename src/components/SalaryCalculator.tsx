@@ -22,9 +22,11 @@ interface SalaryCalculatorProps {
   userId: string;
   onSalaryUpdated: () => void;
   selectedMonth: number;
+  selectedYear: number;
+  kpisBonus?: number;
 }
 
-const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBonus = 0, monthlyCfdBonus = 0, quarterlyGeneralBonus = 0, quarterlyCfdBonus = 0, userId, onSalaryUpdated, selectedMonth }: SalaryCalculatorProps) => {
+const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBonus = 0, monthlyCfdBonus = 0, quarterlyGeneralBonus = 0, quarterlyCfdBonus = 0, userId, onSalaryUpdated, selectedMonth, selectedYear, kpisBonus = 0 }: SalaryCalculatorProps) => {
   const calculations = useMemo(() => {
     let eqBonus = 0;
     let cfdBonus = 0;
@@ -77,7 +79,7 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
     const eqBonusAfterDeduction = Math.max(0, eqBonus - deductionAmount);
     const totalBonus = eqBonusAfterDeduction + cfdBonus;
     const targetBonuses = monthlyGeneralBonus + monthlyCfdBonus + appliedQuarterlyGeneralBonus + appliedQuarterlyCfdBonus;
-    const totalSalary = baseSalary + totalBonus + targetBonuses;
+    const totalSalary = baseSalary + totalBonus + targetBonuses + kpisBonus;
 
     return {
       baseSalary,
@@ -96,8 +98,9 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
       totalSalary,
       newClientsCount: deals.filter(d => d.is_new_client).length,
       isQuarterEnd,
+      kpisBonus,
     };
-  }, [baseSalary, deductionAmount, deals, monthlyGeneralBonus, monthlyCfdBonus, quarterlyGeneralBonus, quarterlyCfdBonus, selectedMonth]);
+  }, [baseSalary, deductionAmount, deals, monthlyGeneralBonus, monthlyCfdBonus, quarterlyGeneralBonus, quarterlyCfdBonus, selectedMonth, kpisBonus]);
 
   return (
     <Card>
@@ -172,6 +175,15 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
                 </div>
               </>
             )}
+          </div>
+        )}
+
+        {calculations.kpisBonus > 0 && (
+          <div className="border-t pt-4">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">בונוס KPIS</span>
+              <span className="font-medium">₪{calculations.kpisBonus.toLocaleString()}</span>
+            </div>
           </div>
         )}
 

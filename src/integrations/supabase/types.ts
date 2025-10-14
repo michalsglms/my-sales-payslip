@@ -70,6 +70,48 @@ export type Database = {
           },
         ]
       }
+      monthly_kpis: {
+        Row: {
+          aff_conversion_rate: boolean | null
+          avg_call_time_minutes: boolean | null
+          avg_calls_count: boolean | null
+          created_at: string
+          id: string
+          month: number
+          ppc_conversion_rate: boolean | null
+          sales_rep_id: string
+          updated_at: string
+          work_excellence: boolean | null
+          year: number
+        }
+        Insert: {
+          aff_conversion_rate?: boolean | null
+          avg_call_time_minutes?: boolean | null
+          avg_calls_count?: boolean | null
+          created_at?: string
+          id?: string
+          month: number
+          ppc_conversion_rate?: boolean | null
+          sales_rep_id: string
+          updated_at?: string
+          work_excellence?: boolean | null
+          year: number
+        }
+        Update: {
+          aff_conversion_rate?: boolean | null
+          avg_call_time_minutes?: boolean | null
+          avg_calls_count?: boolean | null
+          created_at?: string
+          id?: string
+          month?: number
+          ppc_conversion_rate?: boolean | null
+          sales_rep_id?: string
+          updated_at?: string
+          work_excellence?: boolean | null
+          year?: number
+        }
+        Relationships: []
+      }
       monthly_targets: {
         Row: {
           cfd_target_amount: number | null
@@ -179,15 +221,46 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_admin: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "sales_rep"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -314,6 +387,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "sales_rep"],
+    },
   },
 } as const

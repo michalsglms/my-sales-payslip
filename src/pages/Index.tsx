@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,17 +18,20 @@ import TargetForm from "@/components/TargetForm";
 import TargetProgress from "@/components/TargetProgress";
 import ExportToExcel from "@/components/ExportToExcel";
 import ImportFromExcel from "@/components/ImportFromExcel";
+import ImportKpisFromExcel from "@/components/ImportKpisFromExcel";
 import DeleteAllDeals from "@/components/DeleteAllDeals";
 import { LogOut } from "lucide-react";
 
 const Index = () => {
   const { user, loading, signOut } = useAuth();
+  const { isAdmin } = useUserRole(user?.id);
   const navigate = useNavigate();
   const [profile, setProfile] = useState<any>(null);
   const [deals, setDeals] = useState<any[]>([]);
   const [dealsLoading, setDealsLoading] = useState(true);
   const [monthlyTargets, setMonthlyTargets] = useState<any[]>([]);
   const [quarterlyTargets, setQuarterlyTargets] = useState<any[]>([]);
+  const [kpisBonus, setKpisBonus] = useState(0);
 
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1;
@@ -69,8 +73,34 @@ const Index = () => {
       fetchProfile();
       fetchDeals();
       fetchTargets();
+      fetchKpis();
     }
   }, [user, selectedYear, selectedMonth]);
+
+  const fetchKpis = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("monthly_kpis")
+      .select("*")
+      .eq("sales_rep_id", user.id)
+      .eq("month", selectedMonth)
+      .eq("year", selectedYear)
+      .maybeSingle();
+
+    if (data) {
+      // Calculate KPIS bonus based on achieved metrics
+      let bonus = 0;
+      if (data.avg_call_time_minutes) bonus += 600;
+      if (data.avg_calls_count) bonus += 600;
+      if (data.ppc_conversion_rate) bonus += 600;
+      if (data.aff_conversion_rate) bonus += 600;
+      if (data.work_excellence) bonus += 1600;
+      setKpisBonus(bonus);
+    } else {
+      setKpisBonus(0);
+    }
+  };
 
   const fetchProfile = async () => {
     if (!user) return;
@@ -282,6 +312,13 @@ const Index = () => {
             </SelectContent>
           </Select>
           <div className="flex gap-2">
+            {isAdmin && (
+              <ImportKpisFromExcel 
+                month={selectedMonth} 
+                year={selectedYear} 
+                onImportComplete={fetchKpis} 
+              />
+            )}
             <ImportFromExcel userId={user.id} onImportComplete={fetchDeals} />
             <ExportToExcel deals={deals} userName={profile.full_name} />
             <DeleteAllDeals userId={user.id} onDealsDeleted={fetchDeals} />
@@ -309,6 +346,8 @@ const Index = () => {
           userId={user.id}
           onSalaryUpdated={fetchProfile}
           selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          kpisBonus={kpisBonus}
         />
 
         {dealsLoading ? (
