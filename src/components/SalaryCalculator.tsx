@@ -139,8 +139,8 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
           </div>
           {calculations.deductionAmount > 0 && (
             <div className="flex items-center justify-between text-sm mr-4">
-              <span className="text-muted-foreground">בונוס EQ לאחר קיזוז</span>
-              <span className="font-medium">₪{calculations.eqBonusAfterDeduction.toLocaleString()}</span>
+              <span className="text-muted-foreground">סכום הקיזוז</span>
+              <span className="font-medium text-destructive">-₪{calculations.deductionAmount.toLocaleString()}</span>
             </div>
           )}
           <div className="flex items-center justify-between">
