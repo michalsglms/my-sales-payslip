@@ -14,15 +14,10 @@ export const useUserRole = (userId: string | undefined) => {
       }
 
       try {
-        const { data, error } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", userId)
-          .eq("role", "admin")
-          .maybeSingle();
+        const { data, error } = await supabase.rpc('is_admin', { _user_id: userId });
 
         if (error) throw error;
-        setIsAdmin(!!data);
+        setIsAdmin(Boolean(data));
       } catch (error) {
         console.error("Error checking user role:", error);
         setIsAdmin(false);
