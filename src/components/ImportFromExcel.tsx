@@ -80,68 +80,80 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-      const deals = jsonData.map((row: any) => {
-        // Get client type (supporting variations)
-        const clientTypeValue = getHeaderValue(row, ["סוג הלקוח", "סוג לקוח", "client type", "type"]);
-        const clientType = (clientTypeValue === "AQ" || clientTypeValue === "EQ") ? "EQ" : "CFD";
-        
-        // Get traffic source (supporting variations/invisible RTL chars)
-        const trafficSourceLabel = getHeaderValue(row, ["מקור הגעה", "מקור", "traffic source", "source"]);
-        const trafficSource = getTrafficSourceCode(trafficSourceLabel);
-        
-        // Get deposit amount (supporting variations)
-        const depositValue = getHeaderValue(row, ["הפקדה ראשונית", "הפקדה ($)", "הפקדה", "deposits", "deposit"]);
-        const initialDeposit = parseFloat(depositValue.toString().replace(/[^\d.-]/g, '')) || 0;
-        
-        // Get client name (supporting variations)
-        const clientNameRaw = getHeaderValue(row, [
-          "שם לקוח", "שם הלקוח", "שם", "full name", "client name", "name"
-        ]);
-        const clientName = clientNameRaw && clientNameRaw.trim() ? clientNameRaw.trim() : null;
-        
-        // Get client phone (supporting variations)
-        const clientPhoneRaw = getHeaderValue(row, [
-          "טלפון לקוח", "טלפון הלקוח", "טלפון", "מספר טלפון", "מס' טלפון", "נייד", "mobile", "cell", "phone", "phone number"
-        ]);
-        const clientPhoneClean = clientPhoneRaw ? clientPhoneRaw.toString().replace(/[\s-]/g, "") : "";
-        const clientPhone = clientPhoneClean ? clientPhoneClean : null;
-        
-        // Get client link (supporting variations)
-        const clientLink = getHeaderValue(row, ["קישור ללקוח", "קישור", "client link", "link"]) || null;
-        
-        // Get notes (supporting variations)
-        const notes = getHeaderValue(row, ["הערות", "notes", "note"]) || null;
-        
-        // Get date (supporting variations)
-        const dateValue = getHeaderValue(row, ["תאריך", "date", "created"]);
-        
-        const dealData = {
-          client_name: clientName,
-          client_phone: clientPhone,
-          client_link: clientLink,
-          notes: notes,
-          initial_deposit: initialDeposit,
-          traffic_source: trafficSource,
-          client_type: clientType,
-        };
+      const deals = jsonData
+        .map((row: any) => {
+          try {
+            // Get client type (supporting variations)
+            const clientTypeValue = getHeaderValue(row, ["סוג הלקוח", "סוג לקוח", "client type", "type"]);
+            const clientType = (clientTypeValue === "AQ" || clientTypeValue === "EQ") ? "EQ" : "CFD";
+            
+            // Get traffic source (supporting variations/invisible RTL chars)
+            const trafficSourceLabel = getHeaderValue(row, ["מקור הגעה", "מקור", "traffic source", "source"]);
+            const trafficSource = getTrafficSourceCode(trafficSourceLabel);
+            
+            // Get deposit amount (supporting variations)
+            const depositValue = getHeaderValue(row, ["הפקדה ראשונית", "הפקדה ($)", "הפקדה", "deposits", "deposit"]);
+            const initialDeposit = parseFloat(depositValue.toString().replace(/[^\d.-]/g, '')) || 0;
+            
+            // Skip rows with zero or invalid deposit
+            if (initialDeposit <= 0) {
+              return null;
+            }
+            
+            // Get client name (supporting variations)
+            const clientNameRaw = getHeaderValue(row, [
+              "שם לקוח", "שם הלקוח", "שם", "full name", "client name", "name"
+            ]);
+            const clientName = clientNameRaw && clientNameRaw.trim() ? clientNameRaw.trim() : null;
+            
+            // Get client phone (supporting variations)
+            const clientPhoneRaw = getHeaderValue(row, [
+              "טלפון לקוח", "טלפון הלקוח", "טלפון", "מספר טלפון", "מס' טלפון", "נייד", "mobile", "cell", "phone", "phone number"
+            ]);
+            const clientPhoneClean = clientPhoneRaw ? clientPhoneRaw.toString().replace(/[\s-]/g, "") : "";
+            const clientPhone = clientPhoneClean ? clientPhoneClean : null;
+            
+            // Get client link (supporting variations)
+            const clientLink = getHeaderValue(row, ["קישור ללקוח", "קישור", "client link", "link"]) || null;
+            
+            // Get notes (supporting variations)
+            const notes = getHeaderValue(row, ["הערות", "notes", "note"]) || null;
+            
+            // Get date (supporting variations)
+            const dateValue = getHeaderValue(row, ["תאריך", "date", "created"]);
+            
+            const dealData = {
+              client_name: clientName,
+              client_phone: clientPhone,
+              client_link: clientLink,
+              notes: notes,
+              initial_deposit: initialDeposit,
+              traffic_source: trafficSource,
+              client_type: clientType,
+            };
 
-        // Validate data
-        const validated = dealImportSchema.parse(dealData);
-        
-        return {
-          sales_rep_id: userId,
-          client_type: validated.client_type,
-          traffic_source: validated.traffic_source,
-          initial_deposit: validated.initial_deposit,
-          is_new_client: true,
-          completed_within_4_days: false,
-          client_link: validated.client_link,
-          client_name: validated.client_name,
-          client_phone: validated.client_phone,
-          notes: validated.notes,
-          created_at: dateValue ? new Date(dateValue).toISOString() : new Date().toISOString(),
-        };
-      });
+            // Validate data
+            const validated = dealImportSchema.parse(dealData);
+            
+            return {
+              sales_rep_id: userId,
+              client_type: validated.client_type,
+              traffic_source: validated.traffic_source,
+              initial_deposit: validated.initial_deposit,
+              is_new_client: true,
+              completed_within_4_days: false,
+              client_link: validated.client_link,
+              client_name: validated.client_name,
+              client_phone: validated.client_phone,
+              notes: validated.notes,
+              created_at: dateValue ? new Date(dateValue).toISOString() : new Date().toISOString(),
+            };
+          } catch (error) {
+            // Skip invalid rows
+            return null;
+          }
+        })
+        .filter((deal): deal is NonNullable<typeof deal> => deal !== null);
 
       const { error } = await supabase
         .from("deals")
