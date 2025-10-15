@@ -88,11 +88,16 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
             const clientType = (clientTypeValue === "AQ" || clientTypeValue === "EQ") ? "EQ" : "CFD";
             
             // Get traffic source (supporting variations/invisible RTL chars)
-            const trafficSourceLabel = getHeaderValue(row, ["מקור הגעה", "מקור", "traffic source", "source"]);
+            const trafficSourceLabel = getHeaderValue(row, [
+              "מקור הגעה", "מקור", "traffic source", "source", "affiliate type", "affiliate ty"
+            ]);
             const trafficSource = getTrafficSourceCode(trafficSourceLabel);
             
             // Get deposit amount (supporting variations)
-            const depositValue = getHeaderValue(row, ["הפקדה ראשונית", "הפקדה ($)", "הפקדה", "deposits", "deposit"]);
+            const depositValue = getHeaderValue(row, [
+              "הפקדה ראשונית", "הפקדה ($)", "הפקדה", "deposits", "deposit",
+              "total depo", "total deposit", "total real net depo", "total net depo", "amount", "initial deposit"
+            ]);
             const initialDeposit = parseFloat(depositValue.toString().replace(/[^\d.-]/g, '')) || 0;
             
             // Skip rows with zero or invalid deposit
@@ -110,7 +115,7 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
             const clientPhoneRaw = getHeaderValue(row, [
               "טלפון לקוח", "טלפון הלקוח", "טלפון", "מספר טלפון", "מס' טלפון", "נייד", "mobile", "cell", "phone", "phone number"
             ]);
-            const clientPhoneClean = clientPhoneRaw ? clientPhoneRaw.toString().replace(/[\s-]/g, "") : "";
+            const clientPhoneClean = clientPhoneRaw ? clientPhoneRaw.toString().replace(/[^0-9]/g, "") : "";
             const clientPhone = clientPhoneClean ? clientPhoneClean : null;
             
             // Get client link (supporting variations)
@@ -120,7 +125,7 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
             const notes = getHeaderValue(row, ["הערות", "notes", "note"]) || null;
             
             // Get date (supporting variations)
-            const dateValue = getHeaderValue(row, ["תאריך", "date", "created"]);
+            const dateValue = getHeaderValue(row, ["תאריך", "date", "created", "approval date", "approval dt", "approval"]);
             
             const dealData = {
               client_name: clientName,
@@ -155,9 +160,16 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
         })
         .filter((deal): deal is NonNullable<typeof deal> => deal !== null);
 
-      const { error } = await supabase
-        .from("deals")
-        .insert(deals);
+      if (deals.length === 0) {
+        toast({
+          title: "לא נמצאו רשומות תקינות",
+          description: "לא זוהו סכומי הפקדה חיוביים בקובץ. ודא שהעמודה מכילה Total Depo / Total Real Net Depo או Amount.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase.from("deals").insert(deals);
 
       if (error) throw error;
 
