@@ -84,8 +84,9 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
         .map((row: any) => {
           try {
             // Get client type (supporting variations)
-            const clientTypeValue = getHeaderValue(row, ["סוג הלקוח", "סוג לקוח", "client type", "type"]);
-            const clientType = (clientTypeValue === "AQ" || clientTypeValue === "EQ") ? "EQ" : "CFD";
+            const clientTypeValue = getHeaderValue(row, ["סוג הלקוח", "סוג לקוח", "client type", "type", "platform account numb"]).toUpperCase();
+            // CIL = EQ, IL = CFD, AQ = EQ, otherwise CFD
+            const clientType = (clientTypeValue.includes("CIL") || clientTypeValue === "AQ" || clientTypeValue === "EQ") ? "EQ" : "CFD";
             
             // Get traffic source (supporting variations/invisible RTL chars)
             const trafficSourceLabel = getHeaderValue(row, [
