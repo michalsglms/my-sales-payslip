@@ -80,6 +80,9 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
+      console.log("Column headers found:", Object.keys(jsonData[0] || {}));
+      console.log("First row sample:", jsonData[0]);
+
       const deals = jsonData
         .map((row: any) => {
           try {
@@ -97,7 +100,8 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
             // Get deposit amount (supporting variations)
             const depositValue = getHeaderValue(row, [
               "הפקדה ראשונית", "הפקדה ($)", "הפקדה", "deposits", "deposit",
-              "total depo", "total deposit", "total real net depo", "total net depo", "amount", "initial deposit"
+              "total depo", "total deposit", "total real net depo", "total net depo", 
+              "amount", "amou", "initial deposit", "deposits owl"
             ]);
             const initialDeposit = parseFloat(depositValue.toString().replace(/[^\d.-]/g, '')) || 0;
             
