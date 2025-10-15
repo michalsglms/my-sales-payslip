@@ -86,22 +86,23 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
       const deals = jsonData
         .map((row: any) => {
           try {
-            // Get client type (supporting variations)
-            const clientTypeValue = getHeaderValue(row, ["סוג הלקוח", "סוג לקוח", "client type", "type", "platform account numb"]).toUpperCase();
+            // Get client type from "Handling Bran" column (CIL = EQ, IL = CFD)
+            const clientTypeValue = getHeaderValue(row, [
+              "handling bran", "handling brand", "סוג הלקוח", "סוג לקוח", "client type", "type", "platform account numb"
+            ]).toUpperCase();
             // CIL = EQ, IL = CFD, AQ = EQ, otherwise CFD
             const clientType = (clientTypeValue.includes("CIL") || clientTypeValue === "AQ" || clientTypeValue === "EQ") ? "EQ" : "CFD";
             
-            // Get traffic source (supporting variations/invisible RTL chars)
+            // Get traffic source from "Affiliate Name" column
             const trafficSourceLabel = getHeaderValue(row, [
-              "מקור הגעה", "מקור", "traffic source", "source", "affiliate type", "affiliate ty"
+              "affiliate name", "affiliate", "מקור הגעה", "מקור", "traffic source", "source", "affiliate type", "affiliate ty"
             ]);
             const trafficSource = getTrafficSourceCode(trafficSourceLabel);
             
-            // Get deposit amount (supporting variations)
+            // Get deposit amount from "Amou" column
             const depositValue = getHeaderValue(row, [
-              "הפקדה ראשונית", "הפקדה ($)", "הפקדה", "deposits", "deposit",
-              "total depo", "total deposit", "total real net depo", "total net depo", 
-              "amount", "amou", "initial deposit", "deposits owl"
+              "amou", "amoun", "amount", "הפקדה ראשונית", "הפקדה ($)", "הפקדה", "deposits", "deposit",
+              "total depo", "total deposit", "total real net depo", "total net depo", "initial deposit", "deposits owl"
             ]);
             const initialDeposit = parseFloat(depositValue.toString().replace(/[^\d.-]/g, '')) || 0;
             
@@ -110,9 +111,9 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
               return null;
             }
             
-            // Get client name (supporting variations)
+            // Get client name from "Client Name" column
             const clientNameRaw = getHeaderValue(row, [
-              "שם לקוח", "שם הלקוח", "שם", "full name", "client name", "name"
+              "client name", "name", "שם לקוח", "שם הלקוח", "שם", "full name"
             ]);
             const clientName = clientNameRaw && clientNameRaw.trim() ? clientNameRaw.trim() : null;
             
