@@ -78,23 +78,38 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
       const deals = jsonData.map((row: any) => {
-        // Get client type - if it's "AQ" or "EQ", use "EQ", otherwise "CFD"
-        const clientTypeValue = row["סוג הלקוח"] || row["סוג לקוח"] || "";
+        // Get client type (supporting variations)
+        const clientTypeValue = getHeaderValue(row, ["סוג הלקוח", "סוג לקוח", "client type", "type"]);
         const clientType = (clientTypeValue === "AQ" || clientTypeValue === "EQ") ? "EQ" : "CFD";
         
         // Get traffic source (supporting variations/invisible RTL chars)
         const trafficSourceLabel = getHeaderValue(row, ["מקור הגעה", "מקור", "traffic source", "source"]);
         const trafficSource = getTrafficSourceCode(trafficSourceLabel);
         
-        // Get deposit amount
-        const depositValue = row["הפקדה ראשונית"] || row["הפקדה ($)"] || row["Deposits"] || 0;
+        // Get deposit amount (supporting variations)
+        const depositValue = getHeaderValue(row, ["הפקדה ראשונית", "הפקדה ($)", "הפקדה", "deposits", "deposit"]);
         const initialDeposit = parseFloat(depositValue.toString().replace(/[^\d.-]/g, '')) || 0;
         
+        // Get client name (supporting variations)
+        const clientName = getHeaderValue(row, ["שם לקוח", "שם הלקוח", "client name", "name"]) || null;
+        
+        // Get client phone (supporting variations)
+        const clientPhone = getHeaderValue(row, ["טלפון לקוח", "טלפון הלקוח", "טלפון", "client phone", "phone"]) || null;
+        
+        // Get client link (supporting variations)
+        const clientLink = getHeaderValue(row, ["קישור ללקוח", "קישור", "client link", "link"]) || null;
+        
+        // Get notes (supporting variations)
+        const notes = getHeaderValue(row, ["הערות", "notes", "note"]) || null;
+        
+        // Get date (supporting variations)
+        const dateValue = getHeaderValue(row, ["תאריך", "date", "created"]);
+        
         const dealData = {
-          client_name: row["שם הלקוח"] || null,
-          client_phone: row["טלפון הלקוח"] || null,
-          client_link: row["קישור ללקוח"] || row["קישור"] || null,
-          notes: row["הערות"] || null,
+          client_name: clientName,
+          client_phone: clientPhone,
+          client_link: clientLink,
+          notes: notes,
           initial_deposit: initialDeposit,
           traffic_source: trafficSource,
           client_type: clientType,
@@ -114,7 +129,7 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
           client_name: validated.client_name,
           client_phone: validated.client_phone,
           notes: validated.notes,
-          created_at: row["תאריך"] ? new Date(row["תאריך"]).toISOString() : new Date().toISOString(),
+          created_at: dateValue ? new Date(dateValue).toISOString() : new Date().toISOString(),
         };
       });
 

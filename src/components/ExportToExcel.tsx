@@ -9,6 +9,8 @@ interface Deal {
   initial_deposit: number;
   is_new_client: boolean;
   created_at: string;
+  client_name?: string;
+  client_phone?: string;
   client_link?: string;
   notes?: string;
 }
@@ -55,6 +57,8 @@ const ExportToExcel = ({ deals, userName }: ExportToExcelProps) => {
     // Prepare data for Excel
     const excelData = deals.map((deal) => ({
       "תאריך": new Date(deal.created_at).toLocaleDateString("he-IL"),
+      "שם לקוח": deal.client_name || "",
+      "טלפון לקוח": deal.client_phone || "",
       "סוג לקוח": deal.client_type,
       "מקור הגעה": getTrafficSourceLabel(deal.traffic_source),
       "הפקדה ($)": deal.initial_deposit,
@@ -71,6 +75,8 @@ const ExportToExcel = ({ deals, userName }: ExportToExcelProps) => {
     // Set column widths
     const columnWidths = [
       { wch: 12 }, // תאריך
+      { wch: 20 }, // שם לקוח
+      { wch: 15 }, // טלפון לקוח
       { wch: 10 }, // סוג לקוח
       { wch: 15 }, // מקור הגעה
       { wch: 12 }, // הפקדה
