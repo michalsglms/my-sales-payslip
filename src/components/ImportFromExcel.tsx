@@ -78,61 +78,78 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
       const data = await file.arrayBuffer();
       const workbook = XLSX.read(data);
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+      // Read as array-of-arrays for maximum robustness (handles truncated headers like "Amou")
+      const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false, defval: "" }) as any[][];
 
-      console.log("Column headers found:", Object.keys(jsonData[0] || {}));
-      console.log("First row sample:", jsonData[0]);
+      const norm = (s: any) =>
+        s?.toString()
+          .replace(/[\u200e\u200f\u202a-\u202e]/g, "")
+          .trim()
+          .replace(/\s+/g, " ")
+          .toLowerCase();
 
-      const deals = jsonData
-        .map((row: any) => {
+      // Find header row (first non-empty row)
+      const headerRowIndex = rows.findIndex((r) => r.some((c) => String(c).trim() !== ""));
+      const headers = headerRowIndex >= 0 ? rows[headerRowIndex] : [];
+      const headersNorm = headers.map(norm);
+      const dataRows = headerRowIndex >= 0 ? rows.slice(headerRowIndex + 1) : rows;
+
+      console.log("Headers (array):", headers);
+      console.log("First data row sample:", dataRows[0]);
+
+      const getBy = (rowArr: any[], candidates: string[]): string => {
+        for (const c of candidates) {
+          const n = norm(c);
+          const idx = headersNorm.findIndex((h) => h === n || h.includes(n) || n.includes(h));
+          if (idx !== -1) return String(rowArr[idx] ?? "");
+        }
+        return "";
+      };
+
+      const deals = dataRows
+        .map((row: any[]) => {
           try {
+            // Skip completely empty rows
+            if (!row || row.every((v) => String(v ?? "").trim() === "")) return null;
+
             // Get client type from "Handling Bran" column (CIL = EQ, IL = CFD)
-            const clientTypeValue = getHeaderValue(row, [
+            const clientTypeValue = getBy(row, [
               "handling bran", "handling brand", "סוג הלקוח", "סוג לקוח", "client type", "type", "platform account numb"
             ]).toUpperCase();
-            // CIL = EQ, IL = CFD, AQ = EQ, otherwise CFD
             const clientType = (clientTypeValue.includes("CIL") || clientTypeValue === "AQ" || clientTypeValue === "EQ") ? "EQ" : "CFD";
             
-            // Get traffic source from "Affiliate Name" column
-            const trafficSourceLabel = getHeaderValue(row, [
-              "affiliate name", "affiliate", "מקור הגעה", "מקור", "traffic source", "source", "affiliate type", "affiliate ty"
+            // Get traffic source from affiliate/name columns
+            const trafficSourceLabel = getBy(row, [
+              "affiliate name", "affiliate", "type", "מקור הגעה", "מקור", "traffic source", "source", "affiliate type", "affiliate ty"
             ]);
             const trafficSource = getTrafficSourceCode(trafficSourceLabel);
             
-            // Get deposit amount from "Amou" column
-            const depositValue = getHeaderValue(row, [
-              "amou", "amoun", "amount", "הפקדה ראשונית", "הפקדה ($)", "הפקדה", "deposits", "deposit",
-              "total depo", "total deposit", "total real net depo", "total net depo", "initial deposit", "deposits owl"
+            // Get deposit amount (supports Amou/Amount/Total Depo variants)
+            const depositValue = getBy(row, [
+              "amou", "amoun", "amount", "initial deposit",
+              "total depo", "total deposit", "total real net depo", "total net depo",
+              "הפקדה", "הפקדה ראשונית", "הפקדה ($)", "deposits", "deposit", "deposits owl"
             ]);
-            const initialDeposit = parseFloat(depositValue.toString().replace(/[^\d.-]/g, '')) || 0;
+            const initialDeposit = parseFloat(depositValue.toString().replace(/[^\d.-]/g, "")) || 0;
+            if (initialDeposit <= 0) return null;
             
-            // Skip rows with zero or invalid deposit
-            if (initialDeposit <= 0) {
-              return null;
-            }
-            
-            // Get client name from "Client Name" column
-            const clientNameRaw = getHeaderValue(row, [
-              "client name", "name", "שם לקוח", "שם הלקוח", "שם", "full name"
-            ]);
+            // Get client name
+            const clientNameRaw = getBy(row, ["client name", "name", "שם לקוח", "שם הלקוח", "שם", "full name"]);
             const clientName = clientNameRaw && clientNameRaw.trim() ? clientNameRaw.trim() : null;
             
-            // Get client phone (supporting variations)
-            const clientPhoneRaw = getHeaderValue(row, [
-              "טלפון לקוח", "טלפון הלקוח", "טלפון", "מספר טלפון", "מס' טלפון", "נייד", "mobile", "cell", "phone", "phone number"
+            // Get phone
+            const clientPhoneRaw = getBy(row, [
+              "phone", "phone number", "mobile", "cell",
+              "טלפון לקוח", "טלפון הלקוח", "טלפון", "מספר טלפון", "מס' טלפון", "נייד"
             ]);
             const clientPhoneClean = clientPhoneRaw ? clientPhoneRaw.toString().replace(/[^0-9]/g, "") : "";
             const clientPhone = clientPhoneClean ? clientPhoneClean : null;
             
-            // Get client link (supporting variations)
-            const clientLink = getHeaderValue(row, ["קישור ללקוח", "קישור", "client link", "link"]) || null;
-            
-            // Get notes (supporting variations)
-            const notes = getHeaderValue(row, ["הערות", "notes", "note"]) || null;
-            
-            // Get date (supporting variations)
-            const dateValue = getHeaderValue(row, ["תאריך", "date", "created", "approval date", "approval dt", "approval"]);
-            
+            // Optional fields
+            const clientLink = getBy(row, ["client link", "link", "קישור ללקוח", "קישור"]) || null;
+            const notes = getBy(row, ["notes", "note", "הערות"]) || null;
+            const dateValue = getBy(row, ["approval date", "approval dt", "approval", "date", "תאריך", "created"]);
+
             const dealData = {
               client_name: clientName,
               client_phone: clientPhone,
@@ -165,6 +182,7 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
           }
         })
         .filter((deal): deal is NonNullable<typeof deal> => deal !== null);
+            
 
       if (deals.length === 0) {
         toast({
