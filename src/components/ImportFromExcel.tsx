@@ -26,23 +26,26 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
   const [isImporting, setIsImporting] = useState(false);
 
   const getTrafficSourceCode = (label: string): "AFF" | "RFF" | "PPC" | "ORG" => {
-    // הקוד כבר מגיע באנגלית מהאקסל (ORG, AFF, RFF, PPC)
-    const upperLabel = label.trim().toUpperCase();
-    
-    // אם זה כבר אחד מהקודים התקינים, החזר אותו
-    if (upperLabel === "ORG" || upperLabel === "AFF" || upperLabel === "RFF" || upperLabel === "PPC") {
-      return upperLabel as "AFF" | "RFF" | "PPC" | "ORG";
+    const cleaned = (label ?? "")
+      .toString()
+      .replace(/[\u200e\u200f\u202a-\u202e]/g, "")
+      .trim();
+    const upper = cleaned.toUpperCase();
+    const lower = cleaned.toLowerCase();
+
+    // Already a valid code
+    if (upper === "ORG" || upper === "AFF" || upper === "RFF" || upper === "PPC") {
+      return upper as "AFF" | "RFF" | "PPC" | "ORG";
     }
-    
-    // אם זה טקסט בעברית, המר לקוד
-    const mapping: Record<string, "AFF" | "RFF" | "PPC" | "ORG"> = {
-      "הפניה": "RFF",
-      "פרסום ממומן": "PPC",
-      "אורגני": "ORG",
-      "שיווק שותפים": "AFF",
-    };
-    
-    return mapping[label] || "RFF";
+
+    // Heuristics in Hebrew/English
+    if (/הפנ|הפנייה|הפניה|ref|referral/.test(lower)) return "RFF";
+    if (/ppc|ads|google|campaign|קמפיין|ממומן/.test(lower)) return "PPC";
+    if (/אורג|organic/.test(lower)) return "ORG";
+    if (/שותפ|affiliate|aff/.test(lower)) return "AFF";
+
+    // Fallback when unknown/empty
+    return "ORG";
   };
 
   // Helper: robustly find a value by header candidates (handles RTL invisible chars)
@@ -91,10 +94,17 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
         const initialDeposit = parseFloat(depositValue.toString().replace(/[^\d.-]/g, '')) || 0;
         
         // Get client name (supporting variations)
-        const clientName = getHeaderValue(row, ["שם לקוח", "שם הלקוח", "client name", "name"]) || null;
+        const clientNameRaw = getHeaderValue(row, [
+          "שם לקוח", "שם הלקוח", "שם", "full name", "client name", "name"
+        ]);
+        const clientName = clientNameRaw && clientNameRaw.trim() ? clientNameRaw.trim() : null;
         
         // Get client phone (supporting variations)
-        const clientPhone = getHeaderValue(row, ["טלפון לקוח", "טלפון הלקוח", "טלפון", "client phone", "phone"]) || null;
+        const clientPhoneRaw = getHeaderValue(row, [
+          "טלפון לקוח", "טלפון הלקוח", "טלפון", "מספר טלפון", "מס' טלפון", "נייד", "mobile", "cell", "phone", "phone number"
+        ]);
+        const clientPhoneClean = clientPhoneRaw ? clientPhoneRaw.toString().replace(/[\s-]/g, "") : "";
+        const clientPhone = clientPhoneClean ? clientPhoneClean : null;
         
         // Get client link (supporting variations)
         const clientLink = getHeaderValue(row, ["קישור ללקוח", "קישור", "client link", "link"]) || null;
