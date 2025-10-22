@@ -138,10 +138,13 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
             const depositValue = getBy(row, [
               "amou", "amoun", "amount", "initial deposit",
               "total depo", "total deposit", "total real net depo", "total net depo",
-              "הפקדה", "הפקדה ראשונית", "הפקדה ($)", "deposits", "deposit", "deposits owl"
+              "הפקדה", "הפקדה ראשונית", "סכום הפקדה", "הפקדה ($)", "deposits", "deposit", "deposits owl"
             ]);
             const initialDeposit = parseFloat(depositValue.toString().replace(/[^\d.-]/g, "")) || 0;
-            if (initialDeposit <= 0) return null;
+            if (initialDeposit <= 0) {
+              console.warn("Skipping row due to non-positive deposit", { depositValue, initialDeposit, row });
+              return null;
+            }
             
             // Get client name
             const clientNameRaw = getBy(row, ["client name", "name", "שם לקוח", "שם הלקוח", "שם", "full name"]);
@@ -197,7 +200,7 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
       if (deals.length === 0) {
         toast({
           title: "לא נמצאו רשומות תקינות",
-          description: "לא זוהו סכומי הפקדה חיוביים בקובץ. ודא שהעמודה מכילה Total Depo / Total Real Net Depo או Amount.",
+          description: "לא זוהו סכומי הפקדה חיוביים בקובץ. ודא שהעמודה נקראת 'סכום הפקדה' / 'הפקדה' או כוללת Total Depo / Total Real Net Depo / Amount.",
           variant: "destructive",
         });
         return;
