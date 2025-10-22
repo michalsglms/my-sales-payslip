@@ -112,11 +112,21 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
             // Skip completely empty rows
             if (!row || row.every((v) => String(v ?? "").trim() === "")) return null;
 
-            // Get client type from "Handling Bran" column (CIL = EQ, IL = CFD)
+            // Get client type from "Handling Bran" column
+            // CIL or זירה = CFD
+            // פרו or IL = EQ
             const clientTypeValue = getBy(row, [
               "handling bran", "handling brand", "סוג הלקוח", "סוג לקוח", "client type", "type", "platform account numb"
-            ]).toUpperCase();
-            const clientType = (clientTypeValue.includes("CIL") || clientTypeValue === "AQ" || clientTypeValue === "EQ") ? "EQ" : "CFD";
+            ]);
+            const clientTypeUpper = clientTypeValue.toUpperCase();
+            const clientTypeLower = clientTypeValue.toLowerCase();
+            
+            let clientType: "EQ" | "CFD" = "CFD"; // Default to CFD
+            if (clientTypeUpper.includes("CIL") || clientTypeLower.includes("זירה")) {
+              clientType = "CFD";
+            } else if (clientTypeLower.includes("פרו") || clientTypeUpper.includes("IL")) {
+              clientType = "EQ";
+            }
             
             // Get traffic source from affiliate/name columns
             const trafficSourceLabel = getBy(row, [
