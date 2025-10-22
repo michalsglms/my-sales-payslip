@@ -161,7 +161,33 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
             // Optional fields
             const clientLink = getBy(row, ["client link", "link", "קישור ללקוח", "קישור"]) || null;
             const notes = getBy(row, ["notes", "note", "הערות"]) || null;
-            const dateValue = getBy(row, ["approval date", "approval dt", "approval", "date", "תאריך", "created"]);
+            const dateValue = getBy(row, [
+              "approval date", "approval dt", "approval", "date", "תאריך", "תאריך אישור", "תאריך הרשמה", "created"
+            ]);
+
+            // Parse date safely. If invalid or outside sane range, default to now.
+            const parsedDate = (() => {
+              const raw = (dateValue ?? "").toString().trim();
+              if (!raw) return new Date();
+
+              // Excel serial date support
+              const num = Number(raw);
+              if (!Number.isNaN(num) && /^-?\d+(\.\d+)?$/.test(raw) && num > 20000 && num < 60000) {
+                // Excel serial to JS date (UTC)
+                const ms = Math.round((num - 25569) * 86400 * 1000);
+                const d = new Date(ms);
+                return d;
+              }
+
+              // Normalize common dd.mm.yyyy -> mm/dd/yyyy to help Date()
+              const normalized = raw.replace(/(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2,4})/, "$2/$1/$3");
+              const d = new Date(normalized);
+              const year = d.getFullYear();
+              if (!isFinite(d.getTime()) || year < 2019 || year > 2035) {
+                return new Date();
+              }
+              return d;
+            })();
 
             const dealData = {
               client_name: clientName,
@@ -187,7 +213,7 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
               client_name: validated.client_name,
               client_phone: validated.client_phone,
               notes: validated.notes,
-              created_at: dateValue ? new Date(dateValue).toISOString() : new Date().toISOString(),
+              created_at: parsedDate.toISOString(),
             };
           } catch (error) {
             // Skip invalid rows
