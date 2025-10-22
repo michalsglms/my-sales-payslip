@@ -122,7 +122,7 @@ const ImportFromExcel = ({ userId, onImportComplete }: ImportFromExcelProps) => 
             const clientTypeLower = clientTypeValue.toLowerCase();
             
             let clientType: "EQ" | "CFD" = "CFD"; // Default to CFD
-            if (clientTypeUpper.includes("CIL") || clientTypeLower.includes("זירה")) {
+            if (clientTypeUpper.includes("CIL") || clientTypeLower.includes("זירה") || clientTypeLower.includes("ישראל")) {
               clientType = "CFD";
             } else if (clientTypeLower.includes("פרו") || clientTypeUpper.includes("IL")) {
               clientType = "EQ";
