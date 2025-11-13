@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -31,7 +31,9 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus } from "lucide-react";
+import { Plus, Check, ChevronsUpDown } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 
 const dealSchema = z.object({
   client_name: z.string().min(1, "יש להזין שם לקוח"),
@@ -39,6 +41,7 @@ const dealSchema = z.object({
   client_type: z.enum(["EQ", "CFD"], { required_error: "יש לבחור סוג לקוח" }),
   traffic_source: z.enum(["AFF", "RFF", "PPC", "ORG"], { required_error: "יש לבחור מקור הגעה" }),
   initial_deposit: z.string().min(1, "יש להזין סכום הפקדה"),
+  affiliate_name: z.string().optional(),
   client_link: z.string().optional(),
   notes: z.string().optional(),
 });
@@ -52,11 +55,67 @@ interface DealFormProps {
 
 const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
   const [open, setOpen] = useState(false);
+  const [affiliateOpen, setAffiliateOpen] = useState(false);
+  const [affiliateNames, setAffiliateNames] = useState<string[]>([]);
+  const [newAffiliateName, setNewAffiliateName] = useState("");
   const { toast } = useToast();
 
   const form = useForm<DealFormValues>({
     resolver: zodResolver(dealSchema),
   });
+
+  useEffect(() => {
+    fetchAffiliateNames();
+  }, []);
+
+  const fetchAffiliateNames = async () => {
+    const { data, error } = await supabase
+      .from("affiliate_names")
+      .select("name")
+      .order("name");
+
+    if (error) {
+      console.error("Error fetching affiliate names:", error);
+      return;
+    }
+
+    setAffiliateNames(data?.map(item => item.name) || []);
+  };
+
+  const handleAddAffiliateName = async () => {
+    if (!newAffiliateName.trim()) return;
+
+    const { error } = await supabase
+      .from("affiliate_names")
+      .insert({ name: newAffiliateName.trim() });
+
+    if (error) {
+      if (error.code === "23505") {
+        toast({
+          title: "שם זה כבר קיים",
+          description: "השם שהזנת כבר קיים במערכת",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "שגיאה",
+          description: "אירעה שגיאה בהוספת השם",
+          variant: "destructive",
+        });
+      }
+      return;
+    }
+
+    await fetchAffiliateNames();
+    form.setValue("affiliate_name", newAffiliateName.trim());
+    setNewAffiliateName("");
+    setAffiliateOpen(false);
+
+    toast({
+      title: "השם נוסף בהצלחה!",
+      description: "השם החדש זמין כעת לשימוש",
+    });
+  };
 
   const onSubmit = async (data: DealFormValues) => {
     try {
@@ -68,6 +127,7 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
         traffic_source: data.traffic_source,
         initial_deposit: parseFloat(data.initial_deposit),
         is_new_client: true, // כל עסקה חדשה היא לקוח חדש
+        affiliate_name: data.affiliate_name,
         client_link: data.client_link,
         notes: data.notes,
       });
@@ -190,6 +250,78 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
                     <Input type="number" step="0.01" placeholder="3000" {...field} />
                   </FormControl>
                   <FormDescription>הזן סכום בדולרים</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="affiliate_name"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>שם אפילייט</FormLabel>
+                  <Popover open={affiliateOpen} onOpenChange={setAffiliateOpen}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className="justify-between"
+                        >
+                          {field.value || "בחר או הוסף שם אפילייט"}
+                          <ChevronsUpDown className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0" align="start">
+                      <Command>
+                        <CommandInput 
+                          placeholder="חפש או הקלד שם חדש..." 
+                          value={newAffiliateName}
+                          onValueChange={setNewAffiliateName}
+                        />
+                        <CommandList>
+                          <CommandEmpty>
+                            <div className="py-2 px-2">
+                              <p className="text-sm mb-2">לא נמצאו תוצאות</p>
+                              {newAffiliateName && (
+                                <Button
+                                  size="sm"
+                                  onClick={handleAddAffiliateName}
+                                  className="w-full"
+                                >
+                                  <Plus className="ml-2 h-4 w-4" />
+                                  הוסף "{newAffiliateName}"
+                                </Button>
+                              )}
+                            </div>
+                          </CommandEmpty>
+                          <CommandGroup>
+                            {affiliateNames.map((name) => (
+                              <CommandItem
+                                key={name}
+                                value={name}
+                                onSelect={() => {
+                                  form.setValue("affiliate_name", name);
+                                  setAffiliateOpen(false);
+                                  setNewAffiliateName("");
+                                }}
+                              >
+                                <Check
+                                  className={`ml-2 h-4 w-4 ${
+                                    field.value === name ? "opacity-100" : "opacity-0"
+                                  }`}
+                                />
+                                {name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>בחר מהרשימה או הוסף שם חדש</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
