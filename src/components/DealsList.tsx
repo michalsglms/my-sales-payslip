@@ -35,6 +35,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import DealForm from "./DealForm";
+import AffiliateNameSelect from "./AffiliateNameSelect";
 
 interface Deal {
   id: string;
@@ -366,11 +367,9 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
               </TableCell>
               <TableCell className="p-2">
                 {newDeal.traffic_source === "AFF" ? (
-                  <Input
-                    placeholder="שם אפילייאט"
+                  <AffiliateNameSelect
                     value={newDeal.campaign}
-                    onChange={(e) => setNewDeal({ ...newDeal, campaign: e.target.value })}
-                    className="h-9"
+                    onChange={(value) => setNewDeal({ ...newDeal, campaign: value })}
                   />
                 ) : (
                   <span className="text-sm text-muted-foreground">-</span>
@@ -467,11 +466,9 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
                   </TableCell>
                   <TableCell className="p-2">
                     {editDeal.traffic_source === "AFF" ? (
-                      <Input
-                        placeholder="שם אפילייאט"
+                      <AffiliateNameSelect
                         value={editDeal.campaign}
-                        onChange={(e) => setEditDeal({ ...editDeal, campaign: e.target.value })}
-                        className="h-9"
+                        onChange={(value) => setEditDeal({ ...editDeal, campaign: value })}
                       />
                     ) : (
                       <span className="text-sm text-muted-foreground">-</span>
