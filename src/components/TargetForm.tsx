@@ -25,6 +25,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Target } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const monthlyTargetSchema = z.object({
   month: z.string().min(1, "יש לבחור חודש"),
@@ -156,9 +163,27 @@ const TargetForm = ({ userId, onTargetAdded, open, onOpenChange, defaultTab = 'm
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>חודש</FormLabel>
-                        <FormControl>
-                          <Input type="number" min="1" max="12" placeholder="1-12" {...field} />
-                        </FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="בחר חודש" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="1">ינואר (1)</SelectItem>
+                            <SelectItem value="2">פברואר (2)</SelectItem>
+                            <SelectItem value="3">מרץ (3)</SelectItem>
+                            <SelectItem value="4">אפריל (4)</SelectItem>
+                            <SelectItem value="5">מאי (5)</SelectItem>
+                            <SelectItem value="6">יוני (6)</SelectItem>
+                            <SelectItem value="7">יולי (7)</SelectItem>
+                            <SelectItem value="8">אוגוסט (8)</SelectItem>
+                            <SelectItem value="9">ספטמבר (9)</SelectItem>
+                            <SelectItem value="10">אוקטובר (10)</SelectItem>
+                            <SelectItem value="11">נובמבר (11)</SelectItem>
+                            <SelectItem value="12">דצמבר (12)</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -169,9 +194,19 @@ const TargetForm = ({ userId, onTargetAdded, open, onOpenChange, defaultTab = 'm
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>שנה</FormLabel>
-                        <FormControl>
-                          <Input type="number" min="2024" placeholder="2025" {...field} />
-                        </FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="בחר שנה" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="2024">2024</SelectItem>
+                            <SelectItem value="2025">2025</SelectItem>
+                            <SelectItem value="2026">2026</SelectItem>
+                            <SelectItem value="2027">2027</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -235,9 +270,19 @@ const TargetForm = ({ userId, onTargetAdded, open, onOpenChange, defaultTab = 'm
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>רבעון</FormLabel>
-                        <FormControl>
-                          <Input type="number" min="1" max="4" placeholder="1-4" {...field} />
-                        </FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="בחר רבעון" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="1">רבעון 1 (ינואר-מרץ)</SelectItem>
+                            <SelectItem value="2">רבעון 2 (אפריל-יוני)</SelectItem>
+                            <SelectItem value="3">רבעון 3 (יולי-ספטמבר)</SelectItem>
+                            <SelectItem value="4">רבעון 4 (אוקטובר-דצמבר)</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -248,9 +293,19 @@ const TargetForm = ({ userId, onTargetAdded, open, onOpenChange, defaultTab = 'm
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>שנה</FormLabel>
-                        <FormControl>
-                          <Input type="number" min="2024" placeholder="2025" {...field} />
-                        </FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="בחר שנה" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="2024">2024</SelectItem>
+                            <SelectItem value="2025">2025</SelectItem>
+                            <SelectItem value="2026">2026</SelectItem>
+                            <SelectItem value="2027">2027</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
