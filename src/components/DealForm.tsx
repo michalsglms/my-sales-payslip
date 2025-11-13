@@ -32,8 +32,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Check, ChevronsUpDown } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 const dealSchema = z.object({
   client_name: z.string().min(1, "יש להזין שם לקוח"),
@@ -69,7 +81,7 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
   }, []);
 
   const fetchAffiliateNames = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from("affiliate_names")
       .select("name")
       .order("name");
@@ -79,13 +91,15 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
       return;
     }
 
-    setAffiliateNames(data?.map(item => item.name) || []);
+    if (data) {
+      setAffiliateNames(data.map((item: any) => item.name));
+    }
   };
 
   const handleAddAffiliateName = async () => {
     if (!newAffiliateName.trim()) return;
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from("affiliate_names")
       .insert({ name: newAffiliateName.trim() });
 
@@ -126,7 +140,7 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
         client_type: data.client_type,
         traffic_source: data.traffic_source,
         initial_deposit: parseFloat(data.initial_deposit),
-        is_new_client: true, // כל עסקה חדשה היא לקוח חדש
+        is_new_client: true,
         affiliate_name: data.affiliate_name,
         client_link: data.client_link,
         notes: data.notes,
@@ -159,7 +173,7 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
           הוסף עסקה חדשה
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md" dir="rtl">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto" dir="rtl">
         <DialogHeader>
           <DialogTitle>הוספת עסקה חדשה</DialogTitle>
           <DialogDescription>הזן את פרטי העסקה</DialogDescription>
@@ -267,7 +281,10 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
                         <Button
                           variant="outline"
                           role="combobox"
-                          className="justify-between"
+                          className={cn(
+                            "w-full justify-between",
+                            !field.value && "text-muted-foreground"
+                          )}
                         >
                           {field.value || "בחר או הוסף שם אפילייט"}
                           <ChevronsUpDown className="mr-2 h-4 w-4 shrink-0 opacity-50" />
@@ -277,24 +294,22 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
                     <PopoverContent className="w-full p-0" align="start">
                       <Command>
                         <CommandInput 
-                          placeholder="חפש או הקלד שם חדש..." 
+                          placeholder="חפש או הוסף שם אפילייט..."
                           value={newAffiliateName}
                           onValueChange={setNewAffiliateName}
                         />
                         <CommandList>
                           <CommandEmpty>
-                            <div className="py-2 px-2">
-                              <p className="text-sm mb-2">לא נמצאו תוצאות</p>
-                              {newAffiliateName && (
-                                <Button
-                                  size="sm"
-                                  onClick={handleAddAffiliateName}
-                                  className="w-full"
-                                >
-                                  <Plus className="ml-2 h-4 w-4" />
-                                  הוסף "{newAffiliateName}"
-                                </Button>
-                              )}
+                            <div className="p-2">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                className="w-full justify-start"
+                                onClick={handleAddAffiliateName}
+                              >
+                                <Plus className="ml-2 h-4 w-4" />
+                                הוסף "{newAffiliateName}"
+                              </Button>
                             </div>
                           </CommandEmpty>
                           <CommandGroup>
@@ -305,13 +320,13 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
                                 onSelect={() => {
                                   form.setValue("affiliate_name", name);
                                   setAffiliateOpen(false);
-                                  setNewAffiliateName("");
                                 }}
                               >
                                 <Check
-                                  className={`ml-2 h-4 w-4 ${
+                                  className={cn(
+                                    "ml-2 h-4 w-4",
                                     field.value === name ? "opacity-100" : "opacity-0"
-                                  }`}
+                                  )}
                                 />
                                 {name}
                               </CommandItem>
