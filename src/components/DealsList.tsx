@@ -610,17 +610,14 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
           <CardTitle>לקוחות חדשים</CardTitle>
           <div className="flex gap-2">
             {!isAddingDeal && (
-              <>
-                <DealForm userId={userId} onDealAdded={onDealsChange} />
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => setIsAddingDeal(true)}
-                >
-                  <Plus className="ml-2 h-4 w-4" />
-                  הוסף לקוח חדש
-                </Button>
-              </>
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => setIsAddingDeal(true)}
+              >
+                <Plus className="ml-2 h-4 w-4" />
+                הוסף לקוח חדש
+              </Button>
             )}
             <Button
               variant={sortByDate ? "default" : "outline"}
