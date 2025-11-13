@@ -76,6 +76,8 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
     resolver: zodResolver(dealSchema),
   });
 
+  const trafficSource = form.watch("traffic_source");
+
   useEffect(() => {
     fetchAffiliateNames();
   }, []);
@@ -269,78 +271,80 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="affiliate_name"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>שם אפילייט</FormLabel>
-                  <Popover open={affiliateOpen} onOpenChange={setAffiliateOpen}>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className={cn(
-                            "w-full justify-between",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value || "בחר או הוסף שם אפילייט"}
-                          <ChevronsUpDown className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-full p-0" align="start">
-                      <Command>
-                        <CommandInput 
-                          placeholder="חפש או הוסף שם אפילייט..."
-                          value={newAffiliateName}
-                          onValueChange={setNewAffiliateName}
-                        />
-                        <CommandList>
-                          <CommandEmpty>
-                            <div className="p-2">
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                className="w-full justify-start"
-                                onClick={handleAddAffiliateName}
-                              >
-                                <Plus className="ml-2 h-4 w-4" />
-                                הוסף "{newAffiliateName}"
-                              </Button>
-                            </div>
-                          </CommandEmpty>
-                          <CommandGroup>
-                            {affiliateNames.map((name) => (
-                              <CommandItem
-                                key={name}
-                                value={name}
-                                onSelect={() => {
-                                  form.setValue("affiliate_name", name);
-                                  setAffiliateOpen(false);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "ml-2 h-4 w-4",
-                                    field.value === name ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
-                                {name}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <FormDescription>בחר מהרשימה או הוסף שם חדש</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {trafficSource === "AFF" && (
+              <FormField
+                control={form.control}
+                name="affiliate_name"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>שם אפילייט</FormLabel>
+                    <Popover open={affiliateOpen} onOpenChange={setAffiliateOpen}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn(
+                              "w-full justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value || "בחר או הוסף שם אפילייט"}
+                            <ChevronsUpDown className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0" align="start">
+                        <Command>
+                          <CommandInput 
+                            placeholder="חפש או הוסף שם אפילייט..."
+                            value={newAffiliateName}
+                            onValueChange={setNewAffiliateName}
+                          />
+                          <CommandList>
+                            <CommandEmpty>
+                              <div className="p-2">
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  className="w-full justify-start"
+                                  onClick={handleAddAffiliateName}
+                                >
+                                  <Plus className="ml-2 h-4 w-4" />
+                                  הוסף "{newAffiliateName}"
+                                </Button>
+                              </div>
+                            </CommandEmpty>
+                            <CommandGroup>
+                              {affiliateNames.map((name) => (
+                                <CommandItem
+                                  key={name}
+                                  value={name}
+                                  onSelect={() => {
+                                    form.setValue("affiliate_name", name);
+                                    setAffiliateOpen(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "ml-2 h-4 w-4",
+                                      field.value === name ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {name}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormDescription>בחר מהרשימה או הוסף שם חדש</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}
