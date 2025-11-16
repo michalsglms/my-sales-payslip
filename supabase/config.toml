@@ -1,1 +1,4 @@
 project_id = "unxeazybusnrerertyou"
+
+[functions.sync-to-company-db]
+verify_jwt = false
