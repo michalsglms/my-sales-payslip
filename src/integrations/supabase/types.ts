@@ -242,6 +242,36 @@ export type Database = {
           },
         ]
       }
+      sync_log: {
+        Row: {
+          created_at: string
+          id: string
+          last_sync_status: string | null
+          last_synced_at: string
+          records_synced: number | null
+          table_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_sync_status?: string | null
+          last_synced_at?: string
+          records_synced?: number | null
+          table_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_sync_status?: string | null
+          last_synced_at?: string
+          records_synced?: number | null
+          table_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
