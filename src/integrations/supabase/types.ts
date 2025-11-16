@@ -14,8 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      affiliate_names: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       deals: {
         Row: {
+          affiliate_name: string | null
           campaign: string | null
           client_link: string | null
           client_name: string | null
@@ -31,6 +50,7 @@ export type Database = {
           traffic_source: string
         }
         Insert: {
+          affiliate_name?: string | null
           campaign?: string | null
           client_link?: string | null
           client_name?: string | null
@@ -46,6 +66,7 @@ export type Database = {
           traffic_source: string
         }
         Update: {
+          affiliate_name?: string | null
           campaign?: string | null
           client_link?: string | null
           client_name?: string | null
@@ -254,10 +275,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_admin: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "sales_rep"
