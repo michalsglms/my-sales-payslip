@@ -66,8 +66,8 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
         dealBonus += deal.initial_deposit >= 10000 ? 900 : 400;
       }
 
-      // Additional 500 ILS bonus ONLY for EQ clients with $10,000+ (not CFD)
-      if (deal.client_type === "EQ" && deal.initial_deposit >= 10000) {
+      // Additional 500 ILS bonus ONLY for EQ clients with $10,000+ (not CFD, not AFF)
+      if (deal.client_type === "EQ" && deal.initial_deposit >= 10000 && deal.traffic_source !== "AFF") {
         dealBonus += 500;
       }
 
