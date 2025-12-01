@@ -251,14 +251,13 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
     let bonus = 0;
     
     // Traffic source bonus
-    if (deal.initial_deposit >= 10000) {
+    if (deal.traffic_source === "RFF" || deal.traffic_source === "PPC") {
       bonus += 700;
-    } else {
-      if (deal.traffic_source === "RFF" || deal.traffic_source === "PPC") {
-        bonus += 700;
-      } else if (deal.traffic_source === "ORG" || deal.traffic_source === "AFF") {
-        bonus += 400;
-      }
+    } else if (deal.traffic_source === "ORG") {
+      bonus += 400;
+    } else if (deal.traffic_source === "AFF") {
+      // For AFF: 400 regular, 900 if deposit >= 10K
+      bonus += deal.initial_deposit >= 10000 ? 900 : 400;
     }
     
     // Additional bonus for EQ clients with $10,000+
