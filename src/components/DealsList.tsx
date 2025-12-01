@@ -87,7 +87,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
   const handleAddDeal = async () => {
     try {
       // Validate required fields
-      if (!newDeal.client_name || !newDeal.client_phone || !newDeal.client_type || 
+      if (!newDeal.client_name || !newDeal.client_type || 
           !newDeal.traffic_source || !newDeal.initial_deposit) {
         toast({
           title: "שגיאה",
@@ -156,7 +156,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
 
     try {
       // Validate required fields
-      if (!editDeal.client_name || !editDeal.client_phone || !editDeal.client_type || 
+      if (!editDeal.client_name || !editDeal.client_type || 
           !editDeal.traffic_source || !editDeal.initial_deposit) {
         toast({
           title: "שגיאה",

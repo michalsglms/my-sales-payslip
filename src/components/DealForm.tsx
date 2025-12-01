@@ -49,7 +49,7 @@ import { cn } from "@/lib/utils";
 
 const dealSchema = z.object({
   client_name: z.string().min(1, "יש להזין שם לקוח"),
-  client_phone: z.string().min(1, "יש להזין טלפון לקוח"),
+  client_phone: z.string().optional(),
   client_type: z.enum(["EQ", "CFD"], { required_error: "יש לבחור סוג לקוח" }),
   traffic_source: z.enum(["AFF", "RFF", "PPC", "ORG"], { required_error: "יש לבחור מקור הגעה" }),
   initial_deposit: z.string().min(1, "יש להזין סכום הפקדה"),
