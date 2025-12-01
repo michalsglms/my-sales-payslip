@@ -285,8 +285,8 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
       bonus += deal.initial_deposit >= 10000 ? 900 : 400;
     }
     
-    // Additional bonus for EQ clients with $10,000+
-    if (deal.client_type === "EQ" && deal.initial_deposit >= 10000) {
+    // Additional 500 ILS bonus ONLY for EQ clients with $10,000+ (not CFD, not AFF)
+    if (deal.client_type === "EQ" && deal.initial_deposit >= 10000 && deal.traffic_source !== "AFF") {
       bonus += 500;
     }
     
