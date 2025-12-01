@@ -35,6 +35,7 @@ export type Database = {
       deals: {
         Row: {
           affiliate_name: string | null
+          approved: boolean
           campaign: string | null
           client_link: string | null
           client_name: string | null
@@ -51,6 +52,7 @@ export type Database = {
         }
         Insert: {
           affiliate_name?: string | null
+          approved?: boolean
           campaign?: string | null
           client_link?: string | null
           client_name?: string | null
@@ -67,6 +69,7 @@ export type Database = {
         }
         Update: {
           affiliate_name?: string | null
+          approved?: boolean
           campaign?: string | null
           client_link?: string | null
           client_name?: string | null
