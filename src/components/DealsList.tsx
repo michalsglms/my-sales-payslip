@@ -23,7 +23,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Pencil, Trash2, ArrowUpDown, Calendar, Plus, Check, X } from "lucide-react";
+import { Pencil, Trash2, ArrowUpDown, Calendar, Plus, Check, X, CheckCircle, XCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
@@ -50,6 +50,7 @@ interface Deal {
   client_link?: string;
   notes?: string;
   campaign?: string;
+  approved: boolean;
 }
 
 interface DealsListProps {
@@ -238,6 +239,30 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
     }
   };
 
+  const handleToggleApproved = async (dealId: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from("deals")
+        .update({ approved: !currentStatus })
+        .eq("id", dealId);
+
+      if (error) throw error;
+
+      toast({
+        title: "סטטוס עודכן בהצלחה",
+        description: !currentStatus ? "העסקה אושרה" : "אישור העסקה בוטל",
+      });
+
+      onDealsChange();
+    } catch (error: any) {
+      toast({
+        title: "שגיאה",
+        description: error.message || "אירעה שגיאה בעדכון הסטטוס",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getTrafficSourceLabel = (source: string) => {
     return source;
   };
@@ -315,6 +340,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
             <TableHead className="text-right">הפקדה ($)</TableHead>
             <TableHead className="text-right">בונוס (₪)</TableHead>
             <TableHead className="text-right">קישור</TableHead>
+            <TableHead className="text-right">אושר</TableHead>
             <TableHead className="text-right">פעולות</TableHead>
           </TableRow>
         </TableHeader>
@@ -392,6 +418,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
                   className="h-9"
                 />
               </TableCell>
+              <TableCell className="p-2">-</TableCell>
               <TableCell className="p-2">
                 <div className="flex gap-1">
                   <Button
@@ -492,6 +519,20 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
                     />
                   </TableCell>
                   <TableCell className="p-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleToggleApproved(deal.id, deal.approved)}
+                      className="h-9 w-9 p-0"
+                    >
+                      {deal.approved ? (
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-muted-foreground" />
+                      )}
+                    </Button>
+                  </TableCell>
+                  <TableCell className="p-2">
                     <div className="flex gap-1">
                       <Button
                         variant="ghost"
@@ -555,6 +596,20 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
                     ) : (
                       <span className="text-muted-foreground">-</span>
                     )}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleToggleApproved(deal.id, deal.approved)}
+                      className="h-9 w-9 p-0"
+                    >
+                      {deal.approved ? (
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-muted-foreground" />
+                      )}
+                    </Button>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
