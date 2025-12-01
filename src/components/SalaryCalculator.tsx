@@ -56,17 +56,14 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
 
       let dealBonus = 0;
 
-      // Traffic source bonus (includes 60 ILS base per new client)
-      // For deposits $10,000+, bonus is 700 ILS regardless of traffic source
-      if (deal.initial_deposit >= 10000) {
+      // Traffic source bonus
+      if (deal.traffic_source === "RFF" || deal.traffic_source === "PPC") {
         dealBonus += 700;
-      } else {
-        // For deposits under $10,000
-        if (deal.traffic_source === "RFF" || deal.traffic_source === "PPC") {
-          dealBonus += 700;
-        } else if (deal.traffic_source === "ORG" || deal.traffic_source === "AFF") {
-          dealBonus += 400;
-        }
+      } else if (deal.traffic_source === "ORG") {
+        dealBonus += 400;
+      } else if (deal.traffic_source === "AFF") {
+        // For AFF: 400 regular, 900 if deposit >= 10K
+        dealBonus += deal.initial_deposit >= 10000 ? 900 : 400;
       }
 
       // Additional 500 ILS bonus ONLY for EQ clients with $10,000+ (not CFD)
