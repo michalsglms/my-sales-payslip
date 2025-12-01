@@ -62,7 +62,7 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
       } else if (deal.traffic_source === "ORG") {
         dealBonus += 400;
       } else if (deal.traffic_source === "AFF") {
-        // For AFF: 400 regular, 900 if deposit >= 10K
+        // For AFF: 400 base, + 500 bonus if deposit >= 10K (total 900)
         dealBonus += deal.initial_deposit >= 10000 ? 900 : 400;
       }
 
