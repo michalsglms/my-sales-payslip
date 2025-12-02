@@ -281,8 +281,12 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
     } else if (deal.traffic_source === "ORG") {
       bonus += 400;
     } else if (deal.traffic_source === "AFF") {
-      // For AFF: 400 regular, 900 if deposit >= 10K
-      bonus += deal.initial_deposit >= 10000 ? 900 : 400;
+      // For AFF: EQ clients with 10K+ get 900, all others get 400
+      if (deal.client_type === "EQ" && deal.initial_deposit >= 10000) {
+        bonus += 900;
+      } else {
+        bonus += 400;
+      }
     }
     
     // Additional 500 ILS bonus ONLY for EQ clients with $10,000+ (not CFD, not AFF)
