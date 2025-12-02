@@ -62,8 +62,12 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
       } else if (deal.traffic_source === "ORG") {
         dealBonus += 400;
       } else if (deal.traffic_source === "AFF") {
-        // For AFF: 400 base, + 500 bonus if deposit >= 10K (total 900)
-        dealBonus += deal.initial_deposit >= 10000 ? 900 : 400;
+        // For AFF: EQ clients with 10K+ get 900, all others get 400
+        if (deal.client_type === "EQ" && deal.initial_deposit >= 10000) {
+          dealBonus += 900;
+        } else {
+          dealBonus += 400;
+        }
       }
 
       // Additional 500 ILS bonus ONLY for EQ clients with $10,000+ (not CFD, not AFF)
