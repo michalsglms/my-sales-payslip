@@ -23,7 +23,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Pencil, Trash2, ArrowUpDown, Calendar, Plus, Check, X, CheckCircle, XCircle } from "lucide-react";
+import { Pencil, Trash2, ArrowUpDown, Calendar as CalendarIcon, Plus, Check, X, CheckCircle, XCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
@@ -34,6 +34,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
 import DealForm from "./DealForm";
 import AffiliateNameSelect from "./AffiliateNameSelect";
 
@@ -82,6 +89,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
     initial_deposit: string;
     client_link: string;
     campaign: string;
+    created_at: Date;
   } | null>(null);
   const { toast } = useToast();
   
@@ -149,6 +157,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
       initial_deposit: deal.initial_deposit.toString(),
       client_link: deal.client_link || "",
       campaign: deal.campaign || "",
+      created_at: new Date(deal.created_at),
     });
   };
 
@@ -177,6 +186,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
           initial_deposit: parseFloat(editDeal.initial_deposit),
           client_link: editDeal.client_link || null,
           campaign: editDeal.campaign || null,
+          created_at: editDeal.created_at.toISOString(),
         })
         .eq("id", dealId);
 
@@ -450,9 +460,33 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
               {editingDealId === deal.id && editDeal ? (
                 <>
                   <TableCell className="p-2">
-                    <span className="text-sm text-muted-foreground">
-                      {format(new Date(deal.created_at), "dd/MM/yyyy HH:mm", { locale: he })}
-                    </span>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "h-9 w-full justify-start text-right font-normal",
+                            !editDeal.created_at && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="ml-2 h-4 w-4" />
+                          {editDeal.created_at ? (
+                            format(editDeal.created_at, "dd/MM/yyyy", { locale: he })
+                          ) : (
+                            <span>בחר תאריך</span>
+                          )}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={editDeal.created_at}
+                          onSelect={(date) => date && setEditDeal({ ...editDeal, created_at: date })}
+                          initialFocus
+                          className={cn("p-3 pointer-events-auto")}
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </TableCell>
                   <TableCell className="p-2">
                     <Input
