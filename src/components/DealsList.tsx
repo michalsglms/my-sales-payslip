@@ -23,7 +23,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Pencil, Trash2, ArrowUpDown, Calendar as CalendarIcon, Plus, Check, X, CheckCircle, XCircle } from "lucide-react";
+import { Pencil, Trash2, ArrowUpDown, Calendar, Plus, Check, X, CheckCircle, XCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
@@ -34,13 +34,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
 import DealForm from "./DealForm";
 import AffiliateNameSelect from "./AffiliateNameSelect";
 
@@ -89,7 +82,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
     initial_deposit: string;
     client_link: string;
     campaign: string;
-    created_at: Date;
+    created_at: string;
   } | null>(null);
   const { toast } = useToast();
   
@@ -149,6 +142,15 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
 
   const handleStartEdit = (deal: Deal) => {
     setEditingDealId(deal.id);
+    // Convert to datetime-local format (YYYY-MM-DDTHH:mm)
+    const date = new Date(deal.created_at);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const datetimeLocal = `${year}-${month}-${day}T${hours}:${minutes}`;
+    
     setEditDeal({
       client_name: deal.client_name || "",
       client_phone: deal.client_phone || "",
@@ -157,7 +159,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
       initial_deposit: deal.initial_deposit.toString(),
       client_link: deal.client_link || "",
       campaign: deal.campaign || "",
-      created_at: new Date(deal.created_at),
+      created_at: datetimeLocal,
     });
   };
 
@@ -176,6 +178,9 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
         return;
       }
 
+      // Convert datetime-local format back to ISO string
+      const createdAtISO = new Date(editDeal.created_at).toISOString();
+      
       const { error } = await supabase
         .from("deals")
         .update({
@@ -186,7 +191,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
           initial_deposit: parseFloat(editDeal.initial_deposit),
           client_link: editDeal.client_link || null,
           campaign: editDeal.campaign || null,
-          created_at: editDeal.created_at.toISOString(),
+          created_at: createdAtISO,
         })
         .eq("id", dealId);
 
@@ -460,33 +465,12 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
               {editingDealId === deal.id && editDeal ? (
                 <>
                   <TableCell className="p-2">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "h-9 w-full justify-start text-right font-normal",
-                            !editDeal.created_at && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="ml-2 h-4 w-4" />
-                          {editDeal.created_at ? (
-                            format(editDeal.created_at, "dd/MM/yyyy", { locale: he })
-                          ) : (
-                            <span>בחר תאריך</span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={editDeal.created_at}
-                          onSelect={(date) => date && setEditDeal({ ...editDeal, created_at: date })}
-                          initialFocus
-                          className={cn("p-3 pointer-events-auto")}
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <Input
+                      type="datetime-local"
+                      value={editDeal.created_at}
+                      onChange={(e) => setEditDeal({ ...editDeal, created_at: e.target.value })}
+                      className="h-9"
+                    />
                   </TableCell>
                   <TableCell className="p-2">
                     <Input
