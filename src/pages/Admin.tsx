@@ -89,19 +89,21 @@ const Admin = () => {
     }
   }, [user, loading, navigate]);
 
+  // Don't redirect until we've finished loading both auth and role
   useEffect(() => {
-    console.log("Admin: checking access", { roleLoading, isAdmin, userId: user?.id });
-    if (!roleLoading && !isAdmin && user) {
+    console.log("Admin: checking access", { loading, roleLoading, isAdmin, userId: user?.id });
+    // Only redirect if we're done loading and user is definitely not an admin
+    if (!loading && !roleLoading && user && !isAdmin) {
       console.log("Admin: redirecting to home - not admin");
       navigate("/");
     }
-  }, [isAdmin, roleLoading, user, navigate]);
+  }, [isAdmin, roleLoading, loading, user, navigate]);
 
   useEffect(() => {
-    if (user && isAdmin) {
+    if (user && isAdmin && !roleLoading) {
       fetchData();
     }
-  }, [user, isAdmin, selectedYear, selectedMonth]);
+  }, [user, isAdmin, roleLoading, selectedYear, selectedMonth]);
 
   const fetchData = async () => {
     setIsLoadingData(true);
@@ -168,8 +170,16 @@ const Admin = () => {
     );
   }
 
-  if (!user || !isAdmin) {
+  if (!user) {
     return null;
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>אין לך הרשאה לצפות בדף זה</p>
+      </div>
+    );
   }
 
   return (
