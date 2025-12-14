@@ -150,8 +150,8 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
 
         <div className="border-t pt-4 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">סך הכל בונוס EQ</span>
-            <span className="w-16 text-center font-medium">{calculations.eqCount}</span>
+            <span className="text-muted-foreground w-[140px]">סך הכל בונוס EQ</span>
+            <span className="w-12 text-center font-medium">{calculations.eqCount}</span>
             <span className="font-medium">₪{calculations.eqBonus.toLocaleString()}</span>
           </div>
           {calculations.deductionAmount > 0 && (
@@ -161,8 +161,8 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
             </div>
           )}
           <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">סך הכל בונוס CFD</span>
-            <span className="w-16 text-center font-medium">{calculations.cfdCount}</span>
+            <span className="text-muted-foreground w-[140px]">סך הכל בונוס CFD</span>
+            <span className="w-12 text-center font-medium">{calculations.cfdCount}</span>
             <span className="font-medium">₪{calculations.cfdBonus.toLocaleString()}</span>
           </div>
         </div>
