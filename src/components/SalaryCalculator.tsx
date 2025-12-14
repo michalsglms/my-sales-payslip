@@ -149,10 +149,10 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
         </div>
 
         <div className="border-t pt-4 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground flex-shrink-0" style={{ width: '140px' }}>סך הכל בונוס EQ</span>
-            <span className="w-12 text-center font-medium flex-shrink-0">{calculations.eqCount}</span>
-            <span className="font-medium flex-shrink-0">₪{calculations.eqBonus.toLocaleString()}</span>
+          <div className="grid items-center" style={{ gridTemplateColumns: '1fr 3rem auto' }}>
+            <span className="text-muted-foreground">סך הכל בונוס EQ</span>
+            <span className="text-center font-medium">{calculations.eqCount}</span>
+            <span className="font-medium text-left">₪{calculations.eqBonus.toLocaleString()}</span>
           </div>
           {calculations.deductionAmount > 0 && (
             <div className="flex items-center justify-between text-sm mr-4">
@@ -160,10 +160,10 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
               <span className="font-medium text-destructive">-₪{calculations.deductionAmount.toLocaleString()}</span>
             </div>
           )}
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground flex-shrink-0" style={{ width: '140px' }}>סך הכל בונוס CFD</span>
-            <span className="w-12 text-center font-medium flex-shrink-0">{calculations.cfdCount}</span>
-            <span className="font-medium flex-shrink-0">₪{calculations.cfdBonus.toLocaleString()}</span>
+          <div className="grid items-center" style={{ gridTemplateColumns: '1fr 3rem auto' }}>
+            <span className="text-muted-foreground">סך הכל בונוס CFD</span>
+            <span className="text-center font-medium">{calculations.cfdCount}</span>
+            <span className="font-medium text-left">₪{calculations.cfdBonus.toLocaleString()}</span>
           </div>
         </div>
 
