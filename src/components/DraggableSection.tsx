@@ -22,16 +22,22 @@ const DraggableSection = ({ id, children }: DraggableSectionProps) => {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 50 : 1,
   };
 
   return (
-    <div ref={setNodeRef} style={style} className="relative group">
+    <div 
+      ref={setNodeRef} 
+      style={style} 
+      className="relative group"
+    >
       <div
         {...attributes}
         {...listeners}
-        className="absolute -right-2 top-1/2 -translate-y-1/2 z-10 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity bg-muted/80 backdrop-blur-sm rounded-lg p-1.5 shadow-sm border"
+        className="absolute -right-3 top-4 z-20 cursor-grab active:cursor-grabbing bg-primary/10 hover:bg-primary/20 rounded-lg p-2 shadow-md border border-primary/20 transition-all hover:scale-110"
+        title="גרור לשינוי סדר"
       >
-        <GripVertical className="h-5 w-5 text-muted-foreground" />
+        <GripVertical className="h-5 w-5 text-primary" />
       </div>
       {children}
     </div>
