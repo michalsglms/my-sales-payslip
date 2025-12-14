@@ -347,17 +347,15 @@ const Index = () => {
           </div>
           <div className="flex gap-2">
             {isAdmin && (
-              <Button 
-                variant="outline" 
-                className="hover:shadow-card transition-all"
-                onClick={() => {
-                  console.log("Admin button clicked, navigating to /admin");
-                  navigate("/admin");
-                }}
-              >
-                <Settings className="ml-2 h-4 w-4" />
-                פאנל ניהול
-              </Button>
+              <Link to="/admin">
+                <Button 
+                  variant="outline" 
+                  className="hover:shadow-card transition-all"
+                >
+                  <Settings className="ml-2 h-4 w-4" />
+                  פאנל ניהול
+                </Button>
+              </Link>
             )}
             <Button variant="outline" onClick={signOut} className="hover:shadow-card transition-all">
               <LogOut className="ml-2 h-4 w-4" />
