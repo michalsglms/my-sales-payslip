@@ -90,7 +90,9 @@ const Admin = () => {
   }, [user, loading, navigate]);
 
   useEffect(() => {
+    console.log("Admin: checking access", { roleLoading, isAdmin, userId: user?.id });
     if (!roleLoading && !isAdmin && user) {
+      console.log("Admin: redirecting to home - not admin");
       navigate("/");
     }
   }, [isAdmin, roleLoading, user, navigate]);
