@@ -29,12 +29,12 @@ const DraggableSection = ({ id, children }: DraggableSectionProps) => {
     <div 
       ref={setNodeRef} 
       style={style} 
-      className="relative group"
+      className="relative group cursor-grab active:cursor-grabbing"
+      {...attributes}
+      {...listeners}
     >
       <div
-        {...attributes}
-        {...listeners}
-        className="absolute -right-3 top-4 z-20 cursor-grab active:cursor-grabbing bg-primary/10 hover:bg-primary/20 rounded-lg p-2 shadow-md border border-primary/20 transition-all hover:scale-110"
+        className="absolute -right-3 top-4 z-20 bg-primary/10 rounded-lg p-2 shadow-md border border-primary/20 pointer-events-none"
         title="גרור לשינוי סדר"
       >
         <GripVertical className="h-5 w-5 text-primary" />
