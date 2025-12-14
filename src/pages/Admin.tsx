@@ -21,16 +21,40 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { ArrowRight, LogOut } from "lucide-react";
-import ImportKpisFromExcel from "@/components/ImportKpisFromExcel";
+import { ArrowRight, LogOut, TrendingUp, Users, DollarSign } from "lucide-react";
+
+interface Profile {
+  id: string;
+  full_name: string;
+  base_salary: number;
+}
+
+interface Deal {
+  id: string;
+  sales_rep_id: string;
+  initial_deposit: number;
+  client_type: string;
+  traffic_source: string;
+  created_at: string;
+}
+
+interface SalesRepSummary {
+  id: string;
+  name: string;
+  totalDeals: number;
+  totalDeposits: number;
+  cfdDeals: number;
+  eqDeals: number;
+}
 
 const Admin = () => {
   const { user, loading, signOut } = useAuth();
   const { isAdmin, isLoading: roleLoading } = useUserRole(user?.id);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [kpisData, setKpisData] = useState<any[]>([]);
-  const [profiles, setProfiles] = useState<any[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [deals, setDeals] = useState<Deal[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1;
@@ -39,7 +63,6 @@ const Admin = () => {
   const [selectedMonthYear, setSelectedMonthYear] = useState(`${currentYear}-${currentMonth}`);
   const [selectedYear, selectedMonth] = selectedMonthYear.split('-').map(Number);
 
-  // Generate list of available months (last 12 months)
   const availableMonths = useMemo(() => {
     const months = [];
     for (let i = 0; i < 12; i++) {
@@ -74,57 +97,66 @@ const Admin = () => {
 
   useEffect(() => {
     if (user && isAdmin) {
-      fetchProfiles();
-      fetchAllKpis();
+      fetchData();
     }
   }, [user, isAdmin, selectedYear, selectedMonth]);
 
-  const fetchProfiles = async () => {
-    const { data, error } = await supabase
+  const fetchData = async () => {
+    setIsLoadingData(true);
+    
+    // Fetch profiles
+    const { data: profilesData, error: profilesError } = await supabase
       .from("profiles")
-      .select("*");
+      .select("id, full_name, base_salary");
 
-    if (error) {
-      console.error("Admin: error loading profiles", error);
-      toast({ title: "שגיאה בטעינת פרופילים", description: error.message, variant: "destructive" });
-      setProfiles([]);
-      return;
+    if (profilesError) {
+      console.error("Admin: error loading profiles", profilesError);
+      toast({ title: "שגיאה בטעינת פרופילים", description: profilesError.message, variant: "destructive" });
+    } else {
+      setProfiles(profilesData ?? []);
     }
 
-    console.log("Admin: loaded profiles", data?.length ?? 0);
-    setProfiles(data ?? []);
-  };
-  const fetchAllKpis = async () => {
-    const { data, error } = await supabase
-      .from("monthly_kpis")
-      .select("*")
-      .eq("month", selectedMonth)
-      .eq("year", selectedYear);
+    // Fetch deals for selected month
+    const startDate = new Date(selectedYear, selectedMonth - 1, 1);
+    const endDate = new Date(selectedYear, selectedMonth, 0, 23, 59, 59);
+    
+    const { data: dealsData, error: dealsError } = await supabase
+      .from("deals")
+      .select("id, sales_rep_id, initial_deposit, client_type, traffic_source, created_at")
+      .gte("created_at", startDate.toISOString())
+      .lte("created_at", endDate.toISOString());
 
-    if (error) {
-      console.error("Admin: error loading KPIs", error);
-      toast({ title: "שגיאה בטעינת KPIs", description: error.message, variant: "destructive" });
-      setKpisData([]);
-      return;
+    if (dealsError) {
+      console.error("Admin: error loading deals", dealsError);
+      toast({ title: "שגיאה בטעינת עסקאות", description: dealsError.message, variant: "destructive" });
+    } else {
+      setDeals(dealsData ?? []);
     }
 
-    console.log("Admin: loaded KPIs", data?.length ?? 0, { selectedMonth, selectedYear });
-    setKpisData(data ?? []);
-  };
-  const getProfileName = (salesRepId: string) => {
-    const profile = profiles.find(p => p.id === salesRepId);
-    return profile ? profile.full_name : "לא ידוע";
+    setIsLoadingData(false);
   };
 
-  const calculateKpisBonus = (kpi: any) => {
-    let bonus = 0;
-    if (kpi.avg_call_time_minutes) bonus += 600;
-    if (kpi.avg_calls_count) bonus += 600;
-    if (kpi.ppc_conversion_rate) bonus += 600;
-    if (kpi.aff_conversion_rate) bonus += 600;
-    if (kpi.work_excellence) bonus += Math.round(1600 * (kpi.work_excellence / 100));
-    return bonus;
-  };
+  const salesRepSummaries = useMemo((): SalesRepSummary[] => {
+    return profiles.map(profile => {
+      const repDeals = deals.filter(d => d.sales_rep_id === profile.id);
+      return {
+        id: profile.id,
+        name: profile.full_name,
+        totalDeals: repDeals.length,
+        totalDeposits: repDeals.reduce((sum, d) => sum + Number(d.initial_deposit), 0),
+        cfdDeals: repDeals.filter(d => d.client_type === "CFD").length,
+        eqDeals: repDeals.filter(d => d.client_type === "EQ").length,
+      };
+    }).sort((a, b) => b.totalDeposits - a.totalDeposits);
+  }, [profiles, deals]);
+
+  const totals = useMemo(() => {
+    return {
+      totalDeals: salesRepSummaries.reduce((sum, s) => sum + s.totalDeals, 0),
+      totalDeposits: salesRepSummaries.reduce((sum, s) => sum + s.totalDeposits, 0),
+      totalReps: salesRepSummaries.filter(s => s.totalDeals > 0).length,
+    };
+  }, [salesRepSummaries]);
 
   if (loading || roleLoading) {
     return (
@@ -144,9 +176,9 @@ const Admin = () => {
         <div className="container mx-auto px-4 py-5 flex items-center justify-between">
           <div className="space-y-1">
             <h1 className="text-3xl font-bold tracking-tight">
-              <span className="text-gradient-success">פאנל ניהול - KPIs</span>
+              <span className="text-gradient-success">פאנל ניהול</span>
             </h1>
-            <p className="text-sm font-medium text-muted-foreground">צפייה במדדי ביצועים של כל הנציגים</p>
+            <p className="text-sm font-medium text-muted-foreground">סיכום מכירות לפי נציג</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => navigate("/")} className="hover:shadow-card transition-all">
@@ -162,6 +194,7 @@ const Admin = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-8">
+        {/* Month Selector */}
         <div className="flex justify-between items-center bg-card p-4 rounded-xl shadow-card border animate-fade-in">
           <Select value={selectedMonthYear} onValueChange={setSelectedMonthYear}>
             <SelectTrigger className="w-[200px] font-semibold">
@@ -175,22 +208,60 @@ const Admin = () => {
               ))}
             </SelectContent>
           </Select>
-          <ImportKpisFromExcel 
-            month={selectedMonth} 
-            year={selectedYear} 
-            onImportComplete={fetchAllKpis} 
-          />
         </div>
 
-        <Card className="shadow-card border">
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in">
+          <Card className="shadow-card border bg-gradient-to-br from-primary/10 to-primary/5">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">סה״כ עסקאות</p>
+                  <p className="text-3xl font-bold text-primary">{totals.totalDeals}</p>
+                </div>
+                <TrendingUp className="h-10 w-10 text-primary/40" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="shadow-card border bg-gradient-to-br from-green-500/10 to-green-500/5">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">סה״כ הפקדות</p>
+                  <p className="text-3xl font-bold text-green-600">₪{totals.totalDeposits.toLocaleString()}</p>
+                </div>
+                <DollarSign className="h-10 w-10 text-green-500/40" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="shadow-card border bg-gradient-to-br from-blue-500/10 to-blue-500/5">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">נציגים פעילים</p>
+                  <p className="text-3xl font-bold text-blue-600">{totals.totalReps}</p>
+                </div>
+                <Users className="h-10 w-10 text-blue-500/40" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Sales Rep Table */}
+        <Card className="shadow-card border animate-fade-in">
           <CardHeader>
-            <CardTitle className="text-2xl">מדדי KPIs - {availableMonths.find(m => m.value === selectedMonthYear)?.label}</CardTitle>
+            <CardTitle className="text-2xl">מכירות לפי נציג - {availableMonths.find(m => m.value === selectedMonthYear)?.label}</CardTitle>
           </CardHeader>
           <CardContent>
-            {kpisData.length === 0 ? (
+            {isLoadingData ? (
               <div className="text-center py-8 text-muted-foreground">
-                <p>אין מדדי KPIs לחודש זה</p>
-                <p className="text-sm mt-2">ניתן לייבא נתונים באמצעות הכפתור "ייבוא KPIs"</p>
+                <p>טוען נתונים...</p>
+              </div>
+            ) : salesRepSummaries.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <p>אין נציגים במערכת</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -198,57 +269,21 @@ const Admin = () => {
                   <TableHeader>
                     <TableRow>
                       <TableHead className="text-right font-bold">שם הנציג</TableHead>
-                      <TableHead className="text-center font-bold">זמן שיחה ממוצע</TableHead>
-                      <TableHead className="text-center font-bold">מספר שיחות ממוצע</TableHead>
-                      <TableHead className="text-center font-bold">שיעור המרה PPC</TableHead>
-                      <TableHead className="text-center font-bold">שיעור המרה AFF</TableHead>
-                      <TableHead className="text-center font-bold">מצוינות בעבודה</TableHead>
-                      <TableHead className="text-center font-bold">סה"כ בונוס</TableHead>
+                      <TableHead className="text-center font-bold">מספר עסקאות</TableHead>
+                      <TableHead className="text-center font-bold">עסקאות CFD</TableHead>
+                      <TableHead className="text-center font-bold">עסקאות EQ</TableHead>
+                      <TableHead className="text-center font-bold">סה״כ הפקדות</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {kpisData.map((kpi) => (
-                      <TableRow key={kpi.id}>
-                        <TableCell className="font-medium">{getProfileName(kpi.sales_rep_id)}</TableCell>
-                        <TableCell className="text-center">
-                          {kpi.avg_call_time_minutes ? (
-                            <span className="text-green-600 font-semibold">✓ (600₪)</span>
-                          ) : (
-                            <span className="text-red-600">✗</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {kpi.avg_calls_count ? (
-                            <span className="text-green-600 font-semibold">✓ (600₪)</span>
-                          ) : (
-                            <span className="text-red-600">✗</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {kpi.ppc_conversion_rate ? (
-                            <span className="text-green-600 font-semibold">✓ (600₪)</span>
-                          ) : (
-                            <span className="text-red-600">✗</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {kpi.aff_conversion_rate ? (
-                            <span className="text-green-600 font-semibold">✓ (600₪)</span>
-                          ) : (
-                            <span className="text-red-600">✗</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {kpi.work_excellence ? (
-                            <span className="text-blue-600 font-semibold">
-                              {kpi.work_excellence}% ({Math.round(1600 * (kpi.work_excellence / 100))}₪)
-                            </span>
-                          ) : (
-                            <span className="text-red-600">0%</span>
-                          )}
-                        </TableCell>
+                    {salesRepSummaries.map((rep) => (
+                      <TableRow key={rep.id} className={rep.totalDeals === 0 ? "opacity-50" : ""}>
+                        <TableCell className="font-medium">{rep.name}</TableCell>
+                        <TableCell className="text-center font-semibold">{rep.totalDeals}</TableCell>
+                        <TableCell className="text-center">{rep.cfdDeals}</TableCell>
+                        <TableCell className="text-center">{rep.eqDeals}</TableCell>
                         <TableCell className="text-center font-bold text-lg text-green-600">
-                          {calculateKpisBonus(kpi)}₪
+                          ₪{rep.totalDeposits.toLocaleString()}
                         </TableCell>
                       </TableRow>
                     ))}
