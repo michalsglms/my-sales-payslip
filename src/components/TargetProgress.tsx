@@ -705,7 +705,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                   <div className="p-3 bg-muted/50 rounded-lg">
                     <div className="flex justify-between mb-2">
                       <span className="text-sm">יעד כללי (EQ + CFD)</span>
-                      <span className="text-sm font-bold" dir="ltr">
+                      <span className="text-sm font-bold min-w-[60px] text-left" dir="ltr">
                         {calculations.monthly.totalCount} / {calculations.monthly.target.general_target_amount}
                       </span>
                     </div>
@@ -723,7 +723,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                   <div className="p-3 bg-muted/50 rounded-lg">
                     <div className="flex justify-between mb-2">
                       <span className="text-sm">יעד CFD</span>
-                      <span className="text-sm font-bold" dir="ltr">
+                      <span className="text-sm font-bold min-w-[60px] text-left" dir="ltr">
                         {calculations.monthly.cfdCount} / {calculations.monthly.target.cfd_target_amount}
                       </span>
                     </div>
@@ -824,7 +824,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                   <div className="p-3 bg-muted/50 rounded-lg">
                     <div className="flex justify-between mb-2">
                       <span className="text-sm">יעד כללי (EQ + CFD)</span>
-                      <span className="text-sm font-bold" dir="ltr">
+                      <span className="text-sm font-bold min-w-[60px] text-left" dir="ltr">
                         {calculations.quarterly.totalCount} / {calculations.quarterly.target.general_target_amount}
                       </span>
                     </div>
@@ -842,7 +842,7 @@ const TargetProgress = ({ deals, monthlyTargets, quarterlyTargets, onTargetUpdat
                   <div className="p-3 bg-muted/50 rounded-lg">
                     <div className="flex justify-between mb-2">
                       <span className="text-sm">יעד CFD</span>
-                      <span className="text-sm font-bold" dir="ltr">
+                      <span className="text-sm font-bold min-w-[60px] text-left" dir="ltr">
                         {calculations.quarterly.cfdCount} / {calculations.quarterly.target.cfd_target_amount}
                       </span>
                     </div>
