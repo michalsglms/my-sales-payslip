@@ -14,6 +14,7 @@ export const useUserRole = (userId: string | undefined) => {
       }
 
       try {
+        console.log("useUserRole: checking role for userId", userId);
         const { data, error } = await supabase
           .from("user_roles")
           .select("role")
@@ -21,6 +22,7 @@ export const useUserRole = (userId: string | undefined) => {
           .eq("role", "admin")
           .maybeSingle();
 
+        console.log("useUserRole: result", { data, error, isAdmin: !!data });
         if (error) throw error;
         setIsAdmin(!!data);
       } catch (error) {
