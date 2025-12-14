@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -20,7 +20,23 @@ import ExportToExcel from "@/components/ExportToExcel";
 import ImportFromExcel from "@/components/ImportFromExcel";
 import ImportKpisFromExcel from "@/components/ImportKpisFromExcel";
 import DeleteAllDeals from "@/components/DeleteAllDeals";
+import DraggableSection from "@/components/DraggableSection";
 import { LogOut, Settings } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 const Index = () => {
   const { user, loading, signOut } = useAuth();
@@ -33,6 +49,39 @@ const Index = () => {
   const [quarterlyTargets, setQuarterlyTargets] = useState<any[]>([]);
   const [kpisBonus, setKpisBonus] = useState(0);
   const [kpisData, setKpisData] = useState<any>(null);
+  
+  // Section order state with localStorage persistence
+  const defaultSectionOrder = ["targetProgress", "salaryCalculator", "dealsList"];
+  const [sectionOrder, setSectionOrder] = useState<string[]>(() => {
+    const saved = localStorage.getItem("dashboard-section-order");
+    return saved ? JSON.parse(saved) : defaultSectionOrder;
+  });
+
+  // DnD sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setSectionOrder((items) => {
+        const oldIndex = items.indexOf(active.id as string);
+        const newIndex = items.indexOf(over.id as string);
+        const newOrder = arrayMove(items, oldIndex, newIndex);
+        localStorage.setItem("dashboard-section-order", JSON.stringify(newOrder));
+        return newOrder;
+      });
+    }
+  }, []);
 
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1;
@@ -341,41 +390,70 @@ const Index = () => {
           </div>
         </div>
 
-        <TargetProgress
-          deals={deals}
-          monthlyTargets={monthlyTargets}
-          quarterlyTargets={quarterlyTargets}
-          onTargetUpdated={fetchTargets}
-          selectedYear={selectedYear}
-          selectedMonth={selectedMonth}
-          userId={user.id}
-        />
-
-        <SalaryCalculator
-          baseSalary={parseFloat(profile.base_salary)}
-          deductionAmount={parseFloat(profile.deduction_amount || "0")}
-          deals={deals}
-          monthlyGeneralBonus={monthlyGeneralBonus}
-          monthlyCfdBonus={monthlyCfdBonus}
-          quarterlyGeneralBonus={quarterlyGeneralBonus}
-          quarterlyCfdBonus={quarterlyCfdBonus}
-          userId={user.id}
-          onSalaryUpdated={fetchProfile}
-          selectedMonth={selectedMonth}
-          selectedYear={selectedYear}
-          kpisBonus={kpisBonus}
-          kpisData={kpisData}
-        />
-
-        {dealsLoading ? (
-          <Card>
-            <CardContent className="py-8 text-center">
-              <p>טוען עסקאות...</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <DealsList deals={deals} onDealsChange={fetchDeals} userId={user.id} />
-        )}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={sectionOrder} strategy={verticalListSortingStrategy}>
+            <div className="space-y-8">
+              {sectionOrder.map((sectionId) => {
+                if (sectionId === "targetProgress") {
+                  return (
+                    <DraggableSection key={sectionId} id={sectionId}>
+                      <TargetProgress
+                        deals={deals}
+                        monthlyTargets={monthlyTargets}
+                        quarterlyTargets={quarterlyTargets}
+                        onTargetUpdated={fetchTargets}
+                        selectedYear={selectedYear}
+                        selectedMonth={selectedMonth}
+                        userId={user.id}
+                      />
+                    </DraggableSection>
+                  );
+                }
+                if (sectionId === "salaryCalculator") {
+                  return (
+                    <DraggableSection key={sectionId} id={sectionId}>
+                      <SalaryCalculator
+                        baseSalary={parseFloat(profile.base_salary)}
+                        deductionAmount={parseFloat(profile.deduction_amount || "0")}
+                        deals={deals}
+                        monthlyGeneralBonus={monthlyGeneralBonus}
+                        monthlyCfdBonus={monthlyCfdBonus}
+                        quarterlyGeneralBonus={quarterlyGeneralBonus}
+                        quarterlyCfdBonus={quarterlyCfdBonus}
+                        userId={user.id}
+                        onSalaryUpdated={fetchProfile}
+                        selectedMonth={selectedMonth}
+                        selectedYear={selectedYear}
+                        kpisBonus={kpisBonus}
+                        kpisData={kpisData}
+                      />
+                    </DraggableSection>
+                  );
+                }
+                if (sectionId === "dealsList") {
+                  return (
+                    <DraggableSection key={sectionId} id={sectionId}>
+                      {dealsLoading ? (
+                        <Card>
+                          <CardContent className="py-8 text-center">
+                            <p>טוען עסקאות...</p>
+                          </CardContent>
+                        </Card>
+                      ) : (
+                        <DealsList deals={deals} onDealsChange={fetchDeals} userId={user.id} />
+                      )}
+                    </DraggableSection>
+                  );
+                }
+                return null;
+              })}
+            </div>
+          </SortableContext>
+        </DndContext>
       </main>
     </div>
   );
