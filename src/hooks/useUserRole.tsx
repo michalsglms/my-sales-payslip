@@ -7,9 +7,10 @@ export const useUserRole = (userId: string | undefined) => {
 
   useEffect(() => {
     const checkRole = async () => {
+      // Keep loading true if userId is not yet available
       if (!userId) {
         setIsAdmin(false);
-        setIsLoading(false);
+        // Don't set isLoading to false - we're still waiting for userId
         return;
       }
 
