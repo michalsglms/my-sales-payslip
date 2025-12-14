@@ -149,9 +149,9 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
         </div>
 
         <div className="border-t pt-4 space-y-2">
-          <div className="grid items-center" style={{ gridTemplateColumns: '1fr 3rem auto' }}>
+          <div className="grid items-center" style={{ gridTemplateColumns: '1fr 3rem 1fr' }}>
             <span className="text-muted-foreground">סך הכל בונוס EQ</span>
-            <span className="text-center font-medium">{calculations.eqCount}</span>
+            <span className="text-center font-medium justify-self-center">{calculations.eqCount}</span>
             <span className="font-medium text-left">₪{calculations.eqBonus.toLocaleString()}</span>
           </div>
           {calculations.deductionAmount > 0 && (
@@ -160,9 +160,9 @@ const SalaryCalculator = ({ baseSalary, deductionAmount, deals, monthlyGeneralBo
               <span className="font-medium text-destructive">-₪{calculations.deductionAmount.toLocaleString()}</span>
             </div>
           )}
-          <div className="grid items-center" style={{ gridTemplateColumns: '1fr 3rem auto' }}>
+          <div className="grid items-center" style={{ gridTemplateColumns: '1fr 3rem 1fr' }}>
             <span className="text-muted-foreground">סך הכל בונוס CFD</span>
-            <span className="text-center font-medium">{calculations.cfdCount}</span>
+            <span className="text-center font-medium justify-self-center">{calculations.cfdCount}</span>
             <span className="font-medium text-left">₪{calculations.cfdBonus.toLocaleString()}</span>
           </div>
         </div>
