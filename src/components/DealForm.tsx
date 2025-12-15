@@ -190,15 +190,13 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
                   <FormLabel>שם הלקוח</FormLabel>
                   <FormControl>
                     <Input 
+                      {...field}
                       placeholder="שם פרטי ושם משפחה" 
                       autoComplete="off"
                       onKeyDown={(e) => {
                         // Prevent dialog from capturing space key
-                        if (e.key === ' ') {
-                          e.stopPropagation();
-                        }
+                        e.stopPropagation();
                       }}
-                      {...field} 
                     />
                   </FormControl>
                   <FormMessage />
