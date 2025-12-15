@@ -192,6 +192,12 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
                     <Input 
                       placeholder="שם פרטי ושם משפחה" 
                       autoComplete="off"
+                      onKeyDown={(e) => {
+                        // Prevent dialog from capturing space key
+                        if (e.key === ' ') {
+                          e.stopPropagation();
+                        }
+                      }}
                       {...field} 
                     />
                   </FormControl>
