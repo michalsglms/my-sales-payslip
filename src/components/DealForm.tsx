@@ -193,17 +193,6 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
                       {...field}
                       placeholder="שם פרטי ושם משפחה" 
                       autoComplete="off"
-                      onKeyDown={(e) => {
-                        console.log("Input onKeyDown:", e.key, e.code);
-                        e.stopPropagation();
-                      }}
-                      onKeyUp={(e) => {
-                        console.log("Input onKeyUp:", e.key, e.code);
-                        e.stopPropagation();
-                      }}
-                      onKeyPress={(e) => {
-                        console.log("Input onKeyPress:", e.key, e.code);
-                      }}
                     />
                   </FormControl>
                   <FormMessage />
