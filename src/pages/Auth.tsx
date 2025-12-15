@@ -191,10 +191,12 @@ const Auth = () => {
                   <Input
                     id="fullName"
                     type="text"
-                    placeholder="שם מלא"
+                    placeholder="שם פרטי ושם משפחה"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     required={!isLogin}
+                    autoComplete="name"
+                    inputMode="text"
                   />
                 </div>
               )}
