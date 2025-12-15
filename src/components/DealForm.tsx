@@ -189,7 +189,11 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
                 <FormItem>
                   <FormLabel>שם הלקוח</FormLabel>
                   <FormControl>
-                    <Input placeholder="הזן שם לקוח" {...field} />
+                    <Input 
+                      placeholder="שם פרטי ושם משפחה" 
+                      autoComplete="off"
+                      {...field} 
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
