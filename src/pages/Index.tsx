@@ -447,7 +447,7 @@ const Index = () => {
                           </CardContent>
                         </Card>
                       ) : (
-                        <DealsList deals={deals} onDealsChange={fetchDeals} userId={user.id} />
+                        <DealsList deals={deals} onDealsChange={fetchDeals} userId={user.id} selectedMonth={selectedMonth} selectedYear={selectedYear} />
                       )}
                     </DraggableSection>
                   );

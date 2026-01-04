@@ -64,9 +64,11 @@ interface DealsListProps {
   deals: Deal[];
   onDealsChange: () => void;
   userId: string;
+  selectedMonth?: number;
+  selectedYear?: number;
 }
 
-const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
+const DealsList = ({ deals, onDealsChange, userId, selectedMonth, selectedYear }: DealsListProps) => {
   const [editingDealId, setEditingDealId] = useState<string | null>(null);
   const [deletingDealId, setDeletingDealId] = useState<string | null>(null);
   const [sortByName, setSortByName] = useState(false);
@@ -80,6 +82,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
     initial_deposit: "",
     client_link: "",
     campaign: "",
+    created_at: null as Date | null,
   });
   const [editDeal, setEditDeal] = useState<{
     client_name: string;
@@ -106,6 +109,20 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
         return;
       }
 
+      // Use the user-selected date if provided, otherwise use selected month or current time
+      let createdAt: string | undefined;
+      if (newDeal.created_at) {
+        createdAt = newDeal.created_at.toISOString();
+      } else if (selectedMonth && selectedYear) {
+        const now = new Date();
+        const currentMonth = now.getMonth() + 1;
+        const currentYear = now.getFullYear();
+        if (selectedMonth !== currentMonth || selectedYear !== currentYear) {
+          // Set to the 15th of the selected month at noon
+          createdAt = new Date(selectedYear, selectedMonth - 1, 15, 12, 0, 0).toISOString();
+        }
+      }
+
       const { error } = await supabase.from("deals").insert({
         sales_rep_id: userId,
         client_name: newDeal.client_name,
@@ -117,6 +134,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
         client_link: newDeal.client_link || null,
         completed_within_4_days: false,
         campaign: newDeal.campaign || null,
+        ...(createdAt && { created_at: createdAt }),
       });
 
       if (error) throw error;
@@ -135,6 +153,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
         initial_deposit: "",
         client_link: "",
         campaign: "",
+        created_at: null,
       });
       setIsAddingDeal(false);
       onDealsChange();
@@ -223,6 +242,7 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
       initial_deposit: "",
       client_link: "",
       campaign: "",
+      created_at: null,
     });
     setIsAddingDeal(false);
   };
@@ -362,7 +382,51 @@ const DealsList = ({ deals, onDealsChange, userId }: DealsListProps) => {
           {isAddingDeal && (
             <TableRow className="bg-primary/5">
               <TableCell className="p-2">
-                <span className="text-sm text-muted-foreground">עכשיו</span>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "h-9 w-full justify-start text-right font-normal text-xs",
+                        !newDeal.created_at && "text-muted-foreground"
+                      )}
+                    >
+                      <Calendar className="ml-2 h-4 w-4" />
+                      {newDeal.created_at ? (
+                        format(newDeal.created_at, "dd/MM/yyyy", { locale: he })
+                      ) : (
+                        <span>עכשיו</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <div className="p-3 space-y-3 pointer-events-auto">
+                      <CalendarComponent
+                        mode="single"
+                        selected={newDeal.created_at || undefined}
+                        onSelect={(date) => {
+                          if (date) {
+                            const newDate = new Date(date);
+                            newDate.setHours(12, 0, 0, 0);
+                            setNewDeal({ ...newDeal, created_at: newDate });
+                          }
+                        }}
+                        initialFocus
+                        className="rounded-md border"
+                      />
+                      {newDeal.created_at && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => setNewDeal({ ...newDeal, created_at: null })}
+                        >
+                          נקה תאריך (עכשיו)
+                        </Button>
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </TableCell>
               <TableCell className="p-2">
                 <Input
