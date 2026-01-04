@@ -12,9 +12,56 @@ Deno.serve(async (req) => {
   }
 
   try {
-    console.log('Starting data sync to company database...');
+    console.log('Sync request received');
 
-    // Initialize Lovable Cloud (source) client
+    // Require authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.log('No authorization header provided');
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Create authenticated client to verify user
+    const authClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    // Verify user is authenticated
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
+    if (authError || !user) {
+      console.log('Authentication failed:', authError?.message);
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    console.log('User authenticated:', user.id);
+
+    // Verify admin role
+    const { data: roles, error: roleError } = await authClient
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .single();
+
+    if (roleError || !roles) {
+      console.log('Admin check failed:', roleError?.message || 'No admin role found');
+      return new Response(JSON.stringify({ error: 'Forbidden - Admin only' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    console.log('Admin verified, starting data sync to company database...');
+
+    // Initialize Lovable Cloud (source) client with service role for data access
     const lovableClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -120,6 +167,7 @@ Deno.serve(async (req) => {
 
     const summary = {
       timestamp: new Date().toISOString(),
+      triggeredBy: user.id,
       totalTables: tablesToSync.length,
       results: results,
       totalRecordsSynced: results.reduce((sum, r) => sum + (r.recordsSynced || 0), 0)
@@ -134,9 +182,9 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('Error in sync-to-company-db function:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    // Return generic error to client, details are in logs
     return new Response(
-      JSON.stringify({ error: errorMessage }), 
+      JSON.stringify({ error: 'An error occurred during sync' }), 
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
