@@ -298,32 +298,27 @@ const DealsList = ({ deals, onDealsChange, userId, selectedMonth, selectedYear }
   };
 
   const calculateBonus = (deal: Deal) => {
-    // No commission for EQ deposits under $2,950 (CFD has no minimum)
-    if (deal.client_type === "EQ" && deal.initial_deposit < 2950) {
+    // No commission for EQ deposits under $3,000 (CFD has no minimum)
+    if (deal.client_type === "EQ" && deal.initial_deposit < 3000) {
       return 0;
     }
 
     let bonus = 0;
-    
-    // Traffic source bonus
+
+    // Source-based bonus (includes 60₪ social benefits portion):
+    // RFF / PPC = 600 ₪ (540 + 60)
+    // ORG / AFF = 200 ₪ (140 + 60)
     if (deal.traffic_source === "RFF" || deal.traffic_source === "PPC") {
-      bonus += 700;
-    } else if (deal.traffic_source === "ORG") {
-      bonus += 400;
-    } else if (deal.traffic_source === "AFF") {
-      // For AFF: EQ clients with 10K+ get 900, all others get 400
-      if (deal.client_type === "EQ" && deal.initial_deposit >= 10000) {
-        bonus += 900;
-      } else {
-        bonus += 400;
-      }
+      bonus += 600;
+    } else if (deal.traffic_source === "ORG" || deal.traffic_source === "AFF") {
+      bonus += 200;
     }
-    
-    // Additional 500 ILS bonus ONLY for EQ clients with $10,000+ (not CFD, not AFF)
-    if (deal.client_type === "EQ" && deal.initial_deposit >= 10000 && deal.traffic_source !== "AFF") {
-      bonus += 500;
+
+    // Additional 200 ILS bonus for EQ clients with $10,000+ (any source)
+    if (deal.client_type === "EQ" && deal.initial_deposit >= 10000) {
+      bonus += 200;
     }
-    
+
     return bonus;
   };
 
