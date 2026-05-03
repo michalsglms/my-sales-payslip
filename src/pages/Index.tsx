@@ -268,46 +268,42 @@ const Index = () => {
       ? (quarterlyCFDCount / quarterlyTarget.cfd_target_amount) * 100
       : 0;
 
-    // Calculate monthly bonuses - separated by general and CFD
+    // Calculate monthly bonuses per new model (5/2026):
+    // General: 100₪ × new clients if 100% of target, 50₪ × new clients if 90-99%
+    // CFD: 2,000₪ if 100%, 1,000₪ if 90-99%
     let calculatedMonthlyGeneralBonus = 0;
     let calculatedMonthlyCfdBonus = 0;
     if (monthlyTarget) {
-      // General target bonus
       if (monthlyPercentage >= 100) {
-        calculatedMonthlyGeneralBonus += 2000;
+        calculatedMonthlyGeneralBonus = 100 * monthlyTotalCount;
       } else if (monthlyPercentage >= 90) {
-        calculatedMonthlyGeneralBonus += 1000;
+        calculatedMonthlyGeneralBonus = 50 * monthlyTotalCount;
       }
 
-      // CFD specific bonus
       if (monthlyCFDPercentage >= 100) {
-        calculatedMonthlyCfdBonus += 1000;
+        calculatedMonthlyCfdBonus = 2000;
       } else if (monthlyCFDPercentage >= 90) {
-        calculatedMonthlyCfdBonus += 500;
-      }
-
-      // 70% bonus (valid until 30.9.25) - goes to general
-      const now = new Date();
-      const validUntil = new Date(2025, 8, 30);
-      if (now <= validUntil && monthlyPercentage >= 70) {
-        calculatedMonthlyGeneralBonus += 2000;
+        calculatedMonthlyCfdBonus = 1000;
       }
     }
 
-    // Calculate quarterly bonuses - separated by general and CFD (starts from July 2025)
+    // Quarterly bonus: only valid through Q2 2026 (ends 30.6.2026). Cancelled from Q3 2026 onwards.
     let calculatedQuarterlyGeneralBonus = 0;
     let calculatedQuarterlyCfdBonus = 0;
-    const now = new Date();
-    const quarterlyStartDate = new Date(2025, 6, 1);
-    if (quarterlyTarget && now >= quarterlyStartDate) {
-      // General target bonus
+    const quarterlyStartDate = new Date(2025, 6, 1); // July 2025
+    const quarterlyEndYear = 2026;
+    const quarterlyEndQuarter = 2; // Q2 2026 is last eligible quarter
+    const isQuarterlyEligible =
+      selectedYear < quarterlyEndYear ||
+      (selectedYear === quarterlyEndYear && selectedQuarter <= quarterlyEndQuarter);
+    const periodStart = new Date(selectedYear, (selectedQuarter - 1) * 3, 1);
+    if (quarterlyTarget && isQuarterlyEligible && periodStart >= quarterlyStartDate) {
       if (quarterlyPercentage >= 100) {
         calculatedQuarterlyGeneralBonus += 6000;
       } else if (quarterlyPercentage >= 90) {
         calculatedQuarterlyGeneralBonus += 3000;
       }
 
-      // CFD specific bonus
       if (quarterlyCFDPercentage >= 100) {
         calculatedQuarterlyCfdBonus += 3000;
       } else if (quarterlyCFDPercentage >= 90) {
