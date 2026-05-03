@@ -205,7 +205,7 @@ const DealForm = ({ userId, onDealAdded }: DealFormProps) => {
               name="client_phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>טלפון הלקוח</FormLabel>
+                  <FormLabel>טלפון הלקוח (אופציונלי)</FormLabel>
                   <FormControl>
                     <Input type="tel" placeholder="הזן מספר טלפון" {...field} />
                   </FormControl>
